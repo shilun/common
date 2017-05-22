@@ -52,10 +52,6 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
     }
 
     public static void main(String[] args) {
-        System.out.println(isMobileNO("13541370905"));
-        System.out.println(isMobileNO("14541370905"));
-        System.out.println(isMobileNO("15741370905"));
-        System.out.println(isMobileNO("17413709085"));
-        System.out.println(isMobileNO("18413709085"));
+        System.out.println(getUUID());
     }
 }

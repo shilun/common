@@ -65,15 +65,18 @@ public abstract class DefaultBaseDao<E extends AbstractBaseEntity> extends MyBat
     }
 
     public List<E> query(E query) {
+        query.setDelStatus(YesOrNoEnum.NO.getValue());
         return this.selectList(this.getNameSpace("query"), query);
     }
 
     public E findByOne(E entity) {
+        entity.setDelStatus(YesOrNoEnum.NO.getValue());
         List selectList = this.selectList(this.getNameSpace("query"), entity);
         return selectList != null && selectList.size() == 1 ? (E) (AbstractBaseEntity) selectList.get(0) : null;
     }
 
     public int queryCount(E entity) {
+        entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Integer select = (Integer) this.select(this.getNameSpace("queryCount"), entity);
         return select.intValue();
     }

@@ -6,7 +6,7 @@
 
     <groupId>com.60living</groupId>
     <artifactId>com.common</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <properties>
         <spring.version>4.2.5.RELEASE</spring.version>

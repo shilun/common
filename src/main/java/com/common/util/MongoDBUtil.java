@@ -18,12 +18,14 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 import com.mongodb.MongoClientOptions.Builder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.InitializingBean;
@@ -42,12 +44,32 @@ public class MongoDBUtil implements InitializingBean {
     private static String password;
     private static String dbName;
 
+    public enum OrderType implements IGlossary {
+        ASC("升序",1),
+        Desc("降序",-1);
+        OrderType(String name, Integer value) {
+            this.value = value;
+            this.name = name;
+        }
+
+        private Integer value;
+        private String name;
+
+        public Integer getValue() {
+            return value;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
     public MongoDBUtil() {
     }
 
     public void afterPropertiesSet() {
         boolean address = this.addressList != null && this.addressList.size() > 0;
-        if(address) {
+        if (address) {
             try {
                 this.initMongo();
             } catch (Exception var3) {
@@ -68,7 +90,7 @@ public class MongoDBUtil implements InitializingBean {
             e.threadsAllowedToBlockForConnectionMultiplier(50);
             MongoClientOptions options = e.build();
             ArrayList credentialsList = new ArrayList();
-            if(!StringUtils.isBlank(userName) && !StringUtils.isBlank(password)) {
+            if (!StringUtils.isBlank(userName) && !StringUtils.isBlank(password)) {
                 MongoCredential mc = MongoCredential.createCredential(userName, dbName, password.toCharArray());
                 credentialsList.add(mc);
                 client = new MongoClient(this.addressList, credentialsList, options);
@@ -193,7 +215,7 @@ public class MongoDBUtil implements InitializingBean {
         try {
             whereObj = mapToBson(where);
             setFieldObj = mapToBson(setField);
-            this.getCollection(_collsName).findAndModify(whereObj, (DBObject)null, (DBObject)null, false, setFieldObj, false, true);
+            this.getCollection(_collsName).findAndModify(whereObj, (DBObject) null, (DBObject) null, false, setFieldObj, false, true);
             return true;
         } catch (Exception var7) {
             logger.error("MongoDB更新数据错误 whereObj --> " + whereObj + " setFieldObj --> " + setFieldObj, var7);
@@ -205,11 +227,11 @@ public class MongoDBUtil implements InitializingBean {
         BasicDBObject whereObj = mapToBson(where);
         BasicDBObject result = null;
         Iterator iterator = this.getCollection(_collsName).find(whereObj).iterator();
-        if(iterator.hasNext()) {
-            result = (BasicDBObject)iterator.next();
+        if (iterator.hasNext()) {
+            result = (BasicDBObject) iterator.next();
         }
 
-        return (Map)(result != null?bsonTomap(result):result);
+        return (Map) (result != null ? bsonTomap(result) : result);
     }
 
     public List<Map<String, Object>> findList(String _collsName, Map<String, Object> where) {
@@ -217,11 +239,11 @@ public class MongoDBUtil implements InitializingBean {
         BasicDBObject whereObj = mapToBson(where);
         Iterator iterator = null;
         BasicDBObject next;
-        if(whereObj == null) {
+        if (whereObj == null) {
             iterator = this.getCollection(_collsName).find().iterator();
 
-            while(iterator.hasNext()) {
-                next = (BasicDBObject)iterator.next();
+            while (iterator.hasNext()) {
+                next = (BasicDBObject) iterator.next();
                 list.add(bsonTomap(next));
             }
 
@@ -229,8 +251,8 @@ public class MongoDBUtil implements InitializingBean {
         } else {
             iterator = this.getCollection(_collsName).find(whereObj).iterator();
 
-            while(iterator.hasNext()) {
-                next = (BasicDBObject)iterator.next();
+            while (iterator.hasNext()) {
+                next = (BasicDBObject) iterator.next();
                 list.add(bsonTomap(next));
             }
 
@@ -242,26 +264,26 @@ public class MongoDBUtil implements InitializingBean {
         ArrayList list = new ArrayList();
         BasicDBObject whereObj = mapToBson(where);
         Iterator iterator = null;
-        if(null == sortType) {
+        if (null == sortType) {
             sortType = Integer.valueOf(1);
         }
 
-        if(null != sortName && sortName.size() >= 0) {
+        if (null != sortName && sortName.size() >= 0) {
             HashMap sortMap = new HashMap();
             Iterator sortDB = sortName.iterator();
 
-            while(sortDB.hasNext()) {
-                String next = (String)sortDB.next();
+            while (sortDB.hasNext()) {
+                String next = (String) sortDB.next();
                 sortMap.put(next, sortType);
             }
 
             BasicDBObject sortDB1 = new BasicDBObject(sortMap);
             BasicDBObject next1;
-            if(whereObj == null) {
+            if (whereObj == null) {
                 iterator = this.getCollection(_collsName).find().sort(sortDB1).iterator();
 
-                while(iterator.hasNext()) {
-                    next1 = (BasicDBObject)iterator.next();
+                while (iterator.hasNext()) {
+                    next1 = (BasicDBObject) iterator.next();
                     list.add(bsonTomap(next1));
                 }
 
@@ -269,8 +291,8 @@ public class MongoDBUtil implements InitializingBean {
             } else {
                 iterator = this.getCollection(_collsName).find(whereObj).sort(sortDB1).iterator();
 
-                while(iterator.hasNext()) {
-                    next1 = (BasicDBObject)iterator.next();
+                while (iterator.hasNext()) {
+                    next1 = (BasicDBObject) iterator.next();
                     list.add(bsonTomap(next1));
                 }
 
@@ -287,24 +309,24 @@ public class MongoDBUtil implements InitializingBean {
         BasicDBObject whereObj = mapToBson(where);
         Iterator iterator = null;
         BasicDBObject next;
-        if(whereObj == null) {
+        if (whereObj == null) {
             iterator = this.getCollection(_collsName).find().limit(pageSize.intValue()).iterator();
 
             do {
-                if(!iterator.hasNext()) {
+                if (!iterator.hasNext()) {
                     return list;
                 }
 
-                next = (BasicDBObject)iterator.next();
+                next = (BasicDBObject) iterator.next();
                 list.add(bsonTomap(next));
-            } while(list.size() <= pageSize.intValue());
+            } while (list.size() <= pageSize.intValue());
 
             throw new ApplicationException("业务数据过大必需通过分页程序来实现查询");
         } else {
             iterator = this.getCollection(_collsName).find(whereObj).limit(pageSize.intValue()).iterator();
 
-            while(iterator.hasNext()) {
-                next = (BasicDBObject)iterator.next();
+            while (iterator.hasNext()) {
+                next = (BasicDBObject) iterator.next();
                 list.add(bsonTomap(next));
             }
 
@@ -319,12 +341,28 @@ public class MongoDBUtil implements InitializingBean {
         BasicDBObject sort = new BasicDBObject(orderBy, Integer.valueOf(1));
         Iterator iterator = this.getCollection(_collsName).find(mapToBson(where)).sort(sort).skip(skip).limit(page.getPageSize()).iterator();
 
-        while(iterator.hasNext()) {
-            BasicDBObject pageData = (BasicDBObject)iterator.next();
+        while (iterator.hasNext()) {
+            BasicDBObject pageData = (BasicDBObject) iterator.next();
             listdata.add(bsonTomap(pageData));
         }
 
-        PageImpl pageData1 = new PageImpl(listdata, page, (long)count);
+        PageImpl pageData1 = new PageImpl(listdata, page, (long) count);
+        return pageData1;
+    }
+
+    public Page<Map<String, Object>> queryPage(String _collsName, Map<String, Object> where, Pageable page, String orderBy,OrderType type) {
+        int count = this.count(_collsName, where);
+        int skip = page.getPageSize() * page.getPageNumber();
+        ArrayList listdata = new ArrayList(page.getPageSize());
+        BasicDBObject sort = new BasicDBObject(orderBy, type.getValue());
+        Iterator iterator = this.getCollection(_collsName).find(mapToBson(where)).sort(sort).skip(skip).limit(page.getPageSize()).iterator();
+
+        while (iterator.hasNext()) {
+            BasicDBObject pageData = (BasicDBObject) iterator.next();
+            listdata.add(bsonTomap(pageData));
+        }
+
+        PageImpl pageData1 = new PageImpl(listdata, page, (long) count);
         return pageData1;
     }
 
@@ -342,31 +380,31 @@ public class MongoDBUtil implements InitializingBean {
         BasicDBObject obj = new BasicDBObject();
         Iterator entries = map.entrySet().iterator();
 
-        while(true) {
-            while(true) {
+        while (true) {
+            while (true) {
                 Entry entry;
                 do {
-                    if(!entries.hasNext()) {
+                    if (!entries.hasNext()) {
                         return obj;
                     }
 
-                    entry = (Entry)entries.next();
-                } while(entry.getValue() == null);
+                    entry = (Entry) entries.next();
+                } while (entry.getValue() == null);
 
-                if(entry.getValue().getClass().isArray() && !(entry.getValue() instanceof byte[])) {
+                if (entry.getValue().getClass().isArray() && !(entry.getValue() instanceof byte[])) {
                     BasicDBList values = new BasicDBList();
-                    Object[] array = (Object[])((Object[])entry.getValue());
+                    Object[] array = (Object[]) ((Object[]) entry.getValue());
                     Object[] var6 = array;
                     int var7 = array.length;
 
-                    for(int var8 = 0; var8 < var7; ++var8) {
+                    for (int var8 = 0; var8 < var7; ++var8) {
                         Object o = var6[var8];
                         values.add(o);
                     }
 
-                    obj.append((String)entry.getKey(), new BasicDBObject("$in", values));
+                    obj.append((String) entry.getKey(), new BasicDBObject("$in", values));
                 } else {
-                    obj.append((String)entry.getKey(), entry.getValue());
+                    obj.append((String) entry.getKey(), entry.getValue());
                 }
             }
         }
@@ -376,8 +414,8 @@ public class MongoDBUtil implements InitializingBean {
         HashMap result = new HashMap();
         Iterator iterator = doc.entrySet().iterator();
 
-        while(iterator.hasNext()) {
-            Entry entry = (Entry)iterator.next();
+        while (iterator.hasNext()) {
+            Entry entry = (Entry) iterator.next();
             result.put(entry.getKey(), entry.getValue());
         }
 
@@ -391,11 +429,11 @@ public class MongoDBUtil implements InitializingBean {
     }
 
     public long queryTotal(String _collsName, Map<String, Object> where) {
-        return (long)this.getCollection(_collsName).find(mapToBson(where)).count();
+        return (long) this.getCollection(_collsName).find(mapToBson(where)).count();
     }
 
     private void isError(String error) throws Exception {
-        if(error != null) {
+        if (error != null) {
             throw new Exception(error);
         }
     }
