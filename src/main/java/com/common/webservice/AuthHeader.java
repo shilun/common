@@ -45,7 +45,7 @@ public class AuthHeader extends AbstractSoapInterceptor {
     }
 
     private String getContent() {
-        return DESEncryptUtils.encrypt(this.key + "_" + DateUtil.format(Calendar.getInstance().getTime()), this.key);
+        return key;
     }
 
     public void setKey(String key) {
