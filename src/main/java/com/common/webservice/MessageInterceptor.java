@@ -66,6 +66,7 @@ public class MessageInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
             }
             if (StringUtils.isNotBlank(content) && content.equals(authKey)) {
                 LOGGER.info("webservice call success");
+                return;
             }
             throw new Fault(new SOAPException("web service audi error  authKey "));
 

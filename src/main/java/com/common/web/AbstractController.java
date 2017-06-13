@@ -96,7 +96,7 @@ public abstract class AbstractController {
                             Page pateItem = (Page)value;
                             HashMap pageValue = new HashMap();
                             pageValue.put("result", pateItem.getContent());
-                            pageValue.put("total", Long.valueOf(pateItem.getTotalElements()));
+                            pageValue.put("total", pateItem.getTotalElements());
                             page1.put(key, pageValue);
                         } else {
                             page1.put(key, value);

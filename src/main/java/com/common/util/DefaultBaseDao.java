@@ -5,6 +5,8 @@
 
 package com.common.util;
 
+import com.common.exception.ApplicationException;
+import com.common.exception.BizException;
 import com.common.util.AbstractBaseDao;
 import com.common.util.AbstractBaseEntity;
 import com.common.util.MyBatisSupport;
@@ -28,11 +30,13 @@ public abstract class DefaultBaseDao<E extends AbstractBaseEntity> extends MyBat
     public abstract String getNameSpace(String var1);
 
     public Long add(E entity) {
+        if (entity.getId() != null) {
+            throw new ApplicationException("id.not.null");
+        }
         Date createTime = new Date();
         if (entity.getCreateTime() == null) {
             entity.setCreateTime(createTime);
         }
-
         if (entity.getUpdateTime() == null) {
             entity.setUpdateTime(createTime);
         }
@@ -43,6 +47,9 @@ public abstract class DefaultBaseDao<E extends AbstractBaseEntity> extends MyBat
     }
 
     public void up(E entity) {
+        if (entity.getId() == null) {
+            throw new ApplicationException("id.null");
+        }
         entity.setUpdateTime(new Date());
         this.update(this.getNameSpace("update"), entity);
     }
@@ -59,6 +66,9 @@ public abstract class DefaultBaseDao<E extends AbstractBaseEntity> extends MyBat
     }
 
     public void delById(Long id) {
+        if (id == null) {
+            throw new ApplicationException("id.null");
+        }
         HashMap params = new HashMap();
         params.put("id", id);
         this.delete(this.getNameSpace("del"), params);
