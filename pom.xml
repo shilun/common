@@ -6,7 +6,7 @@
 
     <groupId>com.60living</groupId>
     <artifactId>com.common</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
 
     <properties>
         <spring.version>4.2.5.RELEASE</spring.version>
@@ -88,6 +88,11 @@
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-commons</artifactId>
+                <version>1.9.0.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-mongodb</artifactId>
                 <version>1.9.0.RELEASE</version>
             </dependency>
             <dependency>
@@ -384,6 +389,10 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

@@ -5,6 +5,8 @@
 
 package com.common.util;
 
+import com.common.annotation.QueryField;
+import com.common.mongo.QueryType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Date;
@@ -17,6 +19,7 @@ public class AbstractBaseEntity implements Serializable {
     private Integer startRow;
     @JsonIgnore
     private Integer endRow;
+    @QueryField
     private Long id;
     @JsonIgnore
     private Date createTime;

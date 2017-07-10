@@ -6,7 +6,6 @@
 package com.common.upload;
 
 import com.common.exception.BizException;
-import com.common.util.MongoDBUtil;
 import com.common.util.StringUtils;
 
 import java.util.HashMap;
