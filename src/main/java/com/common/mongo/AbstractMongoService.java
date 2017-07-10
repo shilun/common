@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.io.Serializable;
@@ -59,7 +60,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Query query = new Query();
         query.with(pageable);
         if (StringUtils.isNotBlank(entity.getOrderColumn())) {
-            query.with(new Sort(entity.getDirection(), entity.getOrderColumn()));
+            query.with(new Sort(entity.getOrderTpe(), entity.getOrderColumn()));
         }
         Long count = operations.count(query, entity.getClass());
         List<T> list = operations.find(query, (Class<T>) entity.getClass());

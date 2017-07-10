@@ -7,6 +7,6 @@ import com.common.mongo.QueryType;
  */
 public @interface QueryField {
     String name() default "";
-    QueryType type() default QueryType.Equals;
+    QueryType type() default QueryType.EQ;
 
 }
