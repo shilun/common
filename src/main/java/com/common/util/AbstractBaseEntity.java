@@ -34,7 +34,7 @@ public class AbstractBaseEntity implements Serializable {
     @JsonIgnore
     private Date endCreateTime;
     @JsonIgnore
-    private String orderTpe;//升序ASC，降序Desc
+    private Integer orderTpe;//1 升序ASC，2 降序Desc
 
     public Long getMinId() {
         return this.minId;
@@ -119,11 +119,11 @@ public class AbstractBaseEntity implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public String getOrderTpe() {
+    public Integer getOrderTpe() {
         return orderTpe;
     }
 
-    public void setOrderTpe(String orderTpe) {
+    public void setOrderTpe(Integer orderTpe) {
         this.orderTpe = orderTpe;
     }
 }
