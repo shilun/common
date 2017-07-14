@@ -48,9 +48,9 @@ public class AbstractMongoService<T extends AbstractBaseEntity> implements Seria
 
     private static String userName;
     private static String password;
-    private static String dbName = "estate";
-    private static String url = "192.168.89.47";
-    private static Integer port = 27017;
+    private static String dbName;
+    private static String url;
+    private static Integer port;
 
 
     public void add(T entity) {
@@ -151,7 +151,7 @@ public class AbstractMongoService<T extends AbstractBaseEntity> implements Seria
         for (PropertyDescriptor descriptor : propertyDescriptors) {
             Object property = null;
             String descriptorName = descriptor.getName();
-            if((!descriptorName.equals("class"))&&(!descriptorName.equals("orderColumn"))&&(!descriptorName.equals("orderTpe"))){
+            if ((!descriptorName.equals("class")) && (!descriptorName.equals("orderColumn")) && (!descriptorName.equals("orderTpe"))) {
                 try {
                     property = PropertyUtil.getProperty(entity, descriptorName);
                 } catch (IllegalAccessException e) {
@@ -162,79 +162,76 @@ public class AbstractMongoService<T extends AbstractBaseEntity> implements Seria
                     e.printStackTrace();
                 }
                 if (property != null) {
-                    Field field= null;
+                    Field field = null;
                     try {
                         field = entity.getClass().getDeclaredField(descriptorName);
                     } catch (NoSuchFieldException e) {
                         e.printStackTrace();
                     }
                     Criteria criteria = new Criteria();
-                    if(field!=null){
+                    if (field != null) {
                         QueryField annotation = field.getAnnotation(QueryField.class);
                         if (annotation != null) {
                             QueryType type = annotation.type();
                             String typeName = annotation.name();
-                            if (type != null)
+                            if (type != null) {
                                 if (StringUtils.isNotBlank(typeName)) {
-                                    if (type != null) {
-                                        if (type == QueryType.EQ) {
+                                    switch (type) {
+                                        case EQ:
                                             criteria = Criteria.where(typeName).is(property);
-                                        }
-                                        if (type == QueryType.GT) {
-                                            criteria = Criteria.where(typeName).gt(property);
-                                        }
-                                        if (type == QueryType.LT) {
+                                            break;
+                                        case LT:
                                             criteria = Criteria.where(typeName).lt(property);
-                                        }
-                                        if (type == QueryType.GTE) {
-                                            criteria = Criteria.where(typeName).gte(property);
-                                        }
-                                        if (type == QueryType.LTE) {
+                                            break;
+                                        case LTE:
                                             criteria = Criteria.where(typeName).lte(property);
-                                        }
-                                        if (type == QueryType.LIKE) {
-                                            criteria = Criteria.where(typeName).regex(property.toString());
-                                        }
-                                        if (type == QueryType.NE) {
+                                            break;
+                                        case GT:
+                                            criteria = Criteria.where(typeName).gt(property);
+                                            break;
+                                        case GTE:
+                                            criteria = Criteria.where(typeName).gte(property);
+                                            break;
+                                        case NE:
                                             criteria = Criteria.where(typeName).ne(property);
-                                        }
-                                    } else {
-                                        criteria = Criteria.where(typeName).is(property);
+                                            break;
+                                        case LIKE:
+                                            criteria = Criteria.where(typeName).regex(property.toString());
+                                            break;
                                     }
                                 } else {
-                                    if (type != null) {
-                                        if (type == QueryType.EQ) {
+                                    switch (type) {
+                                        case EQ:
                                             criteria = Criteria.where(descriptorName).is(property);
-                                        }
-                                        if (type == QueryType.GT) {
-                                            criteria = Criteria.where(descriptorName).gt(property);
-                                        }
-                                        if (type == QueryType.LT) {
+                                            break;
+                                        case LT:
                                             criteria = Criteria.where(descriptorName).lt(property);
-                                        }
-                                        if (type == QueryType.GTE) {
-                                            criteria = Criteria.where(descriptorName).gte(property);
-                                        }
-                                        if (type == QueryType.LTE) {
+                                            break;
+                                        case LTE:
                                             criteria = Criteria.where(descriptorName).lte(property);
-                                        }
-                                        if (type == QueryType.LIKE) {
-                                            criteria = Criteria.where(typeName).regex(property.toString());
-                                        }
-                                    }
-                                    if (type == QueryType.NE) {
-                                        criteria = Criteria.where(descriptorName).ne(property);
+                                            break;
+                                        case GT:
+                                            criteria = Criteria.where(descriptorName).gt(property);
+                                            break;
+                                        case GTE:
+                                            criteria = Criteria.where(descriptorName).gte(property);
+                                            break;
+                                        case NE:
+                                            criteria = Criteria.where(descriptorName).ne(property);
+                                            break;
+                                        case LIKE:
+                                            criteria = Criteria.where(descriptorName).regex(property.toString());
+                                            break;
                                     }
                                 }
-                            else {
+                            } else {
                                 criteria = Criteria.where(descriptorName).is(property);
                             }
                         }
-                        query.addCriteria(criteria);
                     }else{
                         criteria = Criteria.where(descriptorName).is(property);
-                        query.addCriteria(criteria);
                     }
+                    query.addCriteria(criteria);
                 }
             }
         }
