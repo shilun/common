@@ -33,6 +33,10 @@ public class JsonUtil {
         }
     }
 
+    public static void main(String[] args) {
+
+    }
+
     public <T> T toObject(String json, Class<T> clazz) {
         try {
             return mapper.readValue(json, clazz);

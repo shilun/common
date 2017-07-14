@@ -7,63 +7,46 @@ import com.common.util.AbstractBaseEntity;
 import com.common.util.PropertyUtil;
 import com.common.util.StringUtils;
 import com.common.util.model.YesOrNoEnum;
-import com.mongodb.*;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.log4j.Logger;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.ScriptOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.data.mongodb.core.script.NamedMongoScript;
 
 
 import java.beans.PropertyDescriptor;
-import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/7/10.
  */
-public class AbstractMongoService<T extends AbstractBaseEntity> implements Serializable {
-
+public abstract class AbstractMongoService<T extends AbstractBaseEntity> {
+    private static Logger logger = Logger.getLogger(AbstractMongoService.class);
 
     private MongoTemplate template;
 
-    private static Logger logger = Logger.getLogger(AbstractMongoService.class);
+    protected abstract Class<T> getEntityClass();
 
-    private static String userName;
-    private static String password;
-    private static String dbName;
-    private static String url;
-    private static Integer port;
+    public AbstractMongoService() {
+        buildPropertyDescriptor();
+    }
 
-
-    public void add(T entity) {
-        MongoTemplate mongoTemplate=setTemplate(template);
-        Query query = new Query();
-        query.with(new Sort(Sort.Direction.DESC, "createTime"));
-        Long id=1l;
-        List<T> ts = mongoTemplate.find(query, (Class<T>) entity.getClass());
-        if (!ts.isEmpty()){
-            id=ts.get(0).getId();
-            id++;
+    public Long save(T entity) {
+        if (entity == null) {
+            throw new ApplicationException("保存失败，对象未实例化");
         }
-        entity.setId(id);
+        if (entity.getId() != null) {
+            up(entity);
+            return entity.getId();
+        }
         Date createTime = new Date();
         if (entity.getCreateTime() == null) {
             entity.setCreateTime(createTime);
@@ -72,163 +55,154 @@ public class AbstractMongoService<T extends AbstractBaseEntity> implements Seria
             entity.setUpdateTime(createTime);
         }
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        mongoTemplate.insert(entity);
+        template.insert(entity);
+        return entity.getId();
     }
 
 
-    public void up(T entity) {
-        if(entity.getId()==null){
-            throw new BizException("Id.null","Id不能为空");
+    private void up(T entity) {
+        if (entity == null || entity.getId() == null) {
+            throw new BizException("Id.null", "Id不能为空");
         }
         Query query = new Query();
-        Criteria criteria = Criteria.where("_id").is(entity.getId());
+        Criteria criteria = Criteria.where("id").is(entity.getId());
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
-        setTemplate(template).findAndModify(query, update, entity.getClass());
+        template.findAndModify(query, update, entity.getClass());
     }
 
-    public void save(T entity) {
 
-    }
-    public T findById(Long id,T entity) {
+    public T findById(Long id) {
         Query query = new Query();
-        Criteria criteria = Criteria.where("_id").is(id);
+        Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
-        return setTemplate(template).findById(id, (Class<T>) entity.getClass());
+        return template.findById(id, getEntityClass());
     }
 
-    public void delById(T entity) {
-        if(entity.getId()==null){
-            throw new BizException("Id.null","Id不能为空");
+    public void delById(Long id) {
+        if (id == null) {
+            throw new ApplicationException("删除数据出错,id不能为空");
         }
         Query query = new Query();
-        Criteria criteria = Criteria.where("_id").is(entity.getId());
+        Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
+        Constructor<?>[] constructors = getEntityClass().getConstructors();
+        T entity = null;
+        try {
+            entity = (T) constructors[0].newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         entity.setDelStatus(YesOrNoEnum.YES.getValue());
         Update update = addUpdate(entity);
-        setTemplate(template).findAndModify(query, update, entity.getClass());
+        template.findAndModify(query, update, getEntityClass());
     }
 
     public List<T> query(T entity) {
         if (entity == null) {
-            return setTemplate(template).findAll((Class<T>) entity.getClass());
+            return template.findAll(getEntityClass());
         }
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        Query query = addCondition(entity);
-        return setTemplate(template).find(query, (Class<T>) entity.getClass());
+        Query query = buildCondition(entity);
+        return template.find(query, getEntityClass());
     }
 
     public Long queryCount(T entity) {
-        Query query = addCondition(entity);
+        Query query = buildCondition(entity);
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        return setTemplate(template).count(query, entity.getClass());
+        return template.count(query, entity.getClass());
     }
 
     public Page<T> queryByPage(T entity, Pageable pageable) {
         entity.setDelStatus(YesOrNoEnum.YES.getValue());
-        Query query = addCondition(entity);
-        Long count = setTemplate(template).count(query, entity.getClass());
-        List<T> list = setTemplate(template).find(query, (Class<T>) entity.getClass());
+        Query query = buildCondition(entity);
+        Long count = template.count(query, entity.getClass());
+        List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
     }
 
     public T findByOne(T entity) {
-        Query query = addCondition(entity);
+        Query query = buildCondition(entity);
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        return setTemplate(template).findOne(query, (Class<T>) entity.getClass());
+        return template.findOne(query, getEntityClass());
     }
 
-    public MongoTemplate setTemplate(MongoTemplate template) {
-        Mongo mongo = new Mongo(url, port);
-        return new MongoTemplate(mongo, dbName);
+    private Map<String, Field> beanPropertyes = new HashMap<>();
+
+    private void buildPropertyDescriptor() {
+        List<Class> types = new ArrayList<>();
+        Class currentClass = getEntityClass();
+        while (currentClass != AbstractBaseEntity.class) {
+            types.add(currentClass);
+            currentClass = currentClass.getSuperclass();
+        }
+        types.add(AbstractBaseEntity.class);
+        for (Class classz : types) {
+            Field[] propertyDescriptors = classz.getDeclaredFields();
+            for (Field descriptor : propertyDescriptors) {
+                beanPropertyes.put(descriptor.getName(), descriptor);
+            }
+        }
+        beanPropertyes.remove("serialVersionUID");
+        beanPropertyes.remove("uuid");
     }
 
-    Query addCondition(T entity) {
+    protected Query buildCondition(T entity) {
         Query query = new Query();
-        PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(entity.getClass());
-        for (PropertyDescriptor descriptor : propertyDescriptors) {
+        for (Field field : beanPropertyes.values()) {
             Object property = null;
-            String descriptorName = descriptor.getName();
+            String descriptorName = field.getName();
             if ((!descriptorName.equals("class")) && (!descriptorName.equals("orderColumn")) && (!descriptorName.equals("orderTpe"))) {
                 try {
                     property = PropertyUtil.getProperty(entity, descriptorName);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 if (property != null) {
-                    Field field = null;
-                    try {
-                        field = entity.getClass().getDeclaredField(descriptorName);
-                    } catch (NoSuchFieldException e) {
-                        e.printStackTrace();
-                    }
                     Criteria criteria = new Criteria();
                     if (field != null) {
                         QueryField annotation = field.getAnnotation(QueryField.class);
                         if (annotation != null) {
                             QueryType type = annotation.type();
                             String typeName = annotation.name();
+                            String propertyName;
                             if (type != null) {
                                 if (StringUtils.isNotBlank(typeName)) {
-                                    switch (type) {
-                                        case EQ:
-                                            criteria = Criteria.where(typeName).is(property);
-                                            break;
-                                        case LT:
-                                            criteria = Criteria.where(typeName).lt(property);
-                                            break;
-                                        case LTE:
-                                            criteria = Criteria.where(typeName).lte(property);
-                                            break;
-                                        case GT:
-                                            criteria = Criteria.where(typeName).gt(property);
-                                            break;
-                                        case GTE:
-                                            criteria = Criteria.where(typeName).gte(property);
-                                            break;
-                                        case NE:
-                                            criteria = Criteria.where(typeName).ne(property);
-                                            break;
-                                        case LIKE:
-                                            criteria = Criteria.where(typeName).regex(property.toString());
-                                            break;
-                                    }
+                                    propertyName = annotation.name();
                                 } else {
-                                    switch (type) {
-                                        case EQ:
-                                            criteria = Criteria.where(descriptorName).is(property);
-                                            break;
-                                        case LT:
-                                            criteria = Criteria.where(descriptorName).lt(property);
-                                            break;
-                                        case LTE:
-                                            criteria = Criteria.where(descriptorName).lte(property);
-                                            break;
-                                        case GT:
-                                            criteria = Criteria.where(descriptorName).gt(property);
-                                            break;
-                                        case GTE:
-                                            criteria = Criteria.where(descriptorName).gte(property);
-                                            break;
-                                        case NE:
-                                            criteria = Criteria.where(descriptorName).ne(property);
-                                            break;
-                                        case LIKE:
-                                            criteria = Criteria.where(descriptorName).regex(property.toString());
-                                            break;
-                                    }
+                                    propertyName = descriptorName;
+                                }
+                                switch (type) {
+                                    case EQ:
+                                        criteria = Criteria.where(propertyName).is(property);
+                                        break;
+                                    case LT:
+                                        criteria = Criteria.where(propertyName).lt(property);
+                                        break;
+                                    case LTE:
+                                        criteria = Criteria.where(propertyName).lte(property);
+                                        break;
+                                    case GT:
+                                        criteria = Criteria.where(propertyName).gt(property);
+                                        break;
+                                    case GTE:
+                                        criteria = Criteria.where(propertyName).gte(property);
+                                        break;
+                                    case NE:
+                                        criteria = Criteria.where(propertyName).ne(property);
+                                        break;
+                                    case LIKE:
+                                        criteria = Criteria.where(propertyName).regex(property.toString());
+                                        break;
                                 }
                             } else {
                                 criteria = Criteria.where(descriptorName).is(property);
                             }
                         }
-                    }else{
+                    } else {
                         criteria = Criteria.where(descriptorName).is(property);
                     }
                     query.addCriteria(criteria);
@@ -236,13 +210,13 @@ public class AbstractMongoService<T extends AbstractBaseEntity> implements Seria
             }
         }
         if (StringUtils.isNotBlank(entity.getOrderColumn())) {
-            if(entity.getOrderTpe()==null){
+            if (entity.getOrderTpe() == null) {
                 query.with(new Sort(Sort.Direction.ASC, entity.getOrderColumn()));
-            }else{
-                if(entity.getOrderTpe()==1){
+            } else {
+                if (entity.getOrderTpe() == 1) {
                     query.with(new Sort(Sort.Direction.ASC, entity.getOrderColumn()));
                 }
-                if(entity.getOrderTpe()==2){
+                if (entity.getOrderTpe() == 2) {
                     query.with(new Sort(Sort.Direction.DESC, entity.getOrderColumn()));
                 }
             }
@@ -250,67 +224,26 @@ public class AbstractMongoService<T extends AbstractBaseEntity> implements Seria
         return query;
     }
 
-    Update addUpdate(T entity) {
+    private Update addUpdate(T entity) {
         Update update = new Update();
-        PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(entity.getClass());
-        for (PropertyDescriptor descriptor : propertyDescriptors) {
+        for (Field descriptor : beanPropertyes.values()) {
             String descriptorName = descriptor.getName();
-            if((!descriptorName.equals("class"))&&(!descriptorName.equals("id"))){
+            if ((!descriptorName.equals("class")) && (!descriptorName.equals("id"))) {
                 Object property = null;
                 try {
                     property = PropertyUtil.getProperty(entity, descriptorName);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 if (property != null) {
-                    update.set(descriptorName,property);
+                    update.set(descriptorName, property);
                 }
             }
         }
         return update;
     }
 
-    public static String getUserName() {
-        return userName;
-    }
-
-    public static void setUserName(String userName) {
-        AbstractMongoService.userName = userName;
-    }
-
-    public static String getPassword() {
-        return password;
-    }
-
-    public static void setPassword(String password) {
-        AbstractMongoService.password = password;
-    }
-
-    public static String getDbName() {
-        return dbName;
-    }
-
-    public static void setDbName(String dbName) {
-        AbstractMongoService.dbName = dbName;
-    }
-
-    public static String getUrl() {
-        return url;
-    }
-
-    public static void setUrl(String url) {
-        AbstractMongoService.url = url;
-    }
-
-    public static Integer getPort() {
-        return port;
-    }
-
-    public static void setPort(Integer port) {
-        AbstractMongoService.port = port;
+    public void setTemplate(MongoTemplate template) {
+        this.template = template;
     }
 }

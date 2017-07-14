@@ -5,13 +5,19 @@
 
 package com.common.util;
 
+import com.common.annotation.GeneratedValue;
 import com.common.annotation.QueryField;
-import com.common.mongo.QueryType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Id;
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class AbstractBaseEntity implements Serializable {
+
+    @Id
+    @JsonIgnore
+    private String uuid;
     private static final long serialVersionUID = 1L;
     @JsonIgnore
     private String orderColumn;
@@ -20,6 +26,7 @@ public class AbstractBaseEntity implements Serializable {
     @JsonIgnore
     private Integer endRow;
     @QueryField
+    @GeneratedValue
     private Long id;
     @JsonIgnore
     private Date createTime;
@@ -125,5 +132,13 @@ public class AbstractBaseEntity implements Serializable {
 
     public void setOrderTpe(Integer orderTpe) {
         this.orderTpe = orderTpe;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }
