@@ -7,6 +7,7 @@ package com.common.util;
 
 import com.common.annotation.GeneratedValue;
 import com.common.annotation.QueryField;
+import com.common.mongo.QueryType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 
@@ -37,8 +38,10 @@ public class AbstractBaseEntity implements Serializable {
     @JsonIgnore
     private Long minId;
     @JsonIgnore
+    @QueryField(name="createTime",type = QueryType.GTE )
     private Date startCreateTime;
     @JsonIgnore
+    @QueryField(name="createTime",type = QueryType.LTE )
     private Date endCreateTime;
     @JsonIgnore
     private Integer orderTpe;//1 升序ASC，2 降序Desc
