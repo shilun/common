@@ -62,7 +62,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> {
 
     private void up(T entity) {
         if (entity == null || entity.getId() == null) {
-            throw new BizException("Id.null", "Id不能为空");
+            throw new ApplicationException("Id不能为空");
         }
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(entity.getId());
@@ -92,7 +92,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> {
         try {
             entity = (T) constructors[0].newInstance();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ApplicationException("删除mongodb数据实败", e);
         }
 
         entity.setDelStatus(YesOrNoEnum.YES.getValue());
@@ -233,7 +233,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> {
                 try {
                     property = PropertyUtil.getProperty(entity, descriptorName);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new ApplicationException("更新或添加mongodb失败", e);
                 }
                 if (property != null) {
                     update.set(descriptorName, property);
