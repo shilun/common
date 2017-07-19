@@ -123,7 +123,7 @@ public class Money implements Serializable, Comparable {
         return this.cent < other.cent?-1:(this.cent == other.cent?0:1);
     }
 
-    public String money(){
+    public String getMoney(){
         return this.toString();
     }
 
