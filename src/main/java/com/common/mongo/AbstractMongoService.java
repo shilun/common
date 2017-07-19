@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * Created by Administrator on 2017/7/10.
  */
-public abstract class AbstractMongoService<T extends AbstractBaseEntity> {
+public abstract class AbstractMongoService<T extends AbstractBaseEntity> implements MongoService<T> {
     private static Logger logger = Logger.getLogger(AbstractMongoService.class);
 
     private MongoTemplate template;
