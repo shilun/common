@@ -1,22 +1,10 @@
 package com.common.mongo;
 
-import com.common.annotation.QueryField;
-import com.common.exception.ApplicationException;
 import com.common.util.AbstractBaseEntity;
-import com.common.util.PropertyUtil;
-import com.common.util.StringUtils;
-import com.common.util.model.YesOrNoEnum;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/7/19.
