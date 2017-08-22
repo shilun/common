@@ -9,10 +9,7 @@ import com.common.util.StringUtils;
 import com.common.util.model.YesOrNoEnum;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -77,7 +74,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
-        return template.findById(id, getEntityClass());
+        query.addCriteria(Criteria.where("delStatus").is(YesOrNoEnum.NO.getValue()));
+        List<T> ts = template.find(query, getEntityClass());
+        if (ts != null && ts.size() == 1) {
+            return ts.get(0);
+        }
+        throw new ApplicationException("no data to find");
     }
 
     public void delById(Long id) {
@@ -110,23 +112,23 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Long queryCount(T entity) {
-        Query query = buildCondition(entity);
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        Query query = buildCondition(entity);
         return template.count(query, entity.getClass());
     }
 
     public Page<T> queryByPage(T entity, Pageable pageable) {
-        entity.setDelStatus(YesOrNoEnum.YES.getValue());
-        Query query = buildCondition(entity);
-        Long count = template.count(query, entity.getClass());
+        entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        Long count = queryCount(entity);
+        Query query = buildCondition(entity,pageable);
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
     }
 
     public T findByOne(T entity) {
-        Query query = buildCondition(entity);
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        Query query = buildCondition(entity);
         return template.findOne(query, getEntityClass());
     }
 
@@ -151,6 +153,10 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     protected Query buildCondition(T entity) {
+        return buildCondition(entity, null);
+    }
+
+    protected Query buildCondition(T entity, Pageable pageable) {
         Query query = new Query();
         for (Field field : beanPropertyes.values()) {
             Object property = null;
@@ -163,44 +169,42 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                 }
                 if (property != null) {
                     Criteria criteria = new Criteria();
-                    if (field != null) {
-                        QueryField annotation = field.getAnnotation(QueryField.class);
-                        if (annotation != null) {
-                            QueryType type = annotation.type();
-                            String typeName = annotation.name();
-                            String propertyName;
-                            if (type != null) {
-                                if (StringUtils.isNotBlank(typeName)) {
-                                    propertyName = annotation.name();
-                                } else {
-                                    propertyName = descriptorName;
-                                }
-                                switch (type) {
-                                    case EQ:
-                                        criteria = Criteria.where(propertyName).is(property);
-                                        break;
-                                    case LT:
-                                        criteria = Criteria.where(propertyName).lt(property);
-                                        break;
-                                    case LTE:
-                                        criteria = Criteria.where(propertyName).lte(property);
-                                        break;
-                                    case GT:
-                                        criteria = Criteria.where(propertyName).gt(property);
-                                        break;
-                                    case GTE:
-                                        criteria = Criteria.where(propertyName).gte(property);
-                                        break;
-                                    case NE:
-                                        criteria = Criteria.where(propertyName).ne(property);
-                                        break;
-                                    case LIKE:
-                                        criteria = Criteria.where(propertyName).regex(property.toString());
-                                        break;
-                                }
+                    QueryField annotation = field.getAnnotation(QueryField.class);
+                    if (annotation != null) {
+                        QueryType type = annotation.type();
+                        String typeName = annotation.name();
+                        String propertyName;
+                        if (type != null) {
+                            if (StringUtils.isNotBlank(typeName)) {
+                                propertyName = annotation.name();
                             } else {
-                                criteria = Criteria.where(descriptorName).is(property);
+                                propertyName = descriptorName;
                             }
+                            switch (type) {
+                                case EQ:
+                                    criteria = Criteria.where(propertyName).is(property);
+                                    break;
+                                case LT:
+                                    criteria = Criteria.where(propertyName).lt(property);
+                                    break;
+                                case LTE:
+                                    criteria = Criteria.where(propertyName).lte(property);
+                                    break;
+                                case GT:
+                                    criteria = Criteria.where(propertyName).gt(property);
+                                    break;
+                                case GTE:
+                                    criteria = Criteria.where(propertyName).gte(property);
+                                    break;
+                                case NE:
+                                    criteria = Criteria.where(propertyName).ne(property);
+                                    break;
+                                case LIKE:
+                                    criteria = Criteria.where(propertyName).regex(property.toString());
+                                    break;
+                            }
+                        } else {
+                            criteria = Criteria.where(descriptorName).is(property);
                         }
                     } else {
                         criteria = Criteria.where(descriptorName).is(property);
@@ -209,19 +213,30 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                 }
             }
         }
-        if (StringUtils.isNotBlank(entity.getOrderColumn())) {
-            if (entity.getOrderTpe() == null) {
-                query.with(new Sort(Sort.Direction.ASC, entity.getOrderColumn()));
-            } else {
-                if (entity.getOrderTpe() == 1) {
-                    query.with(new Sort(Sort.Direction.ASC, entity.getOrderColumn()));
-                }
-                if (entity.getOrderTpe() == 2) {
-                    query.with(new Sort(Sort.Direction.DESC, entity.getOrderColumn()));
-                }
+        if (pageable != null) {
+            if(pageable instanceof PageRequest){
+                Sort orders = buildSort(entity);
+                PageRequest pageRequest=new PageRequest(pageable.getPageNumber(),pageable.getPageSize(),orders);
+                query.with(pageRequest);
             }
         }
         return query;
+    }
+
+    private Sort buildSort(T entity) {
+        Sort orders = null;
+        if (entity.getOrderTpe() == null) {
+            orders = new Sort(Sort.Direction.ASC, "createTime");
+        } else {
+
+            if (entity.getOrderTpe() == 1) {
+                orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());
+            }
+            if (entity.getOrderTpe() == 2) {
+                orders = new Sort(Sort.Direction.DESC, entity.getOrderColumn());
+            }
+        }
+        return orders;
     }
 
     private Update addUpdate(T entity) {
