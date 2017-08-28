@@ -20,16 +20,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-@XmlRootElement(
-    name = "result",
-    namespace = "com.neworder.common"
-)
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(
-    name = "result",
-    namespace = "com.neworder.common"
-)
 public class Result<T> implements Serializable {
     private static final long serialVersionUID = 6028636097083630372L;
     @XmlElement

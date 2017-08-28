@@ -8,7 +8,8 @@ package com.common.util;
 import com.common.util.TreeEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 public class TreeNode extends TreeEntity<TreeNode> {
@@ -29,7 +30,7 @@ public class TreeNode extends TreeEntity<TreeNode> {
     }
 
     @JsonBackReference
-    @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public TreeNode getParent() {
         return this.parent;
     }
