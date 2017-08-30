@@ -60,7 +60,7 @@ public abstract class AbstractController {
 
     }
 
-    protected <T> RPCResult<T> buildMessage(IExecute execute) {
+    protected <T> RPCResult<T> buildRPCMessage(IExecute execute) {
         RPCResult<T> result = new RPCResult<>();
 
         try {
