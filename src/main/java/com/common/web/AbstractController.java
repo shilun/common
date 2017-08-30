@@ -60,6 +60,92 @@ public abstract class AbstractController {
 
     }
 
+
+    protected Map<String, Object> buildMessage(IExecute execute) {
+        HashMap map = new HashMap();
+
+        try {
+            Object e = execute.getData();
+            if(e != null) {
+                boolean seted = false;
+                if(!seted && e instanceof Result) {
+                    Result dataItem1 = (Result)e;
+                    map.put("success", dataItem1.getSuccess());
+                    HashMap page1;
+                    if(!dataItem1.getSuccess().booleanValue()) {
+                        page1 = new HashMap();
+                        page1.put("code", dataItem1.getResultCode());
+                        map.put("message", dataItem1.getMessage());
+                        return map;
+                    }
+
+                    page1 = new HashMap();
+                    Set keySet = dataItem1.keySet();
+                    Iterator var8 = keySet.iterator();
+
+                    while(var8.hasNext()) {
+                        String key = (String)var8.next();
+                        Object value = dataItem1.get(key);
+                        if(value instanceof Page) {
+                            Page pateItem = (Page)value;
+                            HashMap pageValue = new HashMap();
+                            pageValue.put("result", pateItem.getContent());
+                            pageValue.put("total", pateItem.getTotalElements());
+                            page1.put(key, pageValue);
+                        } else {
+                            page1.put(key, value);
+                        }
+                    }
+
+                    map.put("data", page1);
+                    seted = true;
+                    return map;
+                }
+
+                HashMap dataItem;
+                if(e instanceof List) {
+                    seted = true;
+                    dataItem = new HashMap();
+                    dataItem.put("list", e);
+                    map.put("data", dataItem);
+                    map.put("success", Boolean.valueOf(true));
+                    return map;
+                }
+
+                if(e instanceof Page) {
+                    seted = true;
+                    dataItem = new HashMap();
+                    Page page = (Page)e;
+                    dataItem.put("list", page.getContent());
+                    dataItem.put("pageSize", Integer.valueOf(page.getSize()));
+                    dataItem.put("totalCount", Long.valueOf(page.getTotalElements()));
+                    dataItem.put("totalPage", Integer.valueOf(page.getTotalPages()));
+                    dataItem.put("pageIndex", Integer.valueOf(page.getNumber()));
+                    map.put("data", dataItem);
+                }
+
+                if(!seted) {
+                    map.put("data", e);
+                }
+            }
+
+            map.put("success", Boolean.valueOf(true));
+        } catch (BizException var13) {
+            LOGGER.error(var13.getMessage(), var13);
+            LOGGER.error("execute json error->" + var13.getMessage());
+            map.put("code", var13.getCode());
+            map.put("message", var13.getMessage());
+            map.put("success", Boolean.valueOf(false));
+        } catch (Exception var14) {
+            LOGGER.error(var14.getMessage(), var14);
+            LOGGER.error("execute json error->" + var14.getMessage());
+            map.put("code", "999");
+            map.put("message", "执行业务失败");
+            map.put("success", Boolean.valueOf(false));
+        }
+
+        return map;
+    }
     protected <T> RPCResult<T> buildRPCMessage(IExecute execute) {
         RPCResult<T> result = new RPCResult<>();
 
