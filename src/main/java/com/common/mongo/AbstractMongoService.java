@@ -2,22 +2,18 @@ package com.common.mongo;
 
 import com.common.annotation.QueryField;
 import com.common.exception.ApplicationException;
-import com.common.exception.BizException;
 import com.common.util.AbstractBaseEntity;
 import com.common.util.PropertyUtil;
 import com.common.util.StringUtils;
 import com.common.util.model.YesOrNoEnum;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.domain.*;
-import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -28,7 +24,8 @@ import java.util.*;
 public abstract class AbstractMongoService<T extends AbstractBaseEntity> implements MongoService<T> {
     private static Logger logger = Logger.getLogger(AbstractMongoService.class);
 
-    private MongoTemplate template;
+    private MongoTemplate mongoTemplate;
+
 
     protected abstract Class<T> getEntityClass();
 
@@ -52,7 +49,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             entity.setUpdateTime(createTime);
         }
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        template.insert(entity);
+        mongoTemplate.insert(entity);
         return entity.getId();
     }
 
@@ -66,7 +63,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
-        template.findAndModify(query, update, entity.getClass());
+        mongoTemplate.findAndModify(query, update, entity.getClass());
     }
 
 
@@ -75,7 +72,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
         query.addCriteria(Criteria.where("delStatus").is(YesOrNoEnum.NO.getValue()));
-        List<T> ts = template.find(query, getEntityClass());
+        List<T> ts = mongoTemplate.find(query, getEntityClass());
         if (ts != null && ts.size() == 1) {
             return ts.get(0);
         }
@@ -99,29 +96,29 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
         entity.setDelStatus(YesOrNoEnum.YES.getValue());
         Update update = addUpdate(entity);
-        template.findAndModify(query, update, getEntityClass());
+        mongoTemplate.findAndModify(query, update, getEntityClass());
     }
 
     public List<T> query(T entity) {
         if (entity == null) {
-            return template.findAll(getEntityClass());
+            return mongoTemplate.findAll(getEntityClass());
         }
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
-        return template.find(query, getEntityClass());
+        return mongoTemplate.find(query, getEntityClass());
     }
 
     public Long queryCount(T entity) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
-        return template.count(query, entity.getClass());
+        return mongoTemplate.count(query, entity.getClass());
     }
 
     public Page<T> queryByPage(T entity, Pageable pageable) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Long count = queryCount(entity);
         Query query = buildCondition(entity,pageable);
-        List<T> list = template.find(query, getEntityClass());
+        List<T> list = mongoTemplate.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
     }
@@ -129,7 +126,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     public T findByOne(T entity) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
-        return template.findOne(query, getEntityClass());
+        return mongoTemplate.findOne(query, getEntityClass());
     }
 
     private Map<String, Field> beanPropertyes = new HashMap<>();
@@ -258,7 +255,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         return update;
     }
 
-    public void setTemplate(MongoTemplate template) {
-        this.template = template;
+    public void setMongoTemplate(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 }
