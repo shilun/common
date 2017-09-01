@@ -99,7 +99,7 @@ public class LoginContextInterceptor extends HandlerInterceptorAdapter {
             queryString = "?" + queryString;
         }
 
-        url.addQueryData("returnUrl", "http://" + request.getHeader("host") + request.getPathInfo() + queryString);
+        url.addQueryData("returnUrl", "http://" + request.getHeader("host") + StringUtils.defaultIfBlank(request.getPathInfo(),"") + queryString);
         return url.toString();
     }
 

@@ -54,7 +54,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
 
-    private void up(T entity) {
+    public void up(T entity) {
         if (entity == null || entity.getId() == null) {
             throw new ApplicationException("Id不能为空");
         }
