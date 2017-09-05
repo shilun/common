@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 
+import javax.annotation.Resource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -24,6 +25,7 @@ import java.util.*;
 public abstract class AbstractMongoService<T extends AbstractBaseEntity> implements MongoService<T> {
     private static Logger logger = Logger.getLogger(AbstractMongoService.class);
 
+    @Resource
     private MongoTemplate mongoTemplate;
 
 
