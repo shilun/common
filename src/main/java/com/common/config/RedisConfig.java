@@ -19,7 +19,6 @@ import java.util.ArrayList;
  * @author shilun
  */
 @Configuration
-@EnableCaching
 public class RedisConfig extends CachingConfigurerSupport {
     @Value("${spring.redis.url}")
     private String redisUrl;
