@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisShardInfo;
@@ -19,10 +20,10 @@ import java.util.ArrayList;
  * @author shilun
  */
 @Configuration
+@Conditional(RedisCondition.class)
 public class RedisConfig extends CachingConfigurerSupport {
     @Value("${spring.redis.url}")
     private String redisUrl;
-
     @Bean
     @RefreshScope
     public RedisDbDao newRedisDao(){

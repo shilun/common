@@ -30,6 +30,7 @@ import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -41,32 +42,22 @@ import java.net.UnknownHostException;
  * {@link EnableAutoConfiguration Auto-configuration} for Mongo.
  */
 @Configuration
-@ConditionalOnClass(MongoClient.class)
-@EnableConfigurationProperties(MongoProperties.class)
-@ConditionalOnMissingBean(type = "org.springframework.data.mongodb.MongoDbFactory")
+@Conditional(MongodbCondition.class)
 public class MongoConfig {
 
     @Value("${spring.data.mongodb.uri}")
     private String mongodbUrl;
 
+    @Value("${spring.data.mongodb.database}")
+    private String database;
     @Bean(name = "mongoTemplate")
     @RefreshScope
     public MongoTemplate mongoTemplate() throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
             return null;
         }
-        return new MongoTemplate(mongo(), properties.getDatabase());
+        return new MongoTemplate(mongo(), database);
     }
-
-    @Autowired(required = false)
-    private MongoProperties properties;
-
-    @Autowired(required = false)
-    private MongoClientOptions options;
-
-    @Autowired(required = false)
-    private Environment environment;
-
     private MongoClient mongo;
 
     @PreDestroy
@@ -77,8 +68,6 @@ public class MongoConfig {
     }
 
     @Bean
-    @RefreshScope
-    @ConditionalOnMissingBean
     public MongoClient mongo() throws UnknownHostException {
         if (StringUtils.isBlank(mongodbUrl)) {
             return null;
@@ -88,4 +77,4 @@ public class MongoConfig {
         return mongo;
     }
 
-} 
+}

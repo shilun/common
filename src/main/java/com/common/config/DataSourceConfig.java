@@ -1,4 +1,4 @@
-package com.common.cfgdata;
+package com.common.config;
 
 import com.common.util.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
@@ -26,6 +27,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @EnableTransactionManagement
+@Conditional(DataSourceCondition.class)
 public class DataSourceConfig implements TransactionManagementConfigurer,EnvironmentAware {
 
     private Logger logger= org.slf4j.LoggerFactory.getLogger(DataSourceConfig.class);
