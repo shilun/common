@@ -1,5 +1,6 @@
 package com.common.config;
 
+import org.apache.commons.io.IOUtils;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -92,6 +93,9 @@ public class ProxyResourceConfig implements EnvironmentAware {
             if (req.getPathInfo().endsWith(".html")) {
                 resp.setContentType("text/html");
             }
+            if (!new File(realPath).exists()) {
+                return;
+            }
             OutputStream os = resp.getOutputStream();// 获得servlet的servletoutputstream对象
             byte[] buffer = new byte[2048];
             FileInputStream fos = new FileInputStream(realPath);// 打开图片文件
@@ -99,7 +103,8 @@ public class ProxyResourceConfig implements EnvironmentAware {
             while ((count = fos.read(buffer)) > 0) {
                 os.write(buffer, 0, count);
             }
-            fos.close();
+            IOUtils.closeQuietly(os);
+            IOUtils.closeQuietly(fos);
         }
     }
 }

@@ -16,6 +16,7 @@
 
 package com.common.config;
 
+import com.common.mongo.SaveMongoEventListener;
 import com.common.util.StringUtils;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
@@ -65,6 +66,10 @@ public class MongoConfig {
         if (this.mongo != null) {
             this.mongo.close();
         }
+    }
+    @Bean
+    public SaveMongoEventListener mongoEventListener(){
+        return new SaveMongoEventListener();
     }
 
     @Bean

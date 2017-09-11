@@ -39,6 +39,17 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-mongodb</artifactId>
             <version>1.10.6.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mongo-java-driver</artifactId>
+                    <groupId>org.mongodb</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.4.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -273,11 +284,6 @@
             <name>releases</name>
             <url>http://maven.60living.com/content/repositories/releases/</url>
         </repository>
-        <snapshotRepository>
-            <id>Snapshots</id>
-            <name>Snapshots</name>
-            <url>http://maven.60living.com/content/repositories/snapshots/</url>
-        </snapshotRepository>
     </distributionManagement>
     <dependencyManagement>
         <dependencies>
