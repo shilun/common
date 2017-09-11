@@ -28,6 +28,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     @RefreshScope
     public RedisDbDao newRedisDao(){
         RedisDbDaoImpl dao=new RedisDbDaoImpl();
+        dao.setUse(true);
         redis.clients.jedis.JedisPoolConfig config=new JedisPoolConfig();
         config.setMaxIdle(300);
         redis.clients.jedis.JedisShardInfo jedisShardInfo=new JedisShardInfo(redisUrl);
