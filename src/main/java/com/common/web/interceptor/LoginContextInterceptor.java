@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.HandlerMethod;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 public class LoginContextInterceptor extends HandlerInterceptorAdapter {
     private static final Log log = LogFactory.getLog(LoginContextInterceptor.class);
+    @Autowired(required=false)
     protected CookieUtils cookieUtils;
     protected String loginCookieKey;
     protected int rate = 2;
