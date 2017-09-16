@@ -13,8 +13,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-
-import javax.annotation.Resource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -25,9 +23,7 @@ import java.util.*;
 public abstract class AbstractMongoService<T extends AbstractBaseEntity> implements MongoService<T> {
     private static Logger logger = Logger.getLogger(AbstractMongoService.class);
 
-    @Resource
-    private MongoTemplate mongoTemplate;
-
+    private MongoTemplate template;
 
     protected abstract Class<T> getEntityClass();
 
@@ -51,12 +47,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             entity.setUpdateTime(createTime);
         }
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        mongoTemplate.insert(entity);
+        template.insert(entity);
         return entity.getId();
     }
 
 
-    public void up(T entity) {
+    private void up(T entity) {
         if (entity == null || entity.getId() == null) {
             throw new ApplicationException("Id不能为空");
         }
@@ -65,7 +61,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
-        mongoTemplate.findAndModify(query, update, entity.getClass());
+        template.findAndModify(query, update, entity.getClass());
     }
 
 
@@ -74,7 +70,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
         query.addCriteria(Criteria.where("delStatus").is(YesOrNoEnum.NO.getValue()));
-        List<T> ts = mongoTemplate.find(query, getEntityClass());
+        List<T> ts = template.find(query, getEntityClass());
         if (ts != null && ts.size() == 1) {
             return ts.get(0);
         }
@@ -98,29 +94,29 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
         entity.setDelStatus(YesOrNoEnum.YES.getValue());
         Update update = addUpdate(entity);
-        mongoTemplate.findAndModify(query, update, getEntityClass());
+        template.findAndModify(query, update, getEntityClass());
     }
 
     public List<T> query(T entity) {
         if (entity == null) {
-            return mongoTemplate.findAll(getEntityClass());
+            return template.findAll(getEntityClass());
         }
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
-        return mongoTemplate.find(query, getEntityClass());
+        return template.find(query, getEntityClass());
     }
 
     public Long queryCount(T entity) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
-        return mongoTemplate.count(query, entity.getClass());
+        return template.count(query, entity.getClass());
     }
 
     public Page<T> queryByPage(T entity, Pageable pageable) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Long count = queryCount(entity);
         Query query = buildCondition(entity,pageable);
-        List<T> list = mongoTemplate.find(query, getEntityClass());
+        List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
     }
@@ -128,7 +124,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     public T findByOne(T entity) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
-        return mongoTemplate.findOne(query, getEntityClass());
+        return template.findOne(query, getEntityClass());
     }
 
     private Map<String, Field> beanPropertyes = new HashMap<>();
@@ -201,6 +197,9 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                                 case LIKE:
                                     criteria = Criteria.where(propertyName).regex(property.toString());
                                     break;
+                                case EXISTS:
+                                    criteria = Criteria.where(propertyName).exists(StringUtils.equalsIgnoreCase("1",property.toString()));
+                                    break;
                             }
                         } else {
                             criteria = Criteria.where(descriptorName).is(property);
@@ -257,7 +256,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         return update;
     }
 
-    public void setMongoTemplate(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
+    public void setTemplate(MongoTemplate template) {
+        this.template = template;
     }
 }
