@@ -3,6 +3,7 @@ package com.common.mongo;
 import com.common.util.AbstractBaseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
 
@@ -60,5 +61,12 @@ public interface MongoService<T extends AbstractBaseEntity> {
     public Page<T> queryByPage(T entity, Pageable pageable);
 
 
+    /**
+     * 分页查询
+     * @param query
+     * @param pageable
+     * @return
+     */
+    public Page<T> queryByPage(Query query,Pageable pageable);
 
 }

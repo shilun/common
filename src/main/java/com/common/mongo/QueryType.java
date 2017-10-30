@@ -11,5 +11,6 @@ public enum QueryType {
     GTE,//">="
     NE,//"!="
     LIKE,//"like"
-    EXISTS,
+    EXISTS,//存在
+    IN,// in
 }

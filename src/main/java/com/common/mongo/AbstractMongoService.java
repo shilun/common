@@ -7,6 +7,7 @@ import com.common.util.PropertyUtil;
 import com.common.util.StringUtils;
 import com.common.util.model.YesOrNoEnum;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -23,6 +24,7 @@ import java.util.*;
 public abstract class AbstractMongoService<T extends AbstractBaseEntity> implements MongoService<T> {
     private static Logger logger = Logger.getLogger(AbstractMongoService.class);
 
+    @Autowired(required = false)
     private MongoTemplate template;
 
     protected abstract Class<T> getEntityClass();
@@ -52,7 +54,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
 
-    private void up(T entity) {
+    public void up(T entity) {
         if (entity == null || entity.getId() == null) {
             throw new ApplicationException("Id不能为空");
         }
@@ -116,6 +118,13 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Long count = queryCount(entity);
         Query query = buildCondition(entity,pageable);
+        List<T> list = template.find(query, getEntityClass());
+        Page<T> pagelist = new PageImpl<T>(list, pageable, count);
+        return pagelist;
+    }
+
+    public Page<T> queryByPage( Query query,Pageable pageable){
+        long count = template.count(query, getEntityClass());
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
@@ -196,6 +205,19 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                                     break;
                                 case LIKE:
                                     criteria = Criteria.where(propertyName).regex(property.toString());
+                                    break;
+                                case IN:
+                                    Object[] values=null;
+                                    if(property instanceof ArrayList){
+                                         values=((ArrayList)property).toArray();
+                                    }
+                                    if(property.getClass().isArray()){
+                                        values= (Object[]) property;
+                                    }
+                                    if(property instanceof Map){
+                                        values= ((Map)property).entrySet().toArray();
+                                    }
+                                    criteria = Criteria.where(propertyName).in(values);
                                     break;
                                 case EXISTS:
                                     criteria = Criteria.where(propertyName).exists(StringUtils.equalsIgnoreCase("1",property.toString()));

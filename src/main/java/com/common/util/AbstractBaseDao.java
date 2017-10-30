@@ -5,7 +5,6 @@
 
 package com.common.util;
 
-import com.common.util.AbstractBaseEntity;
 import java.io.Serializable;
 import java.util.List;
 

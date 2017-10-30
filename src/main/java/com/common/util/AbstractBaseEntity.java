@@ -35,7 +35,7 @@ public class AbstractBaseEntity implements Serializable {
     private Date createTime;
     @JsonIgnore
     private Integer delStatus;
-    @JsonIgnore
+//    @JsonIgnore
     private Date updateTime;
     @JsonIgnore
     private Long minId;
