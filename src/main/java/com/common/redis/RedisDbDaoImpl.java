@@ -54,6 +54,8 @@ public class RedisDbDaoImpl implements RedisDbDao {
 
     }
 
+
+
     public Long llen(String key) {
         if(!this.use) {
             return null;
