@@ -35,15 +35,15 @@ public class AbstractBaseEntity implements Serializable {
     private Date createTime;
     @JsonIgnore
     private Integer delStatus;
-//    @JsonIgnore
+    @JsonIgnore
     private Date updateTime;
     @JsonIgnore
     private Long minId;
     @JsonIgnore
-    @QueryField(name="createTime",type = QueryType.GTE )
+    @QueryField(name = "createTime", type = QueryType.GTE)
     private Date startCreateTime;
     @JsonIgnore
-    @QueryField(name="createTime",type = QueryType.LTE )
+    @QueryField(name = "createTime", type = QueryType.LTE)
     private Date endCreateTime;
     @JsonIgnore
     private Integer orderTpe;//1 升序ASC，2 降序Desc
