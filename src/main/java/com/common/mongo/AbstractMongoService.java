@@ -8,6 +8,7 @@ import com.common.util.StringUtils;
 import com.common.util.model.YesOrNoEnum;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -48,6 +49,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity.getUpdateTime() == null) {
             entity.setUpdateTime(createTime);
         }
+        doExcuteProperty(entity);
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         template.insert(entity);
         return entity.getId();
@@ -59,11 +61,25 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             throw new ApplicationException("Id不能为空");
         }
         Query query = new Query();
+        doExcuteProperty(entity);
         Criteria criteria = Criteria.where("id").is(entity.getId());
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
         template.findAndModify(query, update, entity.getClass());
+    }
+
+    private void doExcuteProperty(T entity) {
+        for (Field field : beanPropertyes.values()) {
+            Transient annotation = field.getAnnotation(Transient.class);
+            if(annotation!=null){
+                try {
+                    field.set(entity,null);
+                } catch (IllegalAccessException e) {
+                    logger.error("set entity property error"+entity.getClass().getSimpleName(),e);
+                }
+            }
+        }
     }
 
 
