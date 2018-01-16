@@ -3,6 +3,7 @@ package com.common.web.interceptor;
 import com.common.annotation.RoleResource;
 import com.common.constants.GlobalContstants;
 import com.common.cookie.LoginContext;
+import com.common.util.RPCResult;
 import com.common.util.Result;
 import com.common.web.interceptor.rpc.ResourcesRPCService;
 
@@ -35,12 +36,12 @@ public class RoleResourceInterceptor extends HandlerInterceptorAdapter {
                 } else {
                     List resourceList = (List) request.getSession().getAttribute(GlobalContstants.LOGIN_ROLE_RESOURCE_KEY);
                     if (resourceList == null) {
-                        Result<List<String>> roleResource = this.resourcesRPCService.findResources(LoginContext.getTicket().getLoginName());
+                        RPCResult<List<String>> roleResource = this.resourcesRPCService.findResources(LoginContext.getTicket().getLoginName());
                         if (!roleResource.getSuccess().booleanValue()) {
                             logger.error("操作员资源获取失败," + roleResource.getMessage());
                             return false;
                         }
-                        resourceList = roleResource.getModule();
+                        resourceList = roleResource.getData();
                         request.getSession().setAttribute(GlobalContstants.LOGIN_ROLE_RESOURCE_KEY, resourceList);
                     }
                     if (methodAnnotation != null && resourceList.contains(methodAnnotation.resource())) {

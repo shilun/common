@@ -5,6 +5,7 @@
 
 package com.common.web.interceptor.rpc;
 
+import com.common.util.RPCResult;
 import com.common.util.Result;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,5 +23,5 @@ public interface ResourcesRPCService {
      * @return
      */
     @RequestMapping("/rpc/resource/findResources")
-    public Result<List<String>> findResources(@RequestParam(name = "pin") String pin);
+    public RPCResult<List<String>> findResources(@RequestParam(name = "pin") String pin);
 }
