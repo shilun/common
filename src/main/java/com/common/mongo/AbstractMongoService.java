@@ -72,11 +72,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     private void doExcuteProperty(T entity) {
         for (Field field : beanPropertyes.values()) {
             Transient annotation = field.getAnnotation(Transient.class);
-            if(annotation!=null){
+            if (annotation != null) {
                 try {
-                    field.set(entity,null);
+                    field.set(entity, null);
                 } catch (IllegalAccessException e) {
-                    logger.error("set entity property error"+entity.getClass().getSimpleName(),e);
+                    logger.error("set entity property error" + entity.getClass().getSimpleName(), e);
                 }
             }
         }
@@ -133,13 +133,13 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     public Page<T> queryByPage(T entity, Pageable pageable) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Long count = queryCount(entity);
-        Query query = buildCondition(entity,pageable);
+        Query query = buildCondition(entity, pageable);
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
     }
 
-    public Page<T> queryByPage( Query query,Pageable pageable){
+    public Page<T> queryByPage(Query query, Pageable pageable) {
         long count = template.count(query, getEntityClass());
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
@@ -223,20 +223,20 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                                     criteria = Criteria.where(propertyName).regex(property.toString());
                                     break;
                                 case IN:
-                                    Object[] values=null;
-                                    if(property instanceof ArrayList){
-                                         values=((ArrayList)property).toArray();
+                                    Object[] values = null;
+                                    if (property instanceof ArrayList) {
+                                        values = ((ArrayList) property).toArray();
                                     }
-                                    if(property.getClass().isArray()){
-                                        values= (Object[]) property;
+                                    if (property.getClass().isArray()) {
+                                        values = (Object[]) property;
                                     }
-                                    if(property instanceof Map){
-                                        values= ((Map)property).entrySet().toArray();
+                                    if (property instanceof Map) {
+                                        values = ((Map) property).entrySet().toArray();
                                     }
                                     criteria = Criteria.where(propertyName).in(values);
                                     break;
                                 case EXISTS:
-                                    criteria = Criteria.where(propertyName).exists(StringUtils.equalsIgnoreCase("1",property.toString()));
+                                    criteria = Criteria.where(propertyName).exists(StringUtils.equalsIgnoreCase("1", property.toString()));
                                     break;
                             }
                         } else {
@@ -250,9 +250,9 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             }
         }
         if (pageable != null) {
-            if(pageable instanceof PageRequest){
+            if (pageable instanceof PageRequest) {
                 Sort orders = buildSort(entity);
-                PageRequest pageRequest=new PageRequest(pageable.getPageNumber(),pageable.getPageSize(),orders);
+                PageRequest pageRequest = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), orders);
                 query.with(pageRequest);
             }
         }
@@ -278,6 +278,10 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     private Update addUpdate(T entity) {
         Update update = new Update();
         for (Field descriptor : beanPropertyes.values()) {
+            Transient annotation = descriptor.getAnnotation(Transient.class);
+            if(annotation!=null){
+                continue;
+            }
             String descriptorName = descriptor.getName();
             if ((!descriptorName.equals("class")) && (!descriptorName.equals("id"))) {
                 Object property = null;
