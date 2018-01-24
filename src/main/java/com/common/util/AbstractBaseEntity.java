@@ -19,33 +19,22 @@ import java.util.Date;
 public class AbstractBaseEntity implements Serializable {
 
     @Id
-    @JsonIgnore
     private String uuid;
     private static final long serialVersionUID = 1L;
-    @JsonIgnore
     private String orderColumn;
-    @JsonIgnore
     private Integer startRow;
-    @JsonIgnore
     private Integer endRow;
     @QueryField
     @GeneratedValue
     private Long id;
-    @JsonIgnore
     private Date createTime;
-    @JsonIgnore
     private Integer delStatus;
-    @JsonIgnore
     private Date updateTime;
-    @JsonIgnore
     private Long minId;
-    @JsonIgnore
     @QueryField(name = "createTime", type = QueryType.GTE)
     private Date startCreateTime;
-    @JsonIgnore
     @QueryField(name = "createTime", type = QueryType.LTE)
     private Date endCreateTime;
-    @JsonIgnore
     private Integer orderTpe;//1 升序ASC，2 降序Desc
 
     public Long getMinId() {
