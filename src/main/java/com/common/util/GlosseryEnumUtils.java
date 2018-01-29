@@ -69,7 +69,7 @@ public class GlosseryEnumUtils {
         classes.put(name, classz);
     }
 
-    public static <T extends IGlossary> List<IGlossary> getItems(Class<T> classz) {
+    public static <T extends IGlossary> List<T> getItems(Class<T> classz) {
         if(classz == null) {
             throw new ApplicationException("class can not be null");
         } else if(!classz.isEnum()) {
@@ -84,7 +84,7 @@ public class GlosseryEnumUtils {
         }
     }
 
-    public static <T extends IGlossary> List<IGlossary> getItemsByShortName(String shortName) {
+    public static <T extends IGlossary> List<T> getItemsByShortName(String shortName) {
         Class classz = (Class)classes.get(shortName);
         if(classz == null) {
             throw new ApplicationException("缺少枚举配置,类型  +" + shortName + "");
@@ -93,75 +93,44 @@ public class GlosseryEnumUtils {
         }
     }
 
-    public static <T extends IGlossary> IGlossary getItemsByShortName(String shortName, Integer value) {
+
+    public static IGlossary getEnumName(String shortName, Integer value) {
+        if(StringUtils.isBlank(shortName)){
+            return null;
+        }
         if(value == null) {
             return null;
         } else {
-            List items = getItems((Class)classes.get(shortName));
-            Iterator var3 = items.iterator();
-
-            IGlossary item;
-            do {
-                if(!var3.hasNext()) {
-                    return null;
+            List<IGlossary> items = getItems((Class)classes.get(shortName));
+            for(IGlossary t:items){
+                if(t.getValue().intValue()==value){
+                    return t;
                 }
 
-                item = (IGlossary)var3.next();
-            } while(item.getValue().intValue() != value.intValue());
-
-            return item;
-        }
-    }
-
-    public static <T extends IGlossary> IGlossary getEnumName(String shortName, Integer value) {
-        if(value == null) {
+            }
             return null;
-        } else {
-            List items = getItems((Class)classes.get(shortName));
-            Iterator var3 = items.iterator();
-
-            IGlossary item;
-            do {
-                if(!var3.hasNext()) {
-                    return null;
-                }
-
-                item = (IGlossary)var3.next();
-            } while(item.getValue().intValue() != value.intValue());
-
-            return item;
         }
     }
 
-    public static <T extends IGlossary> IGlossary getItem(Class<T> classz, Integer value) {
-        List items = getItems(classz);
-        Iterator var3 = items.iterator();
-
-        IGlossary item;
-        do {
-            if(!var3.hasNext()) {
-                return null;
+    public static <T extends IGlossary> T getItem(Class<T> classz, Integer value) {
+        List<T> items = getItems(classz);
+        for(T t:items){
+            if(t.getValue().intValue()==value){
+                return t;
             }
 
-            item = (IGlossary)var3.next();
-        } while(item.getValue().intValue() != value.intValue());
-
-        return item;
+        }
+        return null;
     }
 
-    public static <T extends IGlossary> IGlossary getItem(String className, Integer value) {
-        List items = getItemsByShortName(className);
-        Iterator var3 = items.iterator();
-
-        IGlossary item;
-        do {
-            if(!var3.hasNext()) {
-                return null;
+    public static  IGlossary getItem(String className, Integer value) {
+        List<IGlossary> items = getItemsByShortName(className);
+        for(IGlossary t:items){
+            if(t.getValue().intValue()==value){
+                return t;
             }
 
-            item = (IGlossary)var3.next();
-        } while(item.getValue().intValue() != value.intValue());
-
-        return item;
+        }
+        return null;
     }
 }
