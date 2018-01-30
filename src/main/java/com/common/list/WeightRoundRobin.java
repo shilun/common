@@ -5,7 +5,6 @@
 
 package com.common.list;
 
-import com.common.list.Server;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
