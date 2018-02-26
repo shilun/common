@@ -3,6 +3,7 @@ package com.common.mongo;
 import com.common.annotation.QueryField;
 import com.common.exception.ApplicationException;
 import com.common.util.AbstractBaseEntity;
+import com.common.util.Money;
 import com.common.util.PropertyUtil;
 import com.common.util.StringUtils;
 import com.common.util.model.YesOrNoEnum;
@@ -41,6 +42,13 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity.getId() != null) {
             up(entity);
             return entity.getId();
+        }
+        return insert(entity);
+    }
+
+    public Long insert(T entity) {
+        if (entity == null) {
+            throw new ApplicationException("保存失败，对象未实例化");
         }
         Date createTime = new Date();
         if (entity.getCreateTime() == null) {
@@ -184,8 +192,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             if ((!descriptorName.equals("class")) && (!descriptorName.equals("orderColumn")) && (!descriptorName.equals("orderTpe"))) {
                 try {
                     property = PropertyUtil.getProperty(entity, descriptorName);
+                    if(property instanceof Money){
+                        property=((Money)property).getCent();
+                    }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("buildCondition error",e);
                 }
                 if (property != null) {
                     Criteria criteria = new Criteria();
@@ -200,6 +211,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                             } else {
                                 propertyName = descriptorName;
                             }
+
                             switch (type) {
                                 case EQ:
                                     criteria = Criteria.where(propertyName).is(property);
@@ -287,6 +299,9 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                 Object property = null;
                 try {
                     property = PropertyUtil.getProperty(entity, descriptorName);
+                    if(property instanceof Money){
+                        property=((Money)property).getCent();
+                    }
                 } catch (Exception e) {
                     throw new ApplicationException("更新或添加mongodb失败", e);
                 }

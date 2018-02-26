@@ -17,6 +17,12 @@ public interface MongoService<T extends AbstractBaseEntity> {
      * @return
      */
     public Long save(T entity);
+    /***
+     * 添加
+     * @param entity
+     * @return
+     */
+    public Long insert(T entity);
 
     /***
      * 根据id查询

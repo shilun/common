@@ -16,12 +16,16 @@
 
 package com.common.config;
 
+import com.common.mongo.LongToMoneyConvert;
+import com.common.mongo.MoneyToLongConvert;
 import com.common.mongo.SaveMongoEventListener;
+import com.common.util.Money;
 import com.common.util.StringUtils;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -33,11 +37,18 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.core.convert.*;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 import javax.annotation.PreDestroy;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for Mongo.
@@ -53,11 +64,35 @@ public class MongoConfig {
     private String database;
     @Bean(name = "mongoTemplate")
     @RefreshScope
-    public MongoTemplate mongoTemplate() throws Exception {
+    public MongoTemplate mongoTemplate(MongoDbFactory dbFactory,MappingMongoConverter converter) throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
-            return null;
+            throw new Exception("mongodb load error url"+mongodbUrl);
         }
-        return new MongoTemplate(mongo(), database);
+        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        return new MongoTemplate(dbFactory,converter);
+    }
+    @Bean
+    public CustomConversions customConversions() {
+        List list = new ArrayList();
+        list.add(new MoneyToLongConvert());
+        list.add(new LongToMoneyConvert());
+        return new CustomConversions(list);
+    }
+    @Bean
+    public MongoDbFactory dbFactory() throws UnknownHostException {
+        return new SimpleMongoDbFactory(mongo(), database);
+    }
+    @Bean
+    public MongoMappingContext mappingContext(){
+        return new MongoMappingContext();
+    }
+    @Bean
+    public MappingMongoConverter mappingMongoConverter(MongoDbFactory  factory, MongoMappingContext context,CustomConversions customConversions) {
+        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
+        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
+        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));//去掉默认mapper添加的_class
+        mappingConverter.setCustomConversions(customConversions);//添加自定义的转换器
+        return mappingConverter;
     }
     private MongoClient mongo;
 

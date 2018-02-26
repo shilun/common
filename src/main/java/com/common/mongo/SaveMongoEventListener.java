@@ -1,6 +1,5 @@
 package com.common.mongo;
 
-import com.common.annotation.GeneratedValue;
 import com.common.util.AbstractBaseEntity;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -9,10 +8,8 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Field;
 
 public class SaveMongoEventListener extends AbstractMongoEventListener<AbstractBaseEntity> {
     @Resource
@@ -27,6 +24,7 @@ public class SaveMongoEventListener extends AbstractMongoEventListener<AbstractB
             }
         }
     }
+
 
     /**
      * 获取下一个自增ID
