@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -36,6 +38,29 @@ public class AbstractBaseEntity implements Serializable {
     @QueryField(name = "createTime", type = QueryType.LTE)
     private Date endCreateTime;
     private Integer orderTpe;//1 升序ASC，2 降序Desc
+
+    private Integer size;
+    private Integer page;
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
+
+    public Pageable buildPage(){
+        return new PageRequest(page,size);
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
 
     public Long getMinId() {
         return this.minId;

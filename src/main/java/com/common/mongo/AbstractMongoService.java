@@ -78,16 +78,16 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     private void doExcuteProperty(T entity) {
-        for (Field field : beanPropertyes.values()) {
-            Transient annotation = field.getAnnotation(Transient.class);
-            if (annotation != null) {
-                try {
-                    field.set(entity, null);
-                } catch (IllegalAccessException e) {
-                    logger.error("set entity property error" + entity.getClass().getSimpleName(), e);
-                }
-            }
-        }
+//        for (Field field : beanPropertyes.values()) {
+//            Transient annotation = field.getAnnotation(Transient.class);
+//            if (annotation != null) {
+//                try {
+//                    field.set(entity, null);
+//                } catch (IllegalAccessException e) {
+//                    logger.error("set entity property error" + entity.getClass().getSimpleName(), e);
+//                }
+//            }
+//        }
     }
 
 
