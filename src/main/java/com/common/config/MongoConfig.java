@@ -19,26 +19,14 @@ package com.common.config;
 import com.common.mongo.LongToMoneyConvert;
 import com.common.mongo.MoneyToLongConvert;
 import com.common.mongo.SaveMongoEventListener;
-import com.common.util.Money;
 import com.common.util.StringUtils;
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.mongo.MongoProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
@@ -63,7 +51,6 @@ public class MongoConfig {
     @Value("${spring.data.mongodb.database}")
     private String database;
     @Bean(name = "mongoTemplate")
-    @RefreshScope
     public MongoTemplate mongoTemplate(MongoDbFactory dbFactory,MappingMongoConverter converter) throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url"+mongodbUrl);

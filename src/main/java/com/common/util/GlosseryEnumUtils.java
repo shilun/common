@@ -122,6 +122,18 @@ public class GlosseryEnumUtils {
         }
         return null;
     }
+    public static <T extends IGlossary> T getItem(Class<T> classz, String name) {
+        List<T> items = getItems(classz);
+        for(T t:items){
+            if(t instanceof Enum){
+                Enum  e= (Enum) t;
+                if(e.name().equals(name)){
+                    return t;
+                }
+            }
+        }
+        return null;
+    }
 
     public static  IGlossary getItem(String className, Integer value) {
         List<IGlossary> items = getItemsByShortName(className);

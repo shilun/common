@@ -6,10 +6,7 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -21,7 +18,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 /**
@@ -40,7 +36,6 @@ public class DataSourceConfig implements TransactionManagementConfigurer,Environ
     public DataSource dataSource;
 
     @Bean(name = "sqlSessionFactory")
-    @RefreshScope
     public SqlSessionFactory sqlSessionFactoryBean() {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(dataSource);
@@ -56,13 +51,11 @@ public class DataSourceConfig implements TransactionManagementConfigurer,Environ
     }
 
     @Bean
-    @RefreshScope
     public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean
-    @RefreshScope
     @Override
     public PlatformTransactionManager annotationDrivenTransactionManager() {
         return new DataSourceTransactionManager(dataSource);

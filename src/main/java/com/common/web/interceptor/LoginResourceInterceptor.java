@@ -7,7 +7,6 @@ package com.common.web.interceptor;
 
 import com.common.annotation.LoginResource;
 import com.common.cookie.LoginContext;
-import com.common.web.interceptor.rpc.ResourcesRPCService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
@@ -16,7 +15,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 public class LoginResourceInterceptor extends HandlerInterceptorAdapter {
     private static Logger logger = Logger.getLogger(LoginResourceInterceptor.class);
-    private ResourcesRPCService operatorResourceRPCService;
     private Boolean audi = Boolean.valueOf(false);
 
     public LoginResourceInterceptor() {
