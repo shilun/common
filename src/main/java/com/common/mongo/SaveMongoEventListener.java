@@ -36,7 +36,7 @@ public class SaveMongoEventListener extends AbstractMongoEventListener<AbstractB
     private Long getNextId(String collName) {
         Query query = new Query(Criteria.where("collName").is(collName));
         Update update = new Update();
-        update.inc("seqId", 1);
+        update.inc("seqId", new Long(1));
         FindAndModifyOptions options = new FindAndModifyOptions();
         options.upsert(true);
         options.returnNew(true);

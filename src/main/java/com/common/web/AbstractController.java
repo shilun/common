@@ -6,11 +6,15 @@
 package com.common.web;
 
 import com.common.cookie.LoginContext;
+import com.common.exception.ApplicationException;
 import com.common.exception.BizException;
 import com.common.util.LoginInfo;
 import com.common.util.Money;
 import com.common.util.RPCResult;
 import com.common.util.Result;
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.WebDataBinder;
@@ -19,6 +23,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -66,13 +71,13 @@ public abstract class AbstractController {
 
         try {
             Object e = execute.getData();
-            if(e != null) {
+            if (e != null) {
                 boolean seted = false;
-                if(!seted && e instanceof Result) {
-                    Result dataItem1 = (Result)e;
+                if (!seted && e instanceof Result) {
+                    Result dataItem1 = (Result) e;
                     map.put("success", dataItem1.getSuccess());
                     HashMap page1;
-                    if(!dataItem1.getSuccess().booleanValue()) {
+                    if (!dataItem1.getSuccess().booleanValue()) {
                         page1 = new HashMap();
                         page1.put("code", dataItem1.getResultCode());
                         map.put("message", dataItem1.getMessage());
@@ -83,11 +88,11 @@ public abstract class AbstractController {
                     Set keySet = dataItem1.keySet();
                     Iterator var8 = keySet.iterator();
 
-                    while(var8.hasNext()) {
-                        String key = (String)var8.next();
+                    while (var8.hasNext()) {
+                        String key = (String) var8.next();
                         Object value = dataItem1.get(key);
-                        if(value instanceof Page) {
-                            Page pateItem = (Page)value;
+                        if (value instanceof Page) {
+                            Page pateItem = (Page) value;
                             HashMap pageValue = new HashMap();
                             pageValue.put("result", pateItem.getContent());
                             pageValue.put("total", pateItem.getTotalElements());
@@ -103,7 +108,7 @@ public abstract class AbstractController {
                 }
 
                 HashMap dataItem;
-                if(e instanceof List) {
+                if (e instanceof List) {
                     seted = true;
                     dataItem = new HashMap();
                     dataItem.put("list", e);
@@ -112,10 +117,10 @@ public abstract class AbstractController {
                     return map;
                 }
 
-                if(e instanceof Page) {
+                if (e instanceof Page) {
                     seted = true;
                     dataItem = new HashMap();
-                    Page page = (Page)e;
+                    Page page = (Page) e;
                     dataItem.put("list", page.getContent());
                     dataItem.put("pageSize", Integer.valueOf(page.getSize()));
                     dataItem.put("totalCount", Long.valueOf(page.getTotalElements()));
@@ -124,7 +129,7 @@ public abstract class AbstractController {
                     map.put("data", dataItem);
                 }
 
-                if(!seted) {
+                if (!seted) {
                     map.put("data", e);
                 }
             }
@@ -146,6 +151,7 @@ public abstract class AbstractController {
 
         return map;
     }
+
     protected <T> RPCResult<T> buildRPCMessage(IExecute execute) {
         RPCResult<T> result = new RPCResult<>();
 
@@ -262,5 +268,21 @@ public abstract class AbstractController {
             params.put(name, valueStr);
         }
         return params;
+    }
+
+
+    /**
+     * 获取JSON id
+     *
+     * @return
+     */
+    protected Long getIdByJson(String content) {
+        try {
+            JSONObject json = JSONObject.fromObject(content);
+            return json.getLong("id");
+        } catch (Exception e) {
+            LOGGER.error("get json id error", e);
+        }
+        throw new ApplicationException("获取JSON id 失败");
     }
 }
