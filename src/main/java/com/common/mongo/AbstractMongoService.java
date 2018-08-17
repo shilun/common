@@ -29,7 +29,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     @Autowired(required = false)
     private MongoTemplate template;
 
-    protected abstract Class<T> getEntityClass();
+    protected abstract Class getEntityClass();
 
     public AbstractMongoService() {
         buildPropertyDescriptor();
@@ -157,7 +157,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     public T findByOne(T entity) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
-        return template.findOne(query, getEntityClass());
+        return template.findOne(query, (Class<T>) getEntityClass());
     }
 
     private Map<String, Field> beanPropertyes = new HashMap<>();
