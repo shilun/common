@@ -6,11 +6,6 @@
 package com.common.util;
 
 import com.common.exception.BizException;
-import com.common.redis.RedisDbDao;
-import com.common.util.AbstractBaseDao;
-import com.common.util.AbstractBaseEntity;
-import com.common.util.AbstractBaseInterface;
-import com.common.util.AbstractBaseService;
 import com.common.util.model.YesOrNoEnum;
 import java.util.Date;
 import java.util.List;
@@ -20,16 +15,12 @@ import org.springframework.data.domain.Pageable;
 
 public abstract class DefaultBaseService<E extends AbstractBaseEntity> extends AbstractBaseInterface implements AbstractBaseService<E> {
     private static final long serialVersionUID = 1L;
-    protected RedisDbDao redisDbDao;
 
     public DefaultBaseService() {
     }
 
     public abstract AbstractBaseDao<E> getBaseDao();
 
-    public void setRedisDbDao(RedisDbDao redisDbDao) {
-        this.redisDbDao = redisDbDao;
-    }
 
     public Long add(E entity) {
         if(entity == null) {

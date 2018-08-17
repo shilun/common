@@ -6,12 +6,10 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.context.EnvironmentAware;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -26,11 +24,12 @@ import javax.sql.DataSource;
 @Configuration
 @EnableTransactionManagement
 @Conditional(DataSourceCondition.class)
-public class DataSourceConfig implements TransactionManagementConfigurer,EnvironmentAware {
+public class DataSourceConfig implements TransactionManagementConfigurer {
 
     private Logger logger= org.slf4j.LoggerFactory.getLogger(DataSourceConfig.class);
 
-
+    @Value("${spring.datasource.url}")
+    private String url;
 
     @Autowired(required = false)
     public DataSource dataSource;
@@ -39,7 +38,7 @@ public class DataSourceConfig implements TransactionManagementConfigurer,Environ
     public SqlSessionFactory sqlSessionFactoryBean() {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(dataSource);
-        if(StringUtils.isNotBlank(propertyResolver.getProperty("url"))){
+        if(StringUtils.isNotBlank(url)){
             bean.setConfigLocation(new ClassPathResource("sqlmap-config.xml"));
         }
         try {
@@ -61,10 +60,4 @@ public class DataSourceConfig implements TransactionManagementConfigurer,Environ
         return new DataSourceTransactionManager(dataSource);
     }
 
-    private RelaxedPropertyResolver propertyResolver;
-
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.propertyResolver = new RelaxedPropertyResolver(environment, "spring.datasource.");
-    }
 }
