@@ -100,7 +100,7 @@ public class MongoConfig {
             return null;
         }
         com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl);
-        com.mongodb.MongoClient mongo = new MongoClient(url);
+        mongo = new MongoClient(url);
         return mongo;
     }
 

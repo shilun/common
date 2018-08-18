@@ -6,10 +6,10 @@
 package com.common.security;
 
 import java.security.MessageDigest;
+import java.util.Base64;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 public abstract class Coder {
     private static final Log log = LogFactory.getLog(Coder.class);
@@ -19,13 +19,6 @@ public abstract class Coder {
     public Coder() {
     }
 
-    public static byte[] decryptBASE64(String key) throws Exception {
-        return (new BASE64Decoder()).decodeBuffer(key);
-    }
-
-    public static String encryptBASE64(byte[] key) throws Exception {
-        return (new BASE64Encoder()).encode(key);
-    }
 
     public static byte[] encryptMD5(byte[] data) throws Exception {
         MessageDigest md5 = MessageDigest.getInstance("MD5");
@@ -51,5 +44,37 @@ public abstract class Coder {
         }
 
         return strbuf.toString();
+    }
+
+    /**
+     * BASE64Encoder 加密
+     *
+     * @param data
+     *            要加密的数据
+     * @return 加密后的字符串
+     */
+    public static String encryptBASE64(byte[] data) {
+        // BASE64Encoder encoder = new BASE64Encoder();
+        // String encode = encoder.encode(data);
+        // 从JKD 9开始rt.jar包已废除，从JDK 1.8开始使用java.util.Base64.Encoder
+        Base64.Encoder encoder = Base64.getEncoder();
+        String encode = encoder.encodeToString(data);
+        return encode;
+    }
+    /**
+     * BASE64Decoder 解密
+     *
+     * @param data
+     *            要解密的字符串
+     * @return 解密后的byte[]
+     * @throws Exception
+     */
+    public static byte[] decryptBASE64(String data) throws Exception {
+        // BASE64Decoder decoder = new BASE64Decoder();
+        // byte[] buffer = decoder.decodeBuffer(data);
+        // 从JKD 9开始rt.jar包已废除，从JDK 1.8开始使用java.util.Base64.Decoder
+        Base64.Decoder decoder = Base64.getDecoder();
+        byte[] buffer = decoder.decode(data);
+        return buffer;
     }
 }
