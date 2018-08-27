@@ -38,30 +38,6 @@ public class AbstractBaseEntity implements Serializable {
     @QueryField(name = "createTime", type = QueryType.LTE)
     private Date endCreateTime;
     private Integer orderTpe;//1 升序ASC，2 降序Desc
-
-    private Integer size;
-    private Integer page;
-
-    public Integer getSize() {
-        return size;
-    }
-
-    public void setSize(Integer size) {
-        this.size = size;
-    }
-
-    public Pageable buildPage(){
-        return new PageRequest(page,size);
-    }
-
-    public Integer getPage() {
-        return page;
-    }
-
-    public void setPage(Integer page) {
-        this.page = page;
-    }
-
     public Long getMinId() {
         return this.minId;
     }
