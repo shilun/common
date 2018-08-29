@@ -5,7 +5,9 @@
 
 package com.common.util;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+
 import org.apache.commons.beanutils.PropertyUtils;
 
 public class BeanCoper extends PropertyUtils {
@@ -14,7 +16,18 @@ public class BeanCoper extends PropertyUtils {
 
     public static void copyProperties(Object desc, Object source) {
         try {
-            PropertyUtils.copyProperties(desc, source);
+            PropertyDescriptor[] propertyDescriptors = PropertyUtil.getPropertyDescriptors(desc);
+            for (PropertyDescriptor descriptor : propertyDescriptors) {
+                if (descriptor.getName().startsWith("class")) {
+                    continue;
+                }
+                PropertyDescriptor property = PropertyUtil.getPropertyDescriptor(source, descriptor.getName());
+                if (property != null) {
+                    Object value = PropertyUtil.getProperty(source, descriptor.getName());
+                    if (value != null)
+                        PropertyUtil.setProperty(desc, descriptor.getName(), value);
+                }
+            }
         } catch (IllegalAccessException var3) {
             var3.printStackTrace();
         } catch (InvocationTargetException var4) {
