@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -23,8 +24,11 @@ public class AbstractBaseEntity implements Serializable {
     @Id
     private String uuid;
     private static final long serialVersionUID = 1L;
+    @Transient
     private String orderColumn;
+    @Transient
     private Integer startRow;
+    @Transient
     private Integer endRow;
     @QueryField
     @GeneratedValue
@@ -32,11 +36,15 @@ public class AbstractBaseEntity implements Serializable {
     private Date createTime;
     private Integer delStatus;
     private Date updateTime;
+    @Transient
     private Long minId;
+    @Transient
     @QueryField(name = "createTime", type = QueryType.GTE)
     private Date startCreateTime;
     @QueryField(name = "createTime", type = QueryType.LTE)
+    @Transient
     private Date endCreateTime;
+    @Transient
     private Integer orderTpe;//1 升序ASC，2 降序Desc
     public Long getMinId() {
         return this.minId;

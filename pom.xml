@@ -205,7 +205,7 @@
         <repository>
             <id>releases</id>
             <name>releases</name>
-            <url>http://maven.chainexcloud.net/repository/maven-releases/</url>
+            <url>http://192.168.31.150:8081/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
     <dependencyManagement>

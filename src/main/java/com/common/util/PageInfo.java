@@ -3,7 +3,9 @@ package com.common.util;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-public class PageInfo {
+import java.io.Serializable;
+
+public class PageInfo implements Serializable {
     private Integer page = 0;
     private Integer size = 10;
 
