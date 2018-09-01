@@ -1,9 +1,6 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.common.util;
+
+import com.common.exception.ApplicationException;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -40,11 +37,40 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
     public static String getDomainName(String url) {
         url = url.toLowerCase();
         Matcher m = Pattern.compile("^http://[^/]+").matcher(url);
-        return m.find()?m.group():"";
+        return m.find() ? m.group() : "";
     }
 
     public static String getSubTitleName(String title, Integer subSize) {
-        return isNotBlank(title)?(title.length() > subSize.intValue()?title.substring(0, subSize.intValue()) + "....":title):"";
+        return isNotBlank(title) ? (title.length() > subSize.intValue() ? title.substring(0, subSize.intValue()) + "...." : title) : "";
+    }
+
+    /**
+     * 解析域名
+     *
+     * @param url
+     * @return
+     */
+    public static String asyncDomain(String url) {
+        int i = url.indexOf("//");
+        if (i == -1) {
+            throw new ApplicationException("url.format.error");
+        }
+        url = url.substring(i + 2);
+        i = url.indexOf("/");
+        if (i == -1) {
+            i = url.indexOf("?");
+            url = url.substring(0, i);
+        } else {
+            url = url.substring(0, i);
+        }
+        i = url.lastIndexOf(".");
+        if (i == -1) {
+            throw new ApplicationException("url.format.error");
+        }
+        String temp = url.substring(0, i);
+        i = temp.lastIndexOf(".", i);
+        url = url.substring(i + 1);
+        return url;
     }
 
     public static boolean isContains(String text, String subText) {

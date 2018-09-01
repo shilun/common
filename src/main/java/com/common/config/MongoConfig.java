@@ -16,6 +16,7 @@
 
 package com.common.config;
 
+import com.common.mongo.IGlossaryToIntegerConvert;
 import com.common.mongo.LongToMoneyConvert;
 import com.common.mongo.MoneyToLongConvert;
 import com.common.mongo.SaveMongoEventListener;
@@ -62,6 +63,7 @@ public class MongoConfig {
     public CustomConversions customConversions() {
         List list = new ArrayList();
         list.add(new MoneyToLongConvert());
+        list.add(new IGlossaryToIntegerConvert());
         list.add(new LongToMoneyConvert());
         return new CustomConversions(list);
     }
