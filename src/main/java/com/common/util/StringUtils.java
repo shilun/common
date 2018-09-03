@@ -34,11 +34,6 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
         return replace(UUID.randomUUID().toString(), "-", "");
     }
 
-    public static String getDomainName(String url) {
-        url = url.toLowerCase();
-        Matcher m = Pattern.compile("^http://[^/]+").matcher(url);
-        return m.find() ? m.group() : "";
-    }
 
     public static String getSubTitleName(String title, Integer subSize) {
         return isNotBlank(title) ? (title.length() > subSize.intValue() ? title.substring(0, subSize.intValue()) + "...." : title) : "";
@@ -50,7 +45,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
      * @param url
      * @return
      */
-    public static String asyncDomain(String url) {
+    public static String getDomain(String url) {
         int i = url.indexOf("//");
         if (i == -1) {
             throw new ApplicationException("url.format.error");

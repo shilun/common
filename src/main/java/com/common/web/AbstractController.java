@@ -185,9 +185,6 @@ public abstract class AbstractController {
         return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     }
 
-    protected HttpServletResponse getResponse() {
-        return ((ServletWebRequest) RequestContextHolder.getRequestAttributes()).getResponse();
-    }
 
     /**
      * 获取加密的cookie
@@ -228,12 +225,12 @@ public abstract class AbstractController {
      * @param name
      * @param value
      */
-    protected void putCookie(String name, String value) {
-        String domain = StringUtils.getDomainName(getRequest().getRequestURI());
+    protected void putCookie(String name, String value,HttpServletResponse response) {
+        String domain = StringUtils.getDomain(getRequest().getRequestURL().toString());
         Cookie cookie = new Cookie(name, value);
         cookie.setDomain(domain);
         cookie.setPath("/");
-        getResponse().addCookie(cookie);
+        response.addCookie(cookie);
     }
 
     /**
@@ -242,13 +239,13 @@ public abstract class AbstractController {
      * @param value
      * @param encodeKey
      */
-    protected void putCookie(String name, String value, String encodeKey) {
-        String domain = StringUtils.getDomainName(getRequest().getRequestURI());
+    protected void putCookie(String name, String value, String encodeKey,HttpServletResponse response) {
+        String domain = StringUtils.getDomain(getRequest().getRequestURL().toString());
         DesEncrypter.cryptString(value, encodeKey);
         Cookie cookie = new Cookie(name, value);
         cookie.setDomain(domain);
         cookie.setPath("/");
-        getResponse().addCookie(cookie);
+        response.addCookie(cookie);
     }
 
     public LoginInfo getLogin() {
@@ -292,9 +289,5 @@ public abstract class AbstractController {
             LOGGER.error("get json id error", e);
         }
         throw new ApplicationException("获取JSON id 失败");
-    }
-
-    protected void addCookie(String name, String value) {
-
     }
 }
