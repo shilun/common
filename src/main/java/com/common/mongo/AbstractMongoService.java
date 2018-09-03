@@ -7,6 +7,7 @@ import com.common.util.Money;
 import com.common.util.PropertyUtil;
 import com.common.util.StringUtils;
 import com.common.util.model.YesOrNoEnum;
+import com.mongodb.WriteResult;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
@@ -74,7 +75,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
-        template.findAndModify(query, update, entity.getClass());
+        WriteResult upsert = template.upsert(query, update, entity.getClass());
+        if (upsert.getN() == 1 && upsert.isUpdateOfExisting()) {
+            return;
+        }
+        throw new ApplicationException("mongodb updata error");
     }
 
     private void doExcuteProperty(T entity) {
@@ -192,11 +197,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             if ((!descriptorName.equals("class")) && (!descriptorName.equals("orderColumn")) && (!descriptorName.equals("orderTpe"))) {
                 try {
                     property = PropertyUtil.getProperty(entity, descriptorName);
-                    if(property instanceof Money){
-                        property=((Money)property).getCent();
+                    if (property instanceof Money) {
+                        property = ((Money) property).getCent();
                     }
                 } catch (Exception e) {
-                    logger.error("buildCondition error",e);
+                    logger.error("buildCondition error", e);
                 }
                 if (property != null) {
                     Criteria criteria = new Criteria();
@@ -291,7 +296,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Update update = new Update();
         for (Field descriptor : beanPropertyes.values()) {
             Transient annotation = descriptor.getAnnotation(Transient.class);
-            if(annotation!=null){
+            if (annotation != null) {
                 continue;
             }
             String descriptorName = descriptor.getName();
@@ -299,8 +304,8 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                 Object property = null;
                 try {
                     property = PropertyUtil.getProperty(entity, descriptorName);
-                    if(property instanceof Money){
-                        property=((Money)property).getCent();
+                    if (property instanceof Money) {
+                        property = ((Money) property).getCent();
                     }
                 } catch (Exception e) {
                     throw new ApplicationException("更新或添加mongodb失败", e);

@@ -5,6 +5,7 @@
 
 package com.common.security;
 
+import com.common.exception.ApplicationException;
 import com.common.security.Base32;
 import com.common.security.Des;
 import com.common.security.DesDecrypter;
@@ -17,9 +18,14 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
 public class DesEncrypter extends Des {
-    public static String cryptString(String str, String key) throws Exception {
-        DesEncrypter encrypter = new DesEncrypter(key);
-        return encrypter.encrypt(str);
+    public static String cryptString(String str, String key) {
+        try {
+            DesEncrypter encrypter = new DesEncrypter(key);
+            return encrypter.encrypt(str);
+        }
+        catch(Exception e){
+            throw new ApplicationException("cryptString.error");
+        }
     }
 
     public DesEncrypter(String passPhrase) throws Exception {

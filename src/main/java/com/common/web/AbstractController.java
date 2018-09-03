@@ -8,10 +8,9 @@ package com.common.web;
 import com.common.cookie.LoginContext;
 import com.common.exception.ApplicationException;
 import com.common.exception.BizException;
-import com.common.util.LoginInfo;
-import com.common.util.Money;
-import com.common.util.RPCResult;
-import com.common.util.Result;
+import com.common.security.DesDecrypter;
+import com.common.security.DesEncrypter;
+import com.common.util.*;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
@@ -21,11 +20,13 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 public abstract class AbstractController {
@@ -40,31 +41,6 @@ public abstract class AbstractController {
         binder.registerCustomEditor(String.class, new CustomStringEditor());
         binder.registerCustomEditor(Money.class, new CustomMoneyEditor());
     }
-
-    protected void tovm(Result<?> result) {
-        Iterator var2 = result.keySet().iterator();
-
-        while (var2.hasNext()) {
-            String o = (String) var2.next();
-            this.getRequest().setAttribute(o, result.get(o));
-        }
-
-    }
-
-    protected void tovm(String key, Object value) {
-        this.getRequest().setAttribute(key, value);
-    }
-
-    protected void tovm(Map<String, Object> result) {
-        Iterator var2 = result.keySet().iterator();
-
-        while (var2.hasNext()) {
-            String o = (String) var2.next();
-            this.getRequest().setAttribute(o, result.get(o));
-        }
-
-    }
-
 
     protected Map<String, Object> buildMessage(IExecute execute) {
         HashMap map = new HashMap();
@@ -209,21 +185,26 @@ public abstract class AbstractController {
         return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     }
 
-    protected String getCookeiValue(String key, String domain) {
-        Cookie[] cookies = this.getRequest().getCookies();
-        Cookie[] var4 = cookies;
-        int var5 = cookies.length;
-
-        for (int var6 = 0; var6 < var5; ++var6) {
-            Cookie cookie = var4[var6];
-            if (cookie.getName().equalsIgnoreCase(key) && cookie.getDomain().equalsIgnoreCase(domain)) {
-                return cookie.getValue();
-            }
-        }
-
-        return null;
+    protected HttpServletResponse getResponse() {
+        return ((ServletWebRequest) RequestContextHolder.getRequestAttributes()).getResponse();
     }
 
+    /**
+     * 获取加密的cookie
+     * @param cookieKey
+     * @param encodeKey
+     * @return
+     */
+    protected String getCookie(String cookieKey, String encodeKey) {
+        String cookeiValue = getCookeiValue(cookieKey);
+        return DesDecrypter.decryptString(cookeiValue, encodeKey);
+    }
+
+    /**
+     * 获取cookie
+     * @param key
+     * @return
+     */
     protected String getCookeiValue(String key) {
         Cookie[] cookies = this.getRequest().getCookies();
         if (cookies == null) {
@@ -238,9 +219,36 @@ public abstract class AbstractController {
                     return cookie.getValue();
                 }
             }
-
             return null;
         }
+    }
+
+    /**
+     * 设置cookie
+     * @param name
+     * @param value
+     */
+    protected void putCookie(String name, String value) {
+        String domain = StringUtils.getDomainName(getRequest().getRequestURI());
+        Cookie cookie = new Cookie(name, value);
+        cookie.setDomain(domain);
+        cookie.setPath("/");
+        getResponse().addCookie(cookie);
+    }
+
+    /**
+     * 设置cookie
+     * @param name
+     * @param value
+     * @param encodeKey
+     */
+    protected void putCookie(String name, String value, String encodeKey) {
+        String domain = StringUtils.getDomainName(getRequest().getRequestURI());
+        DesEncrypter.cryptString(value, encodeKey);
+        Cookie cookie = new Cookie(name, value);
+        cookie.setDomain(domain);
+        cookie.setPath("/");
+        getResponse().addCookie(cookie);
     }
 
     public LoginInfo getLogin() {
@@ -284,5 +292,9 @@ public abstract class AbstractController {
             LOGGER.error("get json id error", e);
         }
         throw new ApplicationException("获取JSON id 失败");
+    }
+
+    protected void addCookie(String name, String value) {
+
     }
 }
