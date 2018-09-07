@@ -79,7 +79,7 @@ public class MongoConfig {
     public MappingMongoConverter mappingMongoConverter(MongoDbFactory  factory, MongoMappingContext context,CustomConversions customConversions) {
         DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
         MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
-        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));//去掉默认mapper添加的_class
+//        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));//去掉默认mapper添加的_class
         mappingConverter.setCustomConversions(customConversions);//添加自定义的转换器
         return mappingConverter;
     }

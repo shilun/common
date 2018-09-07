@@ -155,6 +155,31 @@ public abstract class AbstractController {
                     result.setSuccess(true);
                     return result;
                 }
+                if (e instanceof RPCResult) {
+
+                    RPCResult resultRpc = (RPCResult) e;
+                    if(resultRpc.getSuccess()){
+                        result.setSuccess(true);
+                        if (resultRpc.getTotalPage() != null && resultRpc.getTotalPage().intValue() > 0) {
+                            result.setData((T) resultRpc.getData());
+                            result.setTotalCount(resultRpc.getTotalCount());
+                            result.setTotalPage(resultRpc.getTotalPage());
+                            result.setPageIndex(resultRpc.getPageIndex());
+                            return result;
+                        }
+                        else{
+                            result.setData((T) resultRpc.getData());
+
+                        }
+                        return result;
+                    }
+                    else {
+                        result.setCode(resultRpc.getCode());
+                        result.setMessage(resultRpc.getMessage());
+                        result.setSuccess(false);
+                        return result;
+                    }
+                }
                 if (e != null) {
                     result.setData((T) e);
                     result.setSuccess(true);
@@ -188,6 +213,7 @@ public abstract class AbstractController {
 
     /**
      * 获取加密的cookie
+     *
      * @param cookieKey
      * @param encodeKey
      * @return
@@ -199,6 +225,7 @@ public abstract class AbstractController {
 
     /**
      * 获取cookie
+     *
      * @param key
      * @return
      */
@@ -222,10 +249,11 @@ public abstract class AbstractController {
 
     /**
      * 设置cookie
+     *
      * @param name
      * @param value
      */
-    protected void putCookie(String name, String value,HttpServletResponse response) {
+    protected void putCookie(String name, String value, HttpServletResponse response) {
         String domain = StringUtils.getDomain(getRequest().getRequestURL().toString());
         Cookie cookie = new Cookie(name, value);
         cookie.setDomain(domain);
@@ -235,11 +263,12 @@ public abstract class AbstractController {
 
     /**
      * 设置cookie
+     *
      * @param name
      * @param value
      * @param encodeKey
      */
-    protected void putCookie(String name, String value, String encodeKey,HttpServletResponse response) {
+    protected void putCookie(String name, String value, String encodeKey, HttpServletResponse response) {
         String domain = StringUtils.getDomain(getRequest().getRequestURL().toString());
         DesEncrypter.cryptString(value, encodeKey);
         Cookie cookie = new Cookie(name, value);

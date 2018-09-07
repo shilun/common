@@ -65,6 +65,10 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
         String temp = url.substring(0, i);
         i = temp.lastIndexOf(".", i);
         url = url.substring(i + 1);
+        i=url.indexOf(":");
+        if(i!=-1){
+            url=url.substring(0,i);
+        }
         return url;
     }
 
