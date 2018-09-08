@@ -22,7 +22,7 @@ public class BeanCoper extends PropertyUtils {
                     continue;
                 }
                 PropertyDescriptor property = PropertyUtil.getPropertyDescriptor(source, descriptor.getName());
-                if (property != null) {
+                if (property != null && property.getPropertyType() == descriptor.getPropertyType()) {
                     Object value = PropertyUtil.getProperty(source, descriptor.getName());
                     if (value != null)
                         PropertyUtil.setProperty(desc, descriptor.getName(), value);
