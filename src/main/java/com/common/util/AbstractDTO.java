@@ -1,9 +1,11 @@
 package com.common.util;
 
+import java.io.Serializable;
+
 /**
  * 抽像dto
  */
-public abstract class AbstractDTO {
+public abstract class AbstractDTO implements Serializable {
     private Long id;
     private PageInfo pageinfo;
 

@@ -22,7 +22,9 @@ import com.common.mongo.MoneyToLongConvert;
 import com.common.mongo.SaveMongoEventListener;
 import com.common.util.StringUtils;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
+import com.mongodb.WriteConcern;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -101,7 +103,7 @@ public class MongoConfig {
         if (StringUtils.isBlank(mongodbUrl)) {
             return null;
         }
-        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl);
+        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.ACKNOWLEDGED));
         com.mongodb.MongoClient mongo = new MongoClient(url);
         return mongo;
     }
