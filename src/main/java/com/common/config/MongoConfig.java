@@ -1,17 +1,17 @@
-/* 
- * Copyright 2012-2015 the original author or authors. 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at 
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, 
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and 
- * limitations under the License. 
+/*
+ * Copyright 2012-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.common.config;
@@ -53,14 +53,16 @@ public class MongoConfig {
 
     @Value("${spring.data.mongodb.database}")
     private String database;
+
     @Bean(name = "mongoTemplate")
-    public MongoTemplate mongoTemplate(MongoDbFactory dbFactory,MappingMongoConverter converter) throws Exception {
+    public MongoTemplate mongoTemplate(MongoDbFactory dbFactory, MappingMongoConverter converter) throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
-            throw new Exception("mongodb load error url"+mongodbUrl);
+            throw new Exception("mongodb load error url" + mongodbUrl);
         }
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        return new MongoTemplate(dbFactory,converter);
+        return new MongoTemplate(dbFactory, converter);
     }
+
     @Bean
     public CustomConversions customConversions() {
         List list = new ArrayList();
@@ -69,22 +71,26 @@ public class MongoConfig {
         list.add(new LongToMoneyConvert());
         return new CustomConversions(list);
     }
+
     @Bean
     public MongoDbFactory dbFactory() throws UnknownHostException {
         return new SimpleMongoDbFactory(mongo(), database);
     }
+
     @Bean
-    public MongoMappingContext mappingContext(){
+    public MongoMappingContext mappingContext() {
         return new MongoMappingContext();
     }
+
     @Bean
-    public MappingMongoConverter mappingMongoConverter(MongoDbFactory  factory, MongoMappingContext context,CustomConversions customConversions) {
+    public MappingMongoConverter mappingMongoConverter(MongoDbFactory factory, MongoMappingContext context, CustomConversions customConversions) {
         DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
         MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
-//        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));//去掉默认mapper添加的_class
+        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));//去掉默认mapper添加的_class
         mappingConverter.setCustomConversions(customConversions);//添加自定义的转换器
         return mappingConverter;
     }
+
     private MongoClient mongo;
 
     @PreDestroy
@@ -93,8 +99,9 @@ public class MongoConfig {
             this.mongo.close();
         }
     }
+
     @Bean
-    public SaveMongoEventListener mongoEventListener(){
+    public SaveMongoEventListener mongoEventListener() {
         return new SaveMongoEventListener();
     }
 
@@ -104,7 +111,7 @@ public class MongoConfig {
             return null;
         }
         com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.ACKNOWLEDGED));
-        com.mongodb.MongoClient mongo = new MongoClient(url);
+        mongo = new MongoClient(url);
         return mongo;
     }
 

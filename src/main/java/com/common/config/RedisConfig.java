@@ -1,5 +1,6 @@
 package com.common.config;
 
+import com.common.redis.DistributedLockUtil;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -21,6 +22,7 @@ public class RedisConfig extends CachingConfigurerSupport {
 
     @Resource
     private RedisConnectionFactory factory;
+
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
@@ -33,5 +35,8 @@ public class RedisConfig extends CachingConfigurerSupport {
         template.afterPropertiesSet();
         return template;
     }
-
+    @Bean
+    public DistributedLockUtil distributedLockUtil(){
+        return new  DistributedLockUtil();
+    }
 }
