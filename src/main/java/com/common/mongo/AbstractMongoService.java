@@ -278,6 +278,9 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     private Sort buildSort(T entity) {
         Sort orders = null;
+        if(StringUtils.isBlank(entity.getOrderColumn())){
+            entity.setOrderColumn("id");
+        }
         if (entity.getOrderTpe() == null) {
             orders = new Sort(Sort.Direction.ASC, "createTime");
         } else {
