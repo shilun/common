@@ -89,14 +89,14 @@ public class UploadUtil {
 	 */
 	public Result<String> uploadFile(byte[] fileByte, String name) {
 		String temp_path = props.getProperty("java.io.tmpdir");
-		temp_path = temp_path + "/" + StringUtils.getUUID();
+		temp_path = temp_path  + StringUtils.getUUID();
 		File tempDir = new File(temp_path);
 		if (!tempDir.exists()) {
 			tempDir.mkdirs();
 		}
 		FileOutputStream output = null;
 		try {
-			String fileName = temp_path + "/" + name;
+			String fileName = temp_path + File.separator+ name;
 			output = new FileOutputStream(fileName);
 			IOUtils.write(fileByte, output);
 			File uploadFile = new File(fileName);
