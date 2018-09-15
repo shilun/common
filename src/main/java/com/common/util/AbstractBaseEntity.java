@@ -24,11 +24,14 @@ public class AbstractBaseEntity implements Serializable {
     @Id
     private String uuid;
     private static final long serialVersionUID = 1L;
+    @JsonIgnore
     @Transient
     private String orderColumn;
+    @JsonIgnore
     @Transient
     private Integer startRow;
     @Transient
+    @JsonIgnore
     private Integer endRow;
     @QueryField
     @GeneratedValue
@@ -37,14 +40,18 @@ public class AbstractBaseEntity implements Serializable {
     private Integer delStatus;
     private Date updateTime;
     @Transient
+    @JsonIgnore
     private Long minId;
     @Transient
     @QueryField(name = "createTime", type = QueryType.GTE)
+    @JsonIgnore
     private Date startCreateTime;
     @QueryField(name = "createTime", type = QueryType.LTE)
     @Transient
+    @JsonIgnore
     private Date endCreateTime;
     @Transient
+    @JsonIgnore
     private Integer orderTpe;//1 升序ASC，2 降序Desc
     public Long getMinId() {
         return this.minId;
