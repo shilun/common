@@ -10,11 +10,10 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 
 /**
@@ -27,49 +26,25 @@ import java.text.SimpleDateFormat;
 public class RedisConfig extends CachingConfigurerSupport {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<Object>(Object.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        serializer.setObjectMapper(objectMapper);
+
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-
-
-
-
-
-//         <property name="keySerializer">
-//                4             <bean
-        ObjectMapper om = new ObjectMapper();
-        om.setDateFormat(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(om);
-
-
-        redisTemplate.setKeySerializer(serializer);
-//        5                 class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer" />
-//                6         </property>
-//                7         <property name="valueSerializer">
-//                8             <bean
-//        9                 class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer" />
-//                10         </property>
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(serializer);
-//                11
-//        12         <property name="hashKeySerializer">
-//                13             <bean
-//        14                 class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer" />
-//                15         </property>
-        redisTemplate.setHashKeySerializer(serializer);
-//                16         <property name="hashValueSerializer">
-//                17             <bean
-//        18                 class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer" />
-//                19         </property>
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(serializer);
-//                20         <property name="stringSerializer">
-//                21             <bean
-//        22                 class="org.springframework.data.redis.serializer.StringRedisSerializer" />
-//                23         </property>
-        redisTemplate.setStringSerializer(new org.springframework.data.redis.serializer.StringRedisSerializer());
+        redisTemplate.afterPropertiesSet();
+
         return redisTemplate;
     }
 
-//    @Bean
-//    public DistributedLockUtil distributedLockUtil(RedisTemplate redisTemplate) {
-//        return new DistributedLockUtil();
-//    }
+    @Bean
+    public DistributedLockUtil distributedLockUtil() {
+        return new DistributedLockUtil();
+    }
 }
