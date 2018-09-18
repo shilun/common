@@ -270,7 +270,7 @@ public abstract class AbstractController {
      */
     protected void putCookie(String name, String value, String encodeKey, HttpServletResponse response) {
         String domain = StringUtils.getDomain(getRequest().getRequestURL().toString());
-        DesEncrypter.cryptString(value, encodeKey);
+        value=DesEncrypter.cryptString(value, encodeKey);
         Cookie cookie = new Cookie(name, value);
         cookie.setDomain(domain);
         cookie.setPath("/");

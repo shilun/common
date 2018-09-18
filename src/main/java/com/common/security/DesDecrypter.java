@@ -47,11 +47,11 @@ public class DesDecrypter extends Des {
     }
 
     public static void main(String[] args) throws Exception {
-        String key = "ck|jhtr%oxo)ajlos\\qz=i_g,ge*g|j[";
+        String key = "";
         System.out.println("key = " + key);
         String encrypted = DesEncrypter.cryptString("hello world xxss", key);
         System.out.println("encrypted = " + encrypted);
-        String plain = decryptString(encrypted, key);
+        String plain = decryptString("ff0a9a7793994a43bafe62caef90f199:0424090daa0c417f99deed9ff5c21b8e", key);
         System.out.println("plain = " + plain);
     }
 }
