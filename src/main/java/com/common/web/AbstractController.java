@@ -49,6 +49,17 @@ public abstract class AbstractController {
             Object e = execute.getData();
             if (e != null) {
                 boolean seted = false;
+                if (e instanceof RPCResult) {
+                    RPCResult result = (RPCResult) e;
+                    map.put("success", result.getSuccess());
+                    if (result.getSuccess()) {
+                        map.put("data", result.getData());
+                    } else {
+                        map.put("message", result.getMessage());
+                        map.put("message", result.getMessage());
+                    }
+                    return map;
+                }
                 if (!seted && e instanceof Result) {
                     Result dataItem1 = (Result) e;
                     map.put("success", dataItem1.getSuccess());
@@ -128,84 +139,6 @@ public abstract class AbstractController {
         return map;
     }
 
-    protected <T> RPCResult<T> buildRPCMessage(IExecute execute) {
-        RPCResult<T> result = new RPCResult<>();
-
-        try {
-            Object e = execute.getData();
-            if (e != null) {
-                boolean seted = false;
-                if (!seted && e instanceof RPCResult) {
-                    RPCResult dataItem1 = (RPCResult) e;
-                    result.setSuccess(true);
-                    return dataItem1;
-                }
-
-                if (e instanceof List) {
-                    result.setData((T) e);
-                    result.setSuccess(true);
-                    return result;
-                }
-                if (e instanceof Page) {
-                    Page page = (Page) e;
-                    result.setData((T) ((Page) e).getContent());
-                    result.setTotalCount(Long.valueOf(page.getTotalElements()).intValue());
-                    result.setTotalPage(Integer.valueOf(page.getSize()));
-                    result.setPageIndex(Integer.valueOf(page.getNumber()));
-                    result.setSuccess(true);
-                    return result;
-                }
-                if (e instanceof RPCResult) {
-
-                    RPCResult resultRpc = (RPCResult) e;
-                    if(resultRpc.getSuccess()){
-                        result.setSuccess(true);
-                        if (resultRpc.getTotalPage() != null && resultRpc.getTotalPage().intValue() > 0) {
-                            result.setData((T) resultRpc.getData());
-                            result.setTotalCount(resultRpc.getTotalCount());
-                            result.setTotalPage(resultRpc.getTotalPage());
-                            result.setPageIndex(resultRpc.getPageIndex());
-                            return result;
-                        }
-                        else{
-                            result.setData((T) resultRpc.getData());
-
-                        }
-                        return result;
-                    }
-                    else {
-                        result.setCode(resultRpc.getCode());
-                        result.setMessage(resultRpc.getMessage());
-                        result.setSuccess(false);
-                        return result;
-                    }
-                }
-                if (e != null) {
-                    result.setData((T) e);
-                    result.setSuccess(true);
-                    return result;
-                }
-
-            }
-            result.setSuccess(true);
-            return result;
-        } catch (BizException biz) {
-            LOGGER.error("remote call error:code->" + biz.getCode() + " message->" + biz.getMessage());
-            LOGGER.error("execute json error->" + biz.getMessage());
-            result.setCode(biz.getCode());
-            result.setMessage(biz.getMessage());
-            result.setSuccess(false);
-            return result;
-        } catch (Exception var14) {
-            LOGGER.error(var14.getMessage(), var14);
-            LOGGER.error("execute json error->" + var14.getMessage());
-            result.setCode("999");
-            result.setMessage("未知错误");
-            result.setSuccess(false);
-            return result;
-        }
-    }
-
     protected HttpServletRequest getRequest() {
         return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     }
@@ -270,7 +203,7 @@ public abstract class AbstractController {
      */
     protected void putCookie(String name, String value, String encodeKey, HttpServletResponse response) {
         String domain = StringUtils.getDomain(getRequest().getRequestURL().toString());
-        value=DesEncrypter.cryptString(value, encodeKey);
+        value = DesEncrypter.cryptString(value, encodeKey);
         Cookie cookie = new Cookie(name, value);
         cookie.setDomain(domain);
         cookie.setPath("/");
