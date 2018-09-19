@@ -16,10 +16,7 @@
 
 package com.common.config;
 
-import com.common.mongo.IGlossaryToIntegerConvert;
-import com.common.mongo.LongToMoneyConvert;
-import com.common.mongo.MoneyToLongConvert;
-import com.common.mongo.SaveMongoEventListener;
+import com.common.mongo.*;
 import com.common.util.StringUtils;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -73,6 +70,8 @@ public class MongoConfig {
         list.add(new MoneyToLongConvert());
         list.add(new IGlossaryToIntegerConvert());
         list.add(new LongToMoneyConvert());
+        list.add(new BigDecimalToDecimal128Converter());
+        list.add(new Decimal128ToBigDecimalConverter());
         return new CustomConversions(list);
     }
 
@@ -92,6 +91,7 @@ public class MongoConfig {
         MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
         mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));//去掉默认mapper添加的_class
         mappingConverter.setCustomConversions(customConversions);//添加自定义的转换器
+
         return mappingConverter;
     }
 

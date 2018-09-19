@@ -28,7 +28,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     private static Logger logger = Logger.getLogger(AbstractMongoService.class);
 
     @Autowired(required = false)
-    private MongoTemplate template;
+    protected MongoTemplate template;
 
     protected abstract Class getEntityClass();
 
