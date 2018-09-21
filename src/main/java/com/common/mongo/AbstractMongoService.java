@@ -191,6 +191,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     protected Query buildCondition(T entity, Pageable pageable) {
         Query query = new Query();
+        Map<String, QueryItem> queryItemMap = new HashMap<>();
         for (Field field : beanPropertyes.values()) {
             Object property = null;
             String descriptorName = field.getName();
@@ -204,67 +205,81 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                     logger.error("buildCondition error", e);
                 }
                 if (property != null) {
-                    Criteria criteria = new Criteria();
                     QueryField annotation = field.getAnnotation(QueryField.class);
                     if (annotation != null) {
                         QueryType type = annotation.type();
                         String typeName = annotation.name();
                         String propertyName;
-                        if (type != null) {
-                            if (StringUtils.isNotBlank(typeName)) {
-                                propertyName = annotation.name();
-                            } else {
-                                propertyName = descriptorName;
-                            }
-
-                            switch (type) {
-                                case EQ:
-                                    criteria = Criteria.where(propertyName).is(property);
-                                    break;
-                                case LT:
-                                    criteria = Criteria.where(propertyName).lt(property);
-                                    break;
-                                case LTE:
-                                    criteria = Criteria.where(propertyName).lte(property);
-                                    break;
-                                case GT:
-                                    criteria = Criteria.where(propertyName).gt(property);
-                                    break;
-                                case GTE:
-                                    criteria = Criteria.where(propertyName).gte(property);
-                                    break;
-                                case NE:
-                                    criteria = Criteria.where(propertyName).ne(property);
-                                    break;
-                                case LIKE:
-                                    criteria = Criteria.where(propertyName).regex(property.toString());
-                                    break;
-                                case IN:
-                                    Object[] values = null;
-                                    if (property instanceof ArrayList) {
-                                        values = ((ArrayList) property).toArray();
-                                    }
-                                    if (property.getClass().isArray()) {
-                                        values = (Object[]) property;
-                                    }
-                                    if (property instanceof Map) {
-                                        values = ((Map) property).entrySet().toArray();
-                                    }
-                                    criteria = Criteria.where(propertyName).in(values);
-                                    break;
-                                case EXISTS:
-                                    criteria = Criteria.where(propertyName).exists(StringUtils.equalsIgnoreCase("1", property.toString()));
-                                    break;
-                            }
+                        if (StringUtils.isNotBlank(typeName)) {
+                            propertyName = annotation.name();
                         } else {
-                            criteria = Criteria.where(descriptorName).is(property);
+                            propertyName = descriptorName;
                         }
+                        QueryItem queryItem = queryItemMap.get(propertyName);
+                        if (queryItem == null) {
+                            queryItem = new QueryItem(propertyName, property, type);
+                        } else {
+                            queryItem.addCondition(type,property);
+                        }
+                        queryItemMap.put(propertyName, queryItem);
                     } else {
-                        criteria = Criteria.where(descriptorName).is(property);
+                        QueryItem queryItem = queryItemMap.get(descriptorName);
+                        if (queryItem == null) {
+                            queryItem = new QueryItem(descriptorName, property);
+                        } else {
+                            throw new ApplicationException("property duplication");
+                        }
+                        queryItemMap.put(descriptorName, queryItem);
                     }
-                    query.addCriteria(criteria);
                 }
             }
+        }
+
+        Set<String> properties = queryItemMap.keySet();
+        for (String pro : properties) {
+            QueryItem queryItem = queryItemMap.get(pro);
+            Criteria criteria = Criteria.where(queryItem.getName());
+            Set<QueryType> queryTypes = queryItem.getConditions().keySet();
+            for (QueryType type : queryTypes) {
+                switch (type) {
+                    case EQ:
+                        criteria.is(queryItem.getConditions().get(type));
+                        break;
+                    case LT:
+                        criteria.lt(queryItem.getConditions().get(type));
+                        break;
+                    case LTE:
+                        criteria.lte(queryItem.getConditions().get(type));
+                        break;
+                    case GT:
+                        criteria.gt(queryItem.getConditions().get(type));
+                        break;
+                    case GTE:
+                        criteria.gte(queryItem.getConditions().get(type));
+                        break;
+                    case NE:
+                        criteria.ne(queryItem.getConditions().get(type));
+                        break;
+                    case LIKE:
+                        criteria.regex((String) queryItem.getConditions().get(type));
+                        break;
+                    case IN:
+                        Object[] values = null;
+                        Object o = queryItem.getConditions().get(type);
+                        if (o instanceof ArrayList) {
+                            values = ((ArrayList) o).toArray();
+                        }
+                        if (o.getClass().isArray()) {
+                            values = (Object[]) o;
+                        }
+                        if (o instanceof Map) {
+                            values = ((Map) o).entrySet().toArray();
+                        }
+                        criteria = criteria.in(values);
+                        break;
+                }
+            }
+            query.addCriteria(criteria);
         }
         if (pageable != null) {
             if (pageable instanceof PageRequest) {
@@ -278,13 +293,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     private Sort buildSort(T entity) {
         Sort orders = null;
-        if(StringUtils.isBlank(entity.getOrderColumn())){
+        if (StringUtils.isBlank(entity.getOrderColumn())) {
             entity.setOrderColumn("id");
         }
         if (entity.getOrderTpe() == null) {
             orders = new Sort(Sort.Direction.ASC, "createTime");
         } else {
-
             if (entity.getOrderTpe() == 1) {
                 orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());
             }
@@ -323,5 +337,40 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     public void setTemplate(MongoTemplate template) {
         this.template = template;
+    }
+}
+
+class QueryItem {
+    private String name;
+
+    private Map<QueryType, Object> conditions = new HashMap<>();
+
+    public QueryItem(String name, Object value) {
+        this.name = name;
+        conditions.put(QueryType.EQ, value);
+    }
+
+    public QueryItem(String name, Object value, QueryType queryType) {
+        this.name = name;
+        conditions.put(queryType, value);
+    }
+
+    public void addCondition(QueryType type, Object value) {
+        conditions.put(type, value);
+    }
+
+    public QueryItem() {
+    }
+
+    public Map<QueryType, Object> getConditions() {
+        return conditions;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
