@@ -14,97 +14,150 @@ import org.mybatis.spring.SqlSessionTemplate;
 
 abstract class MyBatisSupport {
     protected static final Logger LOGGER = Logger.getLogger(MyBatisSupport.class.getName());
+
     @Resource
     private SqlSessionTemplate sqlTemplate;
+
     @Resource
     private SqlSessionTemplate batchSqlTemplate;
 
-    MyBatisSupport() {
-    }
-
+    /**
+     * SqlSessionTemplate
+     *
+     * @param batch
+     *            是否批处理
+     * @param readonly
+     *            是否只读
+     * @return
+     */
     protected SqlSessionTemplate getSqlTemplate(boolean batch, boolean readonly) {
-        if(readonly) {
-            ;
+
+        if (readonly) {
         }
 
-        return batch?this.batchSqlTemplate:this.sqlTemplate;
+        if (batch) {
+            return batchSqlTemplate;
+        }
+        return sqlTemplate;
     }
 
+    /**
+     * 新增对象
+     *
+     * @param statement
+     * @param parameter
+     * @return
+     */
     protected long insert(String statement, Object parameter) {
-        long res = 0L;
-
+        long res = 0;
         try {
-            if(parameter != null) {
-                res = (long)this.getSqlTemplate(false, false).insert(statement, parameter);
+            if (parameter != null) {
+                res = getSqlTemplate(false, false).insert(statement, parameter);
             }
-
-            return res;
-        } catch (Exception var6) {
-            LOGGER.error("add exception:" + var6.getMessage(), var6);
-            throw new ApplicationException("Mybatis执行新增异常", var6);
+        } catch (Exception ex) {
+            LOGGER.error("add exception:" + ex.getMessage(),ex);
+            throw new ApplicationException("Mybatis执行新增异常", ex);
         }
+        return res;
     }
 
+    /**
+     * 删除对象
+     *
+     * @param statement
+     * @param parameter
+     * @return
+     */
     protected int delete(String statement, Object parameter) {
-        boolean res = false;
-
+        int res = 0;
         try {
-            int res1 = this.getSqlTemplate(false, false).delete(statement, parameter);
-            return res1;
-        } catch (Exception var5) {
-            LOGGER.error("查询失败：" + var5.getMessage(), var5);
-            throw new ApplicationException("Mybatis执行删除异常", var5);
+            res = getSqlTemplate(false, false).delete(statement, parameter);
+        } catch (Exception ex) {
+            LOGGER.error("查询失败：" + ex.getMessage(),ex);
+            throw new ApplicationException("Mybatis执行删除异常", ex);
         }
+        return res;
     }
 
+    /**
+     * 更新对象
+     *
+     * @param statement
+     * @param parameter
+     * @return
+     */
     protected int update(String statement, Object parameter) {
         int res = 0;
-
         try {
-            if(parameter != null) {
-                res = this.getSqlTemplate(false, false).update(statement, parameter);
+            if (parameter != null) {
+                res = getSqlTemplate(false, false).update(statement, parameter);
             }
-
-            return res;
-        } catch (Exception var5) {
-            LOGGER.error("Mybatis执行更新异常" + var5.getMessage(), var5);
-            throw new ApplicationException("Mybatis执行更新异常", var5);
+        } catch (Exception ex) {
+            LOGGER.error("Mybatis执行更新异常" + ex.getMessage(),ex);
+            throw new ApplicationException("Mybatis执行更新异常", ex);
         }
+        return res;
     }
 
+    /**
+     * 查询一条记录
+     *
+     * @param <T>
+     * @param statement
+     * @param parameter
+     * @param parameter
+     * @return
+     */
+    @SuppressWarnings("unchecked")
     protected <T> T select(String statement, Object parameter) {
-        Object obj = null;
-
+        T obj = null;
         try {
-            obj = this.getSqlTemplate(false, true).selectOne(statement, parameter);
-            return (T) obj;
-        } catch (Exception var5) {
-            LOGGER.error("Mybatis执行单条查询异常", var5);
-            throw new ApplicationException("Mybatis执行单条查询异常", var5);
+            obj = (T) getSqlTemplate(false, true).selectOne(statement, parameter);
+        } catch (Exception ex) {
+            LOGGER.error("Mybatis执行单条查询异常",ex);
+            throw new ApplicationException("Mybatis执行单条查询异常", ex);
         }
+        return obj;
     }
 
+    /**
+     * 查询列表
+     *
+     * @param <T>
+     * @param statement
+     * @param parameter
+     * @param clz
+     * @return
+     */
     protected <T> List<T> selectList(String statement, Object parameter) {
-        List list = null;
-
+        List<T> list = null;
         try {
-            list = this.getSqlTemplate(false, true).selectList(statement, parameter);
-            return list;
-        } catch (Exception var5) {
-            LOGGER.error("查询失败：" + var5.getMessage(), var5);
-            throw new ApplicationException("Mybatis执行列表查询异常", var5);
+            list = getSqlTemplate(false, true).selectList(statement, parameter);
+        } catch (Exception ex) {
+            LOGGER.error("查询失败：" + ex.getMessage(),ex);
+            throw new ApplicationException("Mybatis执行列表查询异常", ex);
         }
+        return list;
     }
 
+    /**
+     * 查询Map
+     *
+     * @param <K>
+     * @param <V>
+     * @param statement
+     * @param parameter
+     * @param mapKey
+     * @return
+     */
     protected <K, V> Map<K, V> selectMap(String statement, Object parameter, String mapKey) {
-        Map map = null;
-
+        Map<K, V> map = null;
         try {
-            map = this.getSqlTemplate(false, true).selectMap(statement, parameter, mapKey);
-            return map;
-        } catch (Exception var6) {
-            LOGGER.error("查询失败：" + var6.getMessage(), var6);
-            throw new ApplicationException("Mybatis执行Map查询异常", var6);
+            map = getSqlTemplate(false, true).selectMap(statement, parameter, mapKey);
+        } catch (Exception ex) {
+            LOGGER.error("查询失败：" + ex.getMessage(),ex);
+            throw new ApplicationException("Mybatis执行Map查询异常", ex);
         }
+        return map;
     }
 }
