@@ -55,7 +55,7 @@ public abstract class AbstractController {
                     if (result.getSuccess()) {
                         map.put("data", result.getData());
                     } else {
-                        map.put("message", result.getMessage());
+                        map.put("code", result.getCode());
                         map.put("message", result.getMessage());
                     }
                     return map;
