@@ -53,6 +53,16 @@ public abstract class AbstractController {
                     RPCResult result = (RPCResult) e;
                     map.put("success", result.getSuccess());
                     if (result.getSuccess()) {
+                        if (result.getTotalPage() != null && result.getTotalPage() > 0) {
+                            HashMap dataItem = new HashMap();
+                            dataItem.put("list", result.getData());
+                            dataItem.put("pageSize", Integer.valueOf(result.getPageSize()));
+                            dataItem.put("totalCount", Long.valueOf(result.getTotalCount()));
+                            dataItem.put("totalPage", Integer.valueOf(result.getTotalPage()));
+                            dataItem.put("pageIndex", Integer.valueOf(result.getPageIndex()));
+                            map.put("data", dataItem);
+                            return map;
+                        }
                         map.put("data", result.getData());
                     } else {
                         map.put("code", result.getCode());

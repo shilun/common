@@ -2,6 +2,7 @@ package com.common.util;
 
 import com.common.exception.ApplicationException;
 
+import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,6 +77,15 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
         return text.contains(subText);
     }
 
+
+    /**
+     * 生成6位随机验证码
+     *
+     * @return
+     */
+    public static String randomSixCode() {
+        return String.valueOf(new Random().nextInt(899999) + 100000);
+    }
     public static void main(String[] args) {
         System.out.println(getUUID());
     }

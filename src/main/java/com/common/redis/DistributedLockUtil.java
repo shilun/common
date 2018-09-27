@@ -27,7 +27,7 @@ public class DistributedLockUtil{
      * @return
      */
     private  String assembleKey(String lockKey) {
-        return String.format("lock_%s",lockKey  );
+        return lockKey;
     }
 
     /**

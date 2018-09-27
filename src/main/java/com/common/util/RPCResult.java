@@ -1,6 +1,7 @@
 package com.common.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.data.domain.Page;
 
 import javax.xml.bind.annotation.*;
 import java.io.Serializable;
@@ -17,6 +18,8 @@ public class RPCResult<T> implements Serializable {
     private Integer totalCount;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer totalPage;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer pageSize;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer pageIndex;
 
@@ -62,6 +65,17 @@ public class RPCResult<T> implements Serializable {
      * 默认构造方法
      */
     public RPCResult() {
+    }
+
+    /**
+     * 默认构造方法
+     */
+    public RPCResult(Page page) {
+        this.setTotalPage(page.getTotalPages());
+        this.setPageSize(page.getSize());
+        this.setTotalCount((int) page.getTotalElements());
+        this.setPageIndex(page.getNumber());
+        this.setData((T) page.getContent());
     }
 
     public Integer getPageIndex() {
@@ -128,6 +142,14 @@ public class RPCResult<T> implements Serializable {
     public void setResultCode(String resultCode, String... args) {
         this.resultCode = resultCode;
         this.resultCodeParams = args;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 
     public String[] getResultCodeParams() {
