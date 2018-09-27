@@ -35,7 +35,9 @@ public class RPCResult<T> implements Serializable {
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String resultCode;
-    /** 消息*/
+    /**
+     * 消息
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -65,6 +67,14 @@ public class RPCResult<T> implements Serializable {
      * 默认构造方法
      */
     public RPCResult() {
+    }
+
+    /**
+     * 默认构造方法
+     */
+    public RPCResult(T data) {
+        this.setSuccess(true);
+        this.setData(data);
     }
 
     /**
