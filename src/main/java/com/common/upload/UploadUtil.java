@@ -88,7 +88,10 @@ public class UploadUtil {
 	 * @return
 	 */
 	public Result<String> uploadFile(byte[] fileByte, String name) {
-		String temp_path = props.getProperty("java.io.tmpdir");
+		String temp_path = props.getProperty("catalina.base");
+		if(!temp_path.equals("/")){
+			temp_path=temp_path+"/";
+		}
 		temp_path = temp_path  + StringUtils.getUUID();
 		File tempDir = new File(temp_path);
 		if (!tempDir.exists()) {

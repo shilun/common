@@ -3,6 +3,7 @@ package com.common.mongo;
 import com.common.util.AbstractBaseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public interface MongoService<T extends AbstractBaseEntity> {
     public Long queryCount(T entity);
 
     /***
-     * 分页查询
+     * 分页查询 默认不给排序查询 跟据 createTime 倒序
      * @param entity
      * @param pageable
      * @return
@@ -68,11 +69,21 @@ public interface MongoService<T extends AbstractBaseEntity> {
 
 
     /**
-     * 分页查询
+     * 分页查询 默认不给排序查询 跟据 createTime 倒序
      * @param query
      * @param pageable
      * @return
      */
     public Page<T> queryByPage(Query query,Pageable pageable);
+
+    /**
+     * 分页查询 默认不给排序查询 跟据 createTime 倒序
+     * @param query
+     * @param pageable
+     * @param sortColomn
+     * @param sortType
+     * @return
+     */
+    public Page<T> queryByPage(Query query, Pageable pageable, String sortColomn, Sort.Direction sortType);
 
 }

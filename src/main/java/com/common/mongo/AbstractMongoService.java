@@ -154,7 +154,29 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     public Page<T> queryByPage(Query query, Pageable pageable) {
         long count = template.count(query, getEntityClass());
+        if(pageable.getSort()==null){
+           return queryByPage(query,pageable,null,null);
+        }
         List<T> list = template.find(query, getEntityClass());
+        Page<T> pagelist = new PageImpl<T>(list, pageable, count);
+        return pagelist;
+    }
+
+    public Page<T> queryByPage(Query query, Pageable pageable,String sortColomn,Sort.Direction sortType) {
+        if(sortType==null){
+            sortType= Sort.Direction.DESC;
+        }
+        if(StringUtils.isBlank(sortColomn)){
+            sortColomn="createTime";
+        }
+        long count = template.count(query, getEntityClass());
+        if(pageable.getSort()==null){
+            Sort sort = new Sort(sortType, sortColomn);
+            PageRequest pageRequest = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort);
+            query.with(pageRequest);
+        }
+        List<T> list = template.find(query, getEntityClass());
+
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
     }
@@ -294,10 +316,10 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     private Sort buildSort(T entity) {
         Sort orders = null;
         if (StringUtils.isBlank(entity.getOrderColumn())) {
-            entity.setOrderColumn("id");
+            entity.setOrderColumn("createTime");
         }
         if (entity.getOrderTpe() == null) {
-            orders = new Sort(Sort.Direction.ASC, "createTime");
+            orders = new Sort(Sort.Direction.DESC, entity.getOrderColumn());
         } else {
             if (entity.getOrderTpe() == 1) {
                 orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());

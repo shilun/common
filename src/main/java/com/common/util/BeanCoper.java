@@ -1,14 +1,9 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.common.util;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-
+import com.common.exception.ApplicationException;
 import org.apache.commons.beanutils.PropertyUtils;
+
+import java.beans.PropertyDescriptor;
 
 public class BeanCoper extends PropertyUtils {
     public BeanCoper() {
@@ -28,13 +23,24 @@ public class BeanCoper extends PropertyUtils {
                         PropertyUtil.setProperty(desc, descriptor.getName(), value);
                 }
             }
-        } catch (IllegalAccessException var3) {
-            var3.printStackTrace();
-        } catch (InvocationTargetException var4) {
-            var4.printStackTrace();
-        } catch (NoSuchMethodException var5) {
-            var5.printStackTrace();
+        } catch (Exception var5) {
+            throw new ApplicationException("copyProperties.error");
         }
+
+    }
+
+    public static <T> T copyProperties(Class<T> descType, Object source) {
+        if (descType == null) {
+            throw new ApplicationException("descType.error");
+        }
+        T entity = null;
+        try {
+            entity = (T) descType.getConstructors()[0].newInstance();
+        } catch (Exception e) {
+            throw new ApplicationException(descType.getSimpleName() + "Constructors.error");
+        }
+        copyProperties(entity, source);
+        return entity;
 
     }
 }
