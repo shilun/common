@@ -154,23 +154,23 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     public Page<T> queryByPage(Query query, Pageable pageable) {
         long count = template.count(query, getEntityClass());
-        if(pageable.getSort()==null){
-           return queryByPage(query,pageable,null,null);
+        if (pageable.getSort() == null) {
+            return queryByPage(query, pageable, null, null);
         }
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
     }
 
-    public Page<T> queryByPage(Query query, Pageable pageable,String sortColomn,Sort.Direction sortType) {
-        if(sortType==null){
-            sortType= Sort.Direction.DESC;
+    public Page<T> queryByPage(Query query, Pageable pageable, String sortColomn, Sort.Direction sortType) {
+        if (sortType == null) {
+            sortType = Sort.Direction.DESC;
         }
-        if(StringUtils.isBlank(sortColomn)){
-            sortColomn="createTime";
+        if (StringUtils.isBlank(sortColomn)) {
+            sortColomn = "createTime";
         }
         long count = template.count(query, getEntityClass());
-        if(pageable.getSort()==null){
+        if (pageable.getSort() == null) {
             Sort sort = new Sort(sortType, sortColomn);
             PageRequest pageRequest = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort);
             query.with(pageRequest);
@@ -241,7 +241,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                         if (queryItem == null) {
                             queryItem = new QueryItem(propertyName, property, type);
                         } else {
-                            queryItem.addCondition(type,property);
+                            queryItem.addCondition(type, property);
                         }
                         queryItemMap.put(propertyName, queryItem);
                     } else {
@@ -309,7 +309,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                 PageRequest pageRequest = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), orders);
                 query.with(pageRequest);
             }
-        }else{
+        } else {
             query.with(buildSort(entity));
         }
         return query;
@@ -321,14 +321,13 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             entity.setOrderColumn("createTime");
         }
         if (entity.getOrderTpe() == null) {
+            entity.setOrderTpe(2);
+        }
+        if (entity.getOrderTpe().intValue() == 1) {
+            orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());
+        }
+        if (entity.getOrderTpe().intValue() == 2) {
             orders = new Sort(Sort.Direction.DESC, entity.getOrderColumn());
-        } else {
-            if (entity.getOrderTpe() == 1) {
-                orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());
-            }
-            if (entity.getOrderTpe() == 2) {
-                orders = new Sort(Sort.Direction.DESC, entity.getOrderColumn());
-            }
         }
         return orders;
     }
