@@ -9,9 +9,11 @@ public class RedisCondition implements Condition {
     @Override
     public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
         String property = conditionContext.getEnvironment().getProperty("spring.redis.url");
-        if(StringUtils.isNotBlank(property)){
+        String nodes = conditionContext.getEnvironment().getProperty("spring.redis.cluster.nodes");
+        if (StringUtils.isNotBlank(property) || StringUtils.isNotBlank(nodes)) {
             return true;
         }
+
         return false;
     }
 }

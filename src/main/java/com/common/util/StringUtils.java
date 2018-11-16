@@ -20,7 +20,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
     }
 
     public static boolean isMobileNO(String mobiles) {
-        Pattern p = Pattern.compile("^1[34578]\\d{9}$");
+        Pattern p = Pattern.compile("^1[123456789]\\d{9}$");
         Matcher m = p.matcher(mobiles);
         return m.matches();
     }
@@ -87,6 +87,8 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
         return String.valueOf(new Random().nextInt(899999) + 100000);
     }
     public static void main(String[] args) {
-        System.out.println(getUUID());
+       System.out.println(isMobileNO("11111111111"));
+        System.out.println(isMobileNO("12111111111"));
+        System.out.println(isMobileNO("13111111111"));
     }
 }
