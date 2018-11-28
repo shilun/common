@@ -18,10 +18,7 @@ package com.common.config;
 
 import com.common.mongo.*;
 import com.common.util.StringUtils;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
-import com.mongodb.WriteConcern;
+import com.mongodb.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -61,7 +58,11 @@ public class MongoConfig {
             throw new Exception("mongodb load error url" + mongodbUrl);
         }
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        return new MongoTemplate(dbFactory, converter);
+        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, converter);
+        ReadPreference preference = ReadPreference.secondary();
+        mongoTemplate.setReadPreference(preference);
+        return mongoTemplate;
+
     }
 
     @Bean
