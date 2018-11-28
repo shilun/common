@@ -7,12 +7,22 @@
     <groupId>springboot</groupId>
     <artifactId>common</artifactId>
     <version>2.1.0</version>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-    </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>2.1.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.1.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>2.1.0.RELEASE</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -118,10 +128,6 @@
                 <exclusion>
                     <artifactId>slf4j-log4j12</artifactId>
                     <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

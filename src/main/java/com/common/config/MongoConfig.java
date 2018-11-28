@@ -35,6 +35,7 @@ import org.springframework.data.mongodb.core.convert.*;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,14 +66,14 @@ public class MongoConfig {
     }
 
     @Bean
-    public CustomConversions customConversions() {
+    public MongoCustomConversions customConversions() {
         List list = new ArrayList();
         list.add(new MoneyToLongConvert());
         list.add(new IGlossaryToIntegerConvert());
         list.add(new LongToMoneyConvert());
         list.add(new BigDecimalToDecimal128Converter());
         list.add(new Decimal128ToBigDecimalConverter());
-        return new CustomConversions(list);
+        return new MongoCustomConversions(list);
     }
 
     @Bean
@@ -80,15 +81,13 @@ public class MongoConfig {
         return new SimpleMongoDbFactory(mongo(), database);
     }
 
-    @Bean
-    public MongoMappingContext mappingContext() {
-        return new MongoMappingContext();
-    }
+    @Resource
+    private MongoMappingContext mongoMappingContext;
 
     @Bean
-    public MappingMongoConverter mappingMongoConverter(MongoDbFactory factory, MongoMappingContext context, CustomConversions customConversions) {
+    public MappingMongoConverter mappingMongoConverter(MongoDbFactory factory, MongoCustomConversions customConversions) {
         DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
-        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
+        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
         mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));//去掉默认mapper添加的_class
         mappingConverter.setCustomConversions(customConversions);//添加自定义的转换器
 
