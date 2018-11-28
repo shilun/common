@@ -8,6 +8,7 @@ import com.common.util.PropertyUtil;
 import com.common.util.StringUtils;
 import com.common.util.model.YesOrNoEnum;
 import com.mongodb.WriteResult;
+import com.mongodb.client.result.UpdateResult;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
@@ -75,8 +76,8 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
-        WriteResult upsert = template.upsert(query, update, entity.getClass());
-        if (upsert.getN() == 1 && upsert.isUpdateOfExisting()) {
+        UpdateResult upsert = template.upsert(query, update, entity.getClass());
+        if (upsert.getModifiedCount() == 1 && upsert.isModifiedCountAvailable()) {
             return;
         }
         throw new ApplicationException("mongodb updata error");
