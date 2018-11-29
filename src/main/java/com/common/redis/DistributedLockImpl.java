@@ -1,82 +1,55 @@
 package com.common.redis;
 
-import com.common.exception.ApplicationException;
-import com.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisCommands;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 
-import java.util.Collections;
+import java.util.Objects;
 
 
 public class DistributedLockImpl implements DistributedLock {
-    private static final Long RELEASE_SUCCESS = 1L;
-    private static final String LOCK_SUCCESS = "OK";
-    private static final String SET_IF_NOT_EXIST = "NX";
-    private static final String SET_WITH_EXPIRE_TIME = "PX";
+    int LOCK_EXPIRE = 10 * 1000; //锁超时，防止线程在入锁以后，无限的执行等待
     private static Logger logger = LoggerFactory.getLogger(DistributedLockImpl.class);
-    private JedisCommands jedis;
+    public static final String REDIS_LOCK = "RedisLock:";
+    private RedisTemplate redisTemplate;
     private String key;
-    private String requestId;
-    int expireMsecs = 60 * 1000;
-    private JedisLock jedisLock;
 
-    public DistributedLockImpl(JedisCommands jedis, String key) {
-        this.jedis = jedis;
+    public DistributedLockImpl(RedisTemplate redisTemplate, String key) {
+        this.redisTemplate = redisTemplate;
         this.key = key;
-        this.requestId = StringUtils.getUUID();
-        if (jedis instanceof JedisCluster) {
-            this.jedisLock = new JedisLock((JedisCluster) jedis, key.intern());
-        }
     }
 
-    public DistributedLockImpl(JedisCommands jedis, String key, int expireMsecs) {
-        this.jedis = jedis;
+    public DistributedLockImpl(RedisTemplate redisTemplate, String key, int lockExpire) {
+        this.redisTemplate = redisTemplate;
         this.key = key;
-        this.requestId = StringUtils.getUUID();
-        if (jedis instanceof JedisCluster) {
-            this.jedisLock = new JedisLock((JedisCluster) jedis, key.intern(), expireMsecs);
-        }
-    }
-
-    public DistributedLockImpl(JedisCommands jedis, String key, int expireMsecs, int timeoutMsecs) {
-        this.jedis = jedis;
-        this.key = key;
-        this.requestId = StringUtils.getUUID();
-        if (jedis instanceof JedisCluster) {
-            this.jedisLock = new JedisLock((JedisCluster) jedis, key.intern(), expireMsecs, timeoutMsecs);
-        }
+        this.LOCK_EXPIRE = lockExpire;
     }
 
     @Override
-    public boolean acquire() {
-        if (jedis instanceof JedisCluster) {
-            return jedisLock.acquire();
-        } else {
-            String result = jedis.set(key, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireMsecs);
-            if (LOCK_SUCCESS.equals(result)) {
+    public synchronized boolean acquire() {
+        return (Boolean) redisTemplate.execute((RedisCallback) connection -> {
+            long expireAt = System.currentTimeMillis() + LOCK_EXPIRE + 1;
+            Boolean acquire = connection.setNX(key.getBytes(), String.valueOf(expireAt).getBytes());
+            if (acquire) {
                 return true;
+            } else {
+                byte[] value = connection.get(key.getBytes());
+                if (Objects.nonNull(value) && value.length > 0) {
+                    long expireTime = Long.parseLong(new String(value));
+                    if (expireTime < System.currentTimeMillis()) {
+                        byte[] oldValue = connection.getSet(key.getBytes(), String.valueOf(System.currentTimeMillis() + LOCK_EXPIRE + 1).getBytes());
+                        return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();
+                    }
+                }
             }
             return false;
-        }
+        });
     }
 
     @Override
-    public void release() {
-        if (jedis instanceof JedisCluster) {
-            jedisLock.release();
-        }
-        if (jedis instanceof Jedis) {
-            String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
-            Jedis item = (Jedis) jedis;
-            Object result = item.eval(script, Collections.singletonList(key), Collections.singletonList(requestId));
-            if (!RELEASE_SUCCESS.equals(result)) {
-                throw new ApplicationException("redis.unlock.error->key:" + key);
-            }
-        }
-
+    public synchronized void release() {
+        redisTemplate.opsForValue().getOperations().delete(key);
     }
 
 }
