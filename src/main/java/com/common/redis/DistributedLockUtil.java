@@ -24,16 +24,4 @@ public class DistributedLockUtil{
         return distributedLock;
     }
 
-    /**
-     *
-     * @param lockKey
-     * @param timeoutMsecs
-     * @param expireMsecs
-     * @return
-     */
-    public  DistributedLock getDistributedLock(String lockKey,int timeoutMsecs,int expireMsecs){
-        DistributedLock distributedLock=new DistributedLockImpl(redisTemplate,lockKey,expireMsecs);
-        return distributedLock;
-    }
-
 }
