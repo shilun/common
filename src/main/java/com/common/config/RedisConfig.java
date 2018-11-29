@@ -57,35 +57,6 @@ public class RedisConfig extends CachingConfigurerSupport {
         return redisTemplate;
     }
 
-    @Configuration
-    @ConditionalOnProperty(prefix = "spring.redis.cluster")
-    protected static class JedisClusterConfiguration {
-        @Value("${spring.redis.cluster.nodes}")
-        private String nodes;
-        @Bean
-        public JedisCluster getJedisCluster() {
-            String[] serverArray = nodes.split(",");
-            Set<HostAndPort> nodes = new HashSet<>();
-            for (String ipPort : serverArray) {
-                String[] ipPortPair = ipPort.split("，");
-                nodes.add(new HostAndPort(ipPortPair[0].trim(), Integer.valueOf(ipPortPair[1].trim())));
-            }
-            return new JedisCluster(nodes);
-        }
-    }
-
-    @Configuration
-    @ConditionalOnProperty(prefix = "spring.redis.url")
-    protected static class JedisConfiguration {
-        @Value("${spring.redis.url}")
-        private String redisUrl;
-        @Bean
-        public Jedis jedis() {
-            String items[]=redisUrl.substring(8).split(":");
-            Jedis jedis = new Jedis(items[0],Integer.valueOf(items[1]));
-            return jedis;
-        }
-    }
     @Bean
     public DistributedLockUtil distributedLockUtil() {
         return new DistributedLockUtil();
