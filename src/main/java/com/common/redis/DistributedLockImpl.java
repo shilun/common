@@ -39,7 +39,7 @@ public class DistributedLockImpl implements DistributedLock {
                     long expireTime = Long.parseLong(new String(value));
                     if (expireTime < System.currentTimeMillis()) {
                         byte[] oldValue = connection.getSet(key.getBytes(), String.valueOf(System.currentTimeMillis() + LOCK_EXPIRE + 1).getBytes());
-                        return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();
+                        return Long.parseLong(new String(oldValue).replaceAll("\"","")) < System.currentTimeMillis();
                     }
                 }
             }
