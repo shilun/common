@@ -1,55 +1,59 @@
 package com.common.redis;
 
+import com.common.exception.ApplicationException;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 
-import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 
 public class DistributedLockImpl implements DistributedLock {
-    int LOCK_EXPIRE = 10 * 1000; //锁超时，防止线程在入锁以后，无限的执行等待
-    private static Logger logger = LoggerFactory.getLogger(DistributedLockImpl.class);
-    public static final String REDIS_LOCK = "RedisLock:";
-    private RedisTemplate redisTemplate;
-    private String key;
+    /**
+     * 等待时间
+     */
+    private long waitTime = 10 * 1000;
+    /**
+     * 超时时间
+     */
+    private long leaseTime = 30 * 1000;
 
-    public DistributedLockImpl(RedisTemplate redisTemplate, String key) {
-        this.redisTemplate = redisTemplate;
-        this.key = key;
+    private static Logger logger = LoggerFactory.getLogger(DistributedLockImpl.class);
+    private RedissonClient redissonClient;
+    private RLock lock;
+
+    public DistributedLockImpl(RedissonClient redissonClient, String key) {
+        this.redissonClient = redissonClient;
+        this.lock = redissonClient.getLock(key);
+
     }
 
-    public DistributedLockImpl(RedisTemplate redisTemplate, String key, int lockExpire) {
-        this.redisTemplate = redisTemplate;
-        this.key = key;
-        this.LOCK_EXPIRE = lockExpire;
+    public DistributedLockImpl(RedissonClient redissonClient, String key, int waitTime) {
+        this.redissonClient = redissonClient;
+        this.lock = redissonClient.getLock(key);
+        this.waitTime = waitTime;
+    }
+
+    public DistributedLockImpl(RedissonClient redissonClient, String key, int waitTime, int leaseTime) {
+        this.redissonClient = redissonClient;
+        this.lock = redissonClient.getLock(key);
+        this.waitTime = waitTime;
+        this.leaseTime = leaseTime;
     }
 
     @Override
-    public synchronized boolean acquire() {
-        return (Boolean) redisTemplate.execute((RedisCallback) connection -> {
-            long expireAt = System.currentTimeMillis() + LOCK_EXPIRE + 1;
-            Boolean acquire = connection.setNX(key.getBytes(), String.valueOf(expireAt).getBytes());
-            if (acquire) {
-                return true;
-            } else {
-                byte[] value = connection.get(key.getBytes());
-                if (Objects.nonNull(value) && value.length > 0) {
-                    long expireTime = Long.parseLong(new String(value));
-                    if (expireTime < System.currentTimeMillis()) {
-                        byte[] oldValue = connection.getSet(key.getBytes(), String.valueOf(System.currentTimeMillis() + LOCK_EXPIRE + 1).getBytes());
-                        return Long.parseLong(new String(oldValue).replaceAll("\"","")) < System.currentTimeMillis();
-                    }
-                }
-            }
-            return false;
-        });
+    public boolean acquire() {
+        try {
+            return lock.tryLock(waitTime, leaseTime, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            throw new ApplicationException("redis.lock.error", e);
+        }
     }
 
     @Override
     public synchronized void release() {
-        redisTemplate.opsForValue().getOperations().delete(key);
+        this.lock.forceUnlock();
     }
 
 }
