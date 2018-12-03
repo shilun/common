@@ -115,7 +115,7 @@ public class MongoConfig {
         if (StringUtils.isBlank(mongodbUrl)) {
             return null;
         }
-        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.ACKNOWLEDGED));
+        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference( ReadPreference.secondary()));
         mongo = new MongoClient(url);
         return mongo;
     }
