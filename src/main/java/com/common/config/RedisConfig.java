@@ -44,10 +44,36 @@ public class RedisConfig extends CachingConfigurerSupport {
 
         return redisTemplate;
     }
+    @ConditionalOnProperty(name="spring.redis.url")
+    class RedissonSingleConfig  {
+        @Value("${spring.redis.url}")
+        private String url;
+        @Bean
+        public RedissonClient getRedisson(){
+            Config config = new Config();
+            config.useSingleServer().setAddress(url);
+            return Redisson.create(config);
+        }
+        @Bean
+        public DistributedLockUtil distributedLockUtil() {
+            return new DistributedLockUtil(getRedisson());
+        }
+    }
 
-    @Bean
-    public DistributedLockUtil distributedLockUtil() {
-        return new DistributedLockUtil();
+    @ConditionalOnProperty(name="spring.redis.cluster.nodes")
+    class RedissonClientClusterConfig  {
+        @Value("${spring.redis.cluster.nodes}")
+        private String url;
+        @Bean
+        public RedissonClient getRedisson(){
+            Config config = new Config();
+            config.useClusterServers().addNodeAddress(url.split(","));
+            return Redisson.create(config);
+        }
+        @Bean
+        public DistributedLockUtil distributedLockUtil() {
+            return new DistributedLockUtil(getRedisson());
+        }
     }
     @ConditionalOnProperty(name="spring.redis.url")
     class RedissonSingleConfig  {
@@ -83,5 +109,6 @@ public class RedisConfig extends CachingConfigurerSupport {
             return new DistributedLockUtil(getRedisson());
         }
     }
+
 
 }
