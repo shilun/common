@@ -1,3 +1,4 @@
+
 package com.common.redis;
 
 import org.redisson.api.RedissonClient;
@@ -6,7 +7,7 @@ import javax.annotation.Resource;
 
 public class DistributedLockUtil{
     @Resource
-     private RedissonClient redissonClient;
+    private RedissonClient redissonClient;
 
     /**
      * 获取锁 默认 线程待等10 秒  锁 30秒
