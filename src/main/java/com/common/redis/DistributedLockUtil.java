@@ -1,28 +1,45 @@
+
 package com.common.redis;
 
 import org.redisson.api.RedissonClient;
 
-public class DistributedLockUtil {
-    RedissonClient redissonClient;
+import javax.annotation.Resource;
+
+public class DistributedLockUtil{
+    @Resource
+    private RedissonClient redissonClient;
+
     /**
-     * 获取分布式锁
-     * 默认获取锁10s超时，锁过期时间60s
-     *
+     * 获取锁 默认 线程待等10 秒  锁 30秒
+     * @param lockKey
      * @return
-     * @author yangwenkui
-     * @time 2016年5月6日 下午1:30:46
      */
-    public DistributedLock getDistributedLock(String lockKey) {
-        DistributedLock distributedLock = new DistributedLockImpl(redissonClient, lockKey);
+    public  DistributedLock getDistributedLock(String lockKey){
+        DistributedLock distributedLock=new DistributedLockImpl(redissonClient,lockKey);
         return distributedLock;
     }
 
-    public DistributedLock getDistributedLock(String lockKey, int expireMsecs) {
-        DistributedLock distributedLock = new DistributedLockImpl(redissonClient, lockKey, expireMsecs);
+    /**
+     * 获取锁  锁 30秒
+     * @param lockKey
+     * @param waitTime 线程等待时间 线程等持时间
+     * @return
+     */
+    public  DistributedLock getDistributedLock(String lockKey,int waitTime){
+        DistributedLock distributedLock=new DistributedLockImpl(redissonClient,lockKey,waitTime);
         return distributedLock;
     }
 
-    public DistributedLockUtil(RedissonClient redissonClient) {
-        this.redissonClient = redissonClient;
+    /**
+     * 获取锁
+     * @param key key
+     * @param waitTime 线程等待时间
+     * @param leaseTime 释放时间
+     * @return
+     */
+    public DistributedLock getDistributedLock(String key, int waitTime, int leaseTime){
+        DistributedLock distributedLock=new DistributedLockImpl(redissonClient,key,waitTime,leaseTime);
+        return distributedLock;
     }
+
 }
