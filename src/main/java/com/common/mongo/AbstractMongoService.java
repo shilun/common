@@ -309,9 +309,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                 Sort orders = buildSort(entity);
                 PageRequest pageRequest = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), orders);
                 query.with(pageRequest);
+                query.limit(pageable.getPageSize());
             }
         } else {
             query.with(buildSort(entity));
+            query.limit(10);
         }
         return query;
     }
