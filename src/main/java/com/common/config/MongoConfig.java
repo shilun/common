@@ -54,7 +54,8 @@ public class MongoConfig {
     @Value("${spring.data.mongodb.database}")
     private String database;
 
-    @Bean(name = "mongoTemplate")
+    @Bean
+    @ConditionalOnMissingBean(MongoTemplate.class)
     public MongoTemplate mongoTemplate(MongoDbFactory dbFactory, MappingMongoConverter converter) throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url" + mongodbUrl);
