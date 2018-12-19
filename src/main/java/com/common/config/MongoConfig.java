@@ -63,6 +63,7 @@ public class MongoConfig {
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, converter);
         ReadPreference preference = ReadPreference.secondary();
+        mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         mongoTemplate.setReadPreference(preference);
         return mongoTemplate;
     }
