@@ -116,17 +116,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
-        Constructor<?>[] constructors = getEntityClass().getConstructors();
-        T entity = null;
-        try {
-            entity = (T) constructors[0].newInstance();
-        } catch (Exception e) {
-            throw new ApplicationException("删除mongodb数据实败", e);
-        }
-
-        entity.setDelStatus(YesOrNoEnum.YES.getValue());
-        Update update = addUpdate(entity);
-        template.findAndModify(query, update, getEntityClass());
+        template.remove(query, getEntityClass());
     }
 
     public List<T> query(T entity) {
