@@ -325,7 +325,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         return orders;
     }
 
-    private Update addUpdate(T entity) {
+    protected Update addUpdate(T entity) {
         Update update = new Update();
         for (Field descriptor : beanPropertyes.values()) {
             Transient annotation = descriptor.getAnnotation(Transient.class);
