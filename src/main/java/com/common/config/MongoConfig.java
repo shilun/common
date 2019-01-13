@@ -19,9 +19,14 @@ package com.common.config;
 import com.common.mongo.*;
 import com.common.util.StringUtils;
 import com.mongodb.*;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -54,6 +59,23 @@ public class MongoConfig {
     @Value("${spring.data.mongodb.database}")
     private String database;
 
+    @ConditionalOnProperty(name = "app.db.transaction")
+    class MongoTransactionConfig {
+
+        @Value("${app.db.transaction}")
+        private Boolean transaction;
+        @Bean
+        public TransBean getTransBean() {
+            TransBean transBean = new TransBean();
+            transBean.setTransaction(transaction);
+            return transBean;
+        }
+    }
+
+
+    @Autowired(required = false)
+    private TransBean transBean;
+
     @Bean
     @ConditionalOnMissingBean(MongoTemplate.class)
     public MongoTemplate mongoTemplate(MongoDbFactory dbFactory, MappingMongoConverter converter) throws Exception {
@@ -62,11 +84,17 @@ public class MongoConfig {
         }
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, converter);
-        ReadPreference preference = ReadPreference.secondary();
-        mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
-        mongoTemplate.setReadPreference(preference);
+        if (transBean == null) {
+            mongoTemplate.setReadPreference(ReadPreference.secondary());
+            mongoTemplate.setWriteConcern(WriteConcern.W1);
+        }
+        if (transBean != null && transBean.getTransaction()) {
+            mongoTemplate.setReadPreference(ReadPreference.primary());
+            mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
+        }
         return mongoTemplate;
     }
+
     @Bean
     public MongoTransactionManager transactionManager(MongoDbFactory dbFactory) {
         return new MongoTransactionManager(dbFactory);
@@ -120,8 +148,14 @@ public class MongoConfig {
         if (StringUtils.isBlank(mongodbUrl)) {
             return null;
         }
-        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference( ReadPreference.secondary()));
-        mongo = new MongoClient(url);
+        MongoClientURI uri = null;
+        if (transBean != null && transBean.getTransaction()) {
+            uri = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference(ReadPreference.primary()));
+        } else {
+            uri = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference(ReadPreference.secondary()));
+        }
+        mongo = new MongoClient(uri);
+
         return mongo;
     }
 
