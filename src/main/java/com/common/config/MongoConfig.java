@@ -86,7 +86,7 @@ public class MongoConfig {
         MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, converter);
         if (transBean == null) {
             mongoTemplate.setReadPreference(ReadPreference.secondary());
-            mongoTemplate.setWriteConcern(WriteConcern.W1);
+            mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         }
         if (transBean != null && transBean.getTransaction()) {
             mongoTemplate.setReadPreference(ReadPreference.primary());

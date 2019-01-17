@@ -25,19 +25,19 @@ public class DistributedLockImpl implements DistributedLock {
 
     public DistributedLockImpl(RedissonClient redissonClient, String key) {
         this.redissonClient = redissonClient;
-        this.lock = redissonClient.getLock(key);
+        this.lock = redissonClient.getFairLock(key);
 
     }
 
     public DistributedLockImpl(RedissonClient redissonClient, String key, int waitTime) {
         this.redissonClient = redissonClient;
-        this.lock = redissonClient.getLock(key);
+        this.lock = redissonClient.getFairLock(key);
         this.waitTime = waitTime;
     }
 
     public DistributedLockImpl(RedissonClient redissonClient, String key, int waitTime, int leaseTime) {
         this.redissonClient = redissonClient;
-        this.lock = redissonClient.getLock(key);
+        this.lock = redissonClient.getFairLock(key);
         this.waitTime = waitTime;
         this.leaseTime = leaseTime;
     }
