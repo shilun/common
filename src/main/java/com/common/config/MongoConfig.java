@@ -16,6 +16,7 @@
 
 package com.common.config;
 
+import com.common.exception.ApplicationException;
 import com.common.mongo.*;
 import com.common.util.StringUtils;
 import com.mongodb.*;
@@ -113,7 +114,7 @@ public class MongoConfig {
 
     @Bean
     public MongoDbFactory dbFactory() throws UnknownHostException {
-        return new SimpleMongoDbFactory(mongo(), database);
+        return new SimpleMongoDbFactory(mongo(), mongoClientURI().getDatabase());
     }
 
     @Resource
@@ -128,8 +129,8 @@ public class MongoConfig {
 
         return mappingConverter;
     }
-
     private MongoClient mongo;
+    private MongoClientURI mongoClientURI;
 
     @PreDestroy
     public void close() {
@@ -139,23 +140,33 @@ public class MongoConfig {
     }
 
     @Bean
+    public MongoClientURI mongoClientURI() {
+        if (this.mongoClientURI != null) {
+            return this.mongoClientURI;
+        }
+        if (StringUtils.isBlank(mongodbUrl)) {
+            throw new ApplicationException("mongodb load error url" + mongodbUrl);
+        }
+        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference(ReadPreference.secondary()));
+        this.mongoClientURI = url;
+        return url;
+    }
+
+    @Bean
     public SaveMongoEventListener mongoEventListener() {
         return new SaveMongoEventListener();
     }
 
     @Bean
-    public MongoClient mongo() throws UnknownHostException {
+    public MongoClient mongo() {
+        if (this.mongo != null) {
+            return this.mongo;
+        }
         if (StringUtils.isBlank(mongodbUrl)) {
             return null;
         }
-        MongoClientURI uri = null;
-        if (transBean != null && transBean.getTransaction()) {
-            uri = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference(ReadPreference.primary()));
-        } else {
-            uri = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference(ReadPreference.secondary()));
-        }
-        mongo = new MongoClient(uri);
-
+        MongoClient mongo = new MongoClient(mongoClientURI());
+        this.mongo = mongo;
         return mongo;
     }
 
