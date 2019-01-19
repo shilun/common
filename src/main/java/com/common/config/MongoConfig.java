@@ -57,8 +57,6 @@ public class MongoConfig {
     @Value("${spring.data.mongodb.uri}")
     private String mongodbUrl;
 
-    @Value("${spring.data.mongodb.database}")
-    private String database;
 
     @ConditionalOnProperty(name = "app.db.transaction")
     class MongoTransactionConfig {
@@ -86,7 +84,7 @@ public class MongoConfig {
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, converter);
         if (transBean == null) {
-            mongoTemplate.setReadPreference(ReadPreference.secondary());
+            mongoTemplate.setReadPreference(ReadPreference.primary());
             mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         }
         if (transBean != null && transBean.getTransaction()) {
