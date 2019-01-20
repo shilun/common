@@ -145,7 +145,7 @@ public class MongoConfig {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new ApplicationException("mongodb load error url" + mongodbUrl);
         }
-        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference(ReadPreference.secondary()));
+        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference(ReadPreference.primary()));
         this.mongoClientURI = url;
         return url;
     }
