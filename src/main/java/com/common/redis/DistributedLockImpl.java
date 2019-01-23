@@ -53,7 +53,12 @@ public class DistributedLockImpl implements DistributedLock {
 
     @Override
     public synchronized void release() {
-        this.lock.forceUnlock();
+        try {
+            this.lock.forceUnlock();
+        }
+        catch (Exception e){
+            logger.error("redis-lock.release.error",e);
+        }
     }
 
 }
