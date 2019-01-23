@@ -69,6 +69,10 @@ public class MongoConfig {
             transBean.setTransaction(transaction);
             return transBean;
         }
+        @Bean
+        public MongoTransactionManager transactionManager(MongoDbFactory dbFactory) {
+            return new MongoTransactionManager(dbFactory);
+        }
     }
 
 
@@ -94,10 +98,7 @@ public class MongoConfig {
         return mongoTemplate;
     }
 
-    @Bean
-    public MongoTransactionManager transactionManager(MongoDbFactory dbFactory) {
-        return new MongoTransactionManager(dbFactory);
-    }
+
 
     @Bean
     public MongoCustomConversions customConversions() {
