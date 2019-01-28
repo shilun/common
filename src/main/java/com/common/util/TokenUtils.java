@@ -21,6 +21,11 @@ public class TokenUtils {
             public String getPin() {
                 return items[1];
             }
+
+            @Override
+            public String getToken() {
+                return items[2];
+            }
         };
         return context;
     }
