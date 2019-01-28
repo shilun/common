@@ -1,7 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
 
 package com.common.util;
 
@@ -9,12 +5,10 @@ import com.common.annotation.GeneratedValue;
 import com.common.annotation.QueryField;
 import com.common.mongo.QueryType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -41,7 +35,9 @@ public class AbstractBaseEntity implements Serializable {
     private Date updateTime;
     @Transient
     @JsonIgnore
+    @QueryField(name = "id", type = QueryType.GTE)
     private Long minId;
+
     @Transient
     @QueryField(name = "createTime", type = QueryType.GTE)
     @JsonIgnore
@@ -155,6 +151,6 @@ public class AbstractBaseEntity implements Serializable {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this,
-                ToStringStyle.MULTI_LINE_STYLE);
+                ToStringStyle.JSON_STYLE);
     }
 }
