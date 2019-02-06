@@ -81,12 +81,11 @@ public class MongoConfig {
 
     @Bean
     @ConditionalOnMissingBean(MongoTemplate.class)
-    public MongoTemplate mongoTemplate(MongoDbFactory dbFactory, MappingMongoConverter converter) throws Exception {
+    public MongoTemplate mongoTemplate(MongoDbFactory dbFactory) throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url" + mongodbUrl);
         }
-        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, converter);
+        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(dbFactory));
         if (transBean == null) {
             mongoTemplate.setReadPreference(ReadPreference.primary());
             mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
@@ -120,11 +119,11 @@ public class MongoConfig {
     private MongoMappingContext mongoMappingContext;
 
     @Bean
-    public MappingMongoConverter mappingMongoConverter(MongoDbFactory factory, MongoCustomConversions customConversions) {
+    public MappingMongoConverter mappingMongoConverter(MongoDbFactory factory) {
         DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
         MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
         mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));//去掉默认mapper添加的_class
-        mappingConverter.setCustomConversions(customConversions);//添加自定义的转换器
+        mappingConverter.setCustomConversions(customConversions());//添加自定义的转换器
 
         return mappingConverter;
     }
