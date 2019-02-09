@@ -5,9 +5,9 @@
 
 package com.common.cookie;
 
-import com.common.cookie.CookieCipherTools;
-import javax.servlet.http.Cookie;
 import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.http.Cookie;
 
 public class CookieItem {
     private CookieCipherTools cookieCipherTools;

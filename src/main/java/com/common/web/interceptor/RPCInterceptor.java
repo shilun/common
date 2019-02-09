@@ -7,18 +7,20 @@ package com.common.web.interceptor;
 
 import com.common.util.DESEncryptUtils;
 import com.common.util.DateUtil;
-import java.util.Calendar;
-import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
+import java.util.Date;
+
 public class RPCInterceptor implements HandlerInterceptor {
-    private Logger logger = Logger.getLogger(RPCInterceptor.class);
+    private Logger logger = LoggerFactory.getLogger(RPCInterceptor.class);
     private String authKey;
     private boolean authHead = false;
 

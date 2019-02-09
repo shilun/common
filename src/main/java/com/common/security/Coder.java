@@ -5,11 +5,12 @@
 
 package com.common.security;
 
-import java.security.MessageDigest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
+
+import java.security.MessageDigest;
 
 public abstract class Coder {
     private static final Log log = LogFactory.getLog(Coder.class);

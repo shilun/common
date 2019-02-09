@@ -6,18 +6,13 @@
 package com.common.util;
 
 import com.common.exception.ApplicationException;
-import com.common.util.DateStyleEnum;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DateUtil {
     private static Logger logger = LoggerFactory.getLogger(DateUtil.class);

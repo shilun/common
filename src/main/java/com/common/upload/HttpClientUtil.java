@@ -18,7 +18,8 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -30,9 +31,9 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class HttpClientUtil {
+class HttpClientUtil {
 
-	private static final Logger LOGGER = Logger.getLogger(HttpClientUtil.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientUtil.class);
 
 	private String authKey;
 

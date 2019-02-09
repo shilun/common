@@ -1,7 +1,6 @@
 package com.common.codetable;
 
 import com.common.exception.BizException;
-import com.common.util.IGlossary;
 import com.common.util.MateDataInfo;
 
 import java.util.HashMap;

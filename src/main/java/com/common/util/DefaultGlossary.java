@@ -5,8 +5,6 @@
 
 package com.common.util;
 
-import com.common.util.IGlossary;
-
 public class DefaultGlossary implements IGlossary {
     private static final long serialVersionUID = 1L;
     private Integer value;

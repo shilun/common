@@ -2,7 +2,8 @@ package com.common.util;
 
 import com.common.exception.BizException;
 import net.sf.json.JSONNull;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapPropertyUtils {
-    private static Logger logger = Logger.getLogger(MapPropertyUtils.class);
+    private static Logger logger = LoggerFactory.getLogger(MapPropertyUtils.class);
 
     public MapPropertyUtils() {
     }

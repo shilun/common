@@ -5,14 +5,16 @@
 
 package com.common.web.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 public class CommonInterceptor implements HandlerInterceptor {
-    private Logger log = Logger.getLogger(CommonInterceptor.class);
+    private Logger log = LoggerFactory.getLogger(CommonInterceptor.class);
 
     public CommonInterceptor() {
     }

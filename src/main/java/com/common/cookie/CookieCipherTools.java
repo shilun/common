@@ -7,10 +7,11 @@ package com.common.cookie;
 
 import com.common.security.Base32;
 import com.common.security.DESCoder;
-import java.io.UnsupportedEncodingException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.UnsupportedEncodingException;
 
 public class CookieCipherTools {
     private static final Log log = LogFactory.getLog(CookieCipherTools.class);

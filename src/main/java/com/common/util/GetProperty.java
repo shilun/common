@@ -5,13 +5,14 @@
 
 package com.common.util;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 
 public class GetProperty extends PropertyPlaceholderConfigurer {
     private static Map<String, Object> ctxPropertiesMap;

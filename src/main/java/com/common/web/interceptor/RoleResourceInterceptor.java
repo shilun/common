@@ -4,19 +4,18 @@ import com.common.annotation.RoleResource;
 import com.common.constants.GlobalContstants;
 import com.common.cookie.LoginContext;
 import com.common.util.RPCResult;
-import com.common.util.Result;
 import com.common.web.interceptor.rpc.ResourcesRPCService;
-
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
 public class RoleResourceInterceptor extends HandlerInterceptorAdapter {
-    private static Logger logger = Logger.getLogger(RoleResourceInterceptor.class);
+    private static Logger logger = LoggerFactory.getLogger(RoleResourceInterceptor.class);
     private ResourcesRPCService resourcesRPCService;
     private String loginUrl;
     private Boolean audi = Boolean.valueOf(false);

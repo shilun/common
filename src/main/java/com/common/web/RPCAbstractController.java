@@ -5,8 +5,6 @@
 
 package com.common.web;
 
-import com.common.web.AbstractController;
-
 public abstract class RPCAbstractController extends AbstractController {
     public RPCAbstractController() {
     }

@@ -6,20 +6,11 @@
 package com.common.util;
 
 import com.common.exception.BizException;
-import com.common.util.StringUtils;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
+import java.util.*;
 public class Result<T> implements Serializable {
     private static final long serialVersionUID = 6028636097083630372L;
     @XmlElement

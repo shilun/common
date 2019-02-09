@@ -5,15 +5,15 @@
 
 package com.common.security;
 
-import com.common.security.Coder;
-import java.security.Key;
-import java.security.SecureRandom;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.security.Key;
+import java.security.SecureRandom;
 
 public abstract class DESCoder extends Coder {
     private static final Log log = LogFactory.getLog(DESCoder.class);

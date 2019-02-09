@@ -5,10 +5,11 @@
 
 package com.common.util;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
 
 public class PropertyStringUtils {
     public PropertyStringUtils() {

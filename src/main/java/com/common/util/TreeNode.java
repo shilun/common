@@ -5,7 +5,6 @@
 
 package com.common.util;
 
-import com.common.util.TreeEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

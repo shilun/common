@@ -5,8 +5,9 @@
 
 package com.common.util;
 
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 public abstract class RequestUtil {
     public RequestUtil() {

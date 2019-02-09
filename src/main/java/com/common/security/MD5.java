@@ -5,8 +5,9 @@
 
 package com.common.security;
 
-import java.lang.reflect.Array;
 import org.apache.commons.codec.digest.DigestUtils;
+
+import java.lang.reflect.Array;
 
 public class MD5 {
     public MD5() {

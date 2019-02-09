@@ -9,16 +9,18 @@ import com.common.exception.ApplicationException;
 import com.common.security.DesDecrypter;
 import com.common.security.DesEncrypter;
 import com.common.util.DateUtil;
-import java.io.Serializable;
-import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
+import java.util.Date;
+
 public class LoginContext implements Serializable {
-    private static final Logger logger = Logger.getLogger(LoginContext.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginContext.class);
     private static final long serialVersionUID = 1L;
     private String loginName;
     private Date createTime;

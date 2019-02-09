@@ -7,9 +7,9 @@ import com.common.util.Money;
 import com.common.util.PropertyUtil;
 import com.common.util.StringUtils;
 import com.common.util.model.YesOrNoEnum;
-import com.mongodb.WriteResult;
 import com.mongodb.client.result.UpdateResult;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
@@ -18,7 +18,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -26,7 +25,7 @@ import java.util.*;
  * Created by Administrator on 2017/7/10.
  */
 public abstract class AbstractMongoService<T extends AbstractBaseEntity> implements MongoService<T> {
-    private static Logger logger = Logger.getLogger(AbstractMongoService.class);
+    private static Logger logger = LoggerFactory.getLogger(AbstractMongoService.class);
 
     @Autowired(required = false)
     protected MongoTemplate template;

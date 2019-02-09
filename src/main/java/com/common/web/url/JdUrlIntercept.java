@@ -5,8 +5,6 @@
 
 package com.common.web.url;
 
-import com.common.web.url.JdUrl;
-
 public interface JdUrlIntercept {
     void doIntercept(JdUrl var1);
 }

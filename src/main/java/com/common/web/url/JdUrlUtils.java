@@ -5,7 +5,6 @@
 
 package com.common.web.url;
 
-import com.common.web.url.JdUrl;
 import java.util.Map;
 
 public class JdUrlUtils {

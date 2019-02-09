@@ -6,29 +6,22 @@
 package com.common.worker;
 
 import com.common.exception.ApplicationException;
-import com.common.worker.WorkerSchedulerBean;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 
+import java.lang.reflect.Method;
+import java.util.*;
+
 public class WorkService implements ApplicationContextAware {
-    protected static final Logger LOGGER = Logger.getLogger(WorkService.class.getName());
+    protected static final Logger LOGGER = LoggerFactory.getLogger(WorkService.class.getName());
     private ApplicationContext applicationContext;
 
     public WorkService() {

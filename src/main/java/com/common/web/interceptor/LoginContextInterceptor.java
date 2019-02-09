@@ -9,10 +9,6 @@ import com.common.cookie.CookieUtils;
 import com.common.cookie.LoginContext;
 import com.common.util.StringUtils;
 import com.common.web.url.JdUrl;
-import java.net.MalformedURLException;
-import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,6 +17,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.MalformedURLException;
+import java.util.Date;
 
 public class LoginContextInterceptor extends HandlerInterceptorAdapter {
     private static final Log log = LogFactory.getLog(LoginContextInterceptor.class);

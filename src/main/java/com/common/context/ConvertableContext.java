@@ -5,7 +5,6 @@
 
 package com.common.context;
 
-import com.common.context.Convertable;
 import java.lang.reflect.Method;
 
 public final class ConvertableContext<T, V> {

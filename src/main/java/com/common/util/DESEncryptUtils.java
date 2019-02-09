@@ -8,17 +8,19 @@ package com.common.util;
 import com.common.exception.ApplicationException;
 import com.sun.crypto.provider.SunJCE;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-import java.security.SecureRandom;
-import java.security.Security;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import java.security.SecureRandom;
+import java.security.Security;
 
 public class DESEncryptUtils {
-    private static final Logger logger = Logger.getLogger(DESEncryptUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(DESEncryptUtils.class);
     private static String charsetName = "UTF-8";
 
     public DESEncryptUtils() {

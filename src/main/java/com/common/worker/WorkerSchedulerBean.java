@@ -6,8 +6,9 @@
 package com.common.worker;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.UUID;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+
+import java.util.UUID;
 
 public class WorkerSchedulerBean extends SchedulerFactoryBean {
     private String id = UUID.randomUUID().toString().replaceAll("-", "");

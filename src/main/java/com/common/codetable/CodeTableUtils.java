@@ -1,7 +1,10 @@
 package com.common.codetable;
 
 import com.common.annotation.Editor;
-import com.common.util.*;
+import com.common.util.AbstractExtendCodeTable;
+import com.common.util.EditorDto;
+import com.common.util.PropertyUtil;
+import com.common.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;

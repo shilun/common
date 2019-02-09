@@ -5,7 +5,8 @@ import com.common.util.Result;
 import com.common.util.StringUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,7 +16,7 @@ import java.util.Properties;
 
 
 public class UploadUtil {
-    private static final Logger LOGGER = Logger.getLogger(UploadUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadUtil.class);
     // 域名
     private String domainName;
     // 业务碼
@@ -126,9 +127,9 @@ public class UploadUtil {
 
     public static void main(String[] args) {
         UploadUtil uploadUtil = new UploadUtil();
-        uploadUtil.setDomainName("127.0.0.1");
-        uploadUtil.setCode("cbd0262ba9c34b12a2a14022e4c33eb2");
-        uploadUtil.setScode("img");
+        uploadUtil.setDomainName("image.jiahou.com");
+        uploadUtil.setCode("cbd0262ba9c34b12a2a14022e4c33ebe");
+        uploadUtil.setScode("app");
         Result<String> stringResult = uploadUtil.uploadFile(new File("d:\\ss.jpg"));
         System.out.println(stringResult.getSuccess());
         System.out.println(stringResult.getModule());

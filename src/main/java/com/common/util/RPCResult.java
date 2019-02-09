@@ -3,10 +3,7 @@ package com.common.util;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.domain.Page;
 
-import javax.xml.bind.annotation.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class RPCResult<T> implements Serializable {

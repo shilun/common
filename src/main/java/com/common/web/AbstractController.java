@@ -11,26 +11,23 @@ import com.common.exception.BizException;
 import com.common.security.DesDecrypter;
 import com.common.security.DesEncrypter;
 import com.common.util.*;
-import net.sf.json.JSON;
 import net.sf.json.JSONObject;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 public abstract class AbstractController {
-    private static final Logger LOGGER = Logger.getLogger(AbstractController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractController.class);
 
     public AbstractController() {
     }

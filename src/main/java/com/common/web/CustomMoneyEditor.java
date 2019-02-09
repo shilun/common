@@ -6,10 +6,11 @@
 package com.common.web;
 
 import com.common.util.Money;
+import org.apache.commons.lang.StringUtils;
+
 import java.beans.PropertyEditorSupport;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import org.apache.commons.lang.StringUtils;
 
 public class CustomMoneyEditor extends PropertyEditorSupport {
     public CustomMoneyEditor() {

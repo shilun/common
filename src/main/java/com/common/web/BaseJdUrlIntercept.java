@@ -7,11 +7,12 @@ package com.common.web;
 
 import com.common.web.url.JdUrl;
 import com.common.web.url.JdUrlIntercept;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BaseJdUrlIntercept implements JdUrlIntercept {
     private static final Log log = LogFactory.getLog(BaseJdUrlIntercept.class);

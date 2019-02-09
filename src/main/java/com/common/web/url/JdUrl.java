@@ -5,7 +5,10 @@
 
 package com.common.web.url;
 
-import com.common.web.url.JdUrlIntercept;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,9 +17,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class JdUrl implements Cloneable {
     private static final Log log = LogFactory.getLog(JdUrl.class);

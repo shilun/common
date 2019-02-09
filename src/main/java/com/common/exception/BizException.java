@@ -5,8 +5,6 @@
 
 package com.common.exception;
 
-import com.common.exception.ApplicationException;
-
 public class BizException extends ApplicationException {
     private static final long serialVersionUID = 1L;
     private String code;
