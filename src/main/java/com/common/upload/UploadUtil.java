@@ -127,10 +127,10 @@ public class UploadUtil {
 
     public static void main(String[] args) {
         UploadUtil uploadUtil = new UploadUtil();
-        uploadUtil.setDomainName("image.jiahou.com");
-        uploadUtil.setCode("cbd0262ba9c34b12a2a14022e4c33ebe");
-        uploadUtil.setScode("app");
-        Result<String> stringResult = uploadUtil.uploadFile(new File("d:\\ss.jpg"));
+        uploadUtil.setDomainName("127.0.0.1");
+        uploadUtil.setCode("cbd0262ba9c34b12a2a14022e4c33eb2");
+        uploadUtil.setScode("img");
+        Result<String> stringResult = uploadUtil.uploadFile(new File("d:\\1.jpg"));
         System.out.println(stringResult.getSuccess());
         System.out.println(stringResult.getModule());
     }

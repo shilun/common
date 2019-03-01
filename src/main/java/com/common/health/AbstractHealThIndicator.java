@@ -15,12 +15,12 @@ public abstract class AbstractHealThIndicator implements HealthIndicator {
         try {
             RPCResult<Boolean> status = getStatusRpcService().status();
             if (status.getSuccess()) {
-                return new Health.Builder().withDetail("status", "UP").up().build();
+                return new Health.Builder().up().build();
             }
         } catch (Exception e) {
             logger.error(this.getClass().getSimpleName() + " 监控健康检查失败");
         }
-        return new Health.Builder().withDetail("status", "DOWN").up().build();
+        return new Health.Builder().down().build();
     }
 
     /**
