@@ -130,8 +130,7 @@ public abstract class AbstractController {
 
             map.put("success", Boolean.valueOf(true));
         } catch (BizException var13) {
-            LOGGER.error(var13.getMessage(), var13);
-            LOGGER.error("execute json error->" + var13.getMessage());
+            LOGGER.error("execute json error->code:" + var13.getCode()+" msg:"+var13.getMessage());
             map.put("code", var13.getCode());
             map.put("message", var13.getMessage());
             map.put("success", Boolean.valueOf(false));
