@@ -6,18 +6,23 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ApplicationListener;
 
-public abstract class AbstractApplication  {
-    protected void run(){
-        SpringApplication app =new SpringApplication(buildRunClass());
-        app.addListeners(buildListeners());
-        app.run();
+public abstract class AbstractApplication {
+
+    protected static <T extends AbstractApplication> T getInstance(Class<T> classz) {
+        T abstractApplication = null;
+        try {
+            abstractApplication = (T) classz.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return abstractApplication;
     }
 
-    protected ApplicationListener[] buildListeners(){
-        ApplicationListener[] listeners=new ApplicationListener[3];
-        listeners[0]= new ApplicationStartingEventListener();
-        listeners[1]=new ApplicationFailedEventListener();
-        listeners[2]=new ApplicationStartedEventListener();
+    public ApplicationListener[] buildListeners() {
+        ApplicationListener[] listeners = new ApplicationListener[3];
+        listeners[0] = new ApplicationStartingEventListener();
+        listeners[1] = new ApplicationFailedEventListener();
+        listeners[2] = new ApplicationStartedEventListener();
         return listeners;
     }
 
@@ -26,7 +31,6 @@ public abstract class AbstractApplication  {
     protected abstract void startFailed(Throwable throwable);
 
     protected abstract void started();
-    protected abstract Class buildRunClass();
 
 
     class ApplicationFailedEventListener implements ApplicationListener<ApplicationFailedEvent> {
@@ -38,6 +42,7 @@ public abstract class AbstractApplication  {
 
 
     }
+
     class ApplicationStartingEventListener implements ApplicationListener<ApplicationStartingEvent> {
         @Override
         public void onApplicationEvent(ApplicationStartingEvent applicationStartingEvent) {
@@ -45,7 +50,7 @@ public abstract class AbstractApplication  {
         }
     }
 
-    class ApplicationStartedEventListener implements ApplicationListener<ApplicationReadyEvent>{
+    class ApplicationStartedEventListener implements ApplicationListener<ApplicationReadyEvent> {
         @Override
         public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
             started();
