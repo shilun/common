@@ -302,7 +302,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             }
         } else {
             query.with(buildSort(entity));
-            query.limit(10);
+            query.limit(50);
         }
         return query;
     }

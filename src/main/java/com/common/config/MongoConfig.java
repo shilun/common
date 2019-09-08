@@ -99,8 +99,8 @@ public class MongoConfig {
         list.add(new MoneyToLongConvert());
         list.add(new IGlossaryToIntegerConvert());
         list.add(new LongToMoneyConvert());
-        list.add(new BigDecimalToDecimal128Converter());
-        list.add(new Decimal128ToBigDecimalConverter());
+//        list.add(new BigDecimalToDecimal128Converter());
+//        list.add(new Decimal128ToBigDecimalConverter());
         return new MongoCustomConversions(list);
     }
 
