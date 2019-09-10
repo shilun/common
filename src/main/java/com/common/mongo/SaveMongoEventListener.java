@@ -13,17 +13,16 @@ import org.springframework.data.mongodb.core.query.Update;
 import javax.annotation.Resource;
 
 public class SaveMongoEventListener extends AbstractMongoEventListener<AbstractBaseEntity> {
-    @Resource
+    @Resource(name = "primary")
     private MongoTemplate mongoTemplate;
 
     public void onBeforeConvert(BeforeConvertEvent event) {
         if (event != null) {
             AbstractBaseEntity entity = (AbstractBaseEntity) event.getSource();
-            if(entity instanceof ISplitProxy){
-                ISplitProxy proxyEntity= (ISplitProxy) entity;
-                entity.setId(getNextId(entity.getClass().getSimpleName()+"_"+proxyEntity.getProxyId()));
-            }
-            else{
+            if (entity instanceof ISplitProxy) {
+                ISplitProxy proxyEntity = (ISplitProxy) entity;
+                entity.setId(getNextId(entity.getClass().getSimpleName() + "_" + proxyEntity.getProxyId()));
+            } else {
                 entity.setId(getNextId(entity.getClass().getSimpleName()));
             }
 
@@ -50,6 +49,7 @@ public class SaveMongoEventListener extends AbstractMongoEventListener<AbstractB
         }
         return seqId.getSeqId();
     }
+
     /**
      * 获取下一个自增ID
      *
@@ -67,6 +67,7 @@ public class SaveMongoEventListener extends AbstractMongoEventListener<AbstractB
         SequenceId seqId = mongoTemplate.findAndModify(query, update, options, SequenceId.class);
         return seqId.getSeqId();
     }
+
     /**
      * 获取下一个自增ID
      *
