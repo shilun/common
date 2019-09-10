@@ -57,12 +57,14 @@ public class MongoConfig {
 
         @Value("${app.db.transaction}")
         private Boolean transaction;
+
         @Bean
         public TransBean getTransBean() {
             TransBean transBean = new TransBean();
             transBean.setTransaction(transaction);
             return transBean;
         }
+
         @Bean
         public MongoTransactionManager transactionManager(MongoDbFactory dbFactory) {
             return new MongoTransactionManager(dbFactory);
@@ -70,27 +72,27 @@ public class MongoConfig {
     }
 
 
-    @Autowired(required = false)
-    private TransBean transBean;
-
-    @Bean
-    @ConditionalOnMissingBean(MongoTemplate.class)
-    public MongoTemplate mongoTemplate(MongoDbFactory dbFactory) throws Exception {
+    @Bean("primary")
+    public MongoTemplate mongoPrimaryTemplate(MongoDbFactory dbFactory) throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url" + mongodbUrl);
         }
         MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(dbFactory));
-        if (transBean == null) {
-            mongoTemplate.setReadPreference(ReadPreference.primary());
-            mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
-        }
-        if (transBean != null && transBean.getTransaction()) {
-            mongoTemplate.setReadPreference(ReadPreference.primary());
-            mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
-        }
+        mongoTemplate.setReadPreference(ReadPreference.primary());
+        mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         return mongoTemplate;
     }
 
+    @Bean("secondary")
+    public MongoTemplate mongoSecondaryTemplate(MongoDbFactory dbFactory) throws Exception {
+        if (StringUtils.isBlank(mongodbUrl)) {
+            throw new Exception("mongodb load error url" + mongodbUrl);
+        }
+        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(dbFactory));
+        mongoTemplate.setReadPreference(ReadPreference.secondary());
+        mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
+        return mongoTemplate;
+    }
 
 
     @Bean
@@ -99,8 +101,6 @@ public class MongoConfig {
         list.add(new MoneyToLongConvert());
         list.add(new IGlossaryToIntegerConvert());
         list.add(new LongToMoneyConvert());
-//        list.add(new BigDecimalToDecimal128Converter());
-//        list.add(new Decimal128ToBigDecimalConverter());
         return new MongoCustomConversions(list);
     }
 
@@ -121,6 +121,7 @@ public class MongoConfig {
 
         return mappingConverter;
     }
+
     private MongoClient mongo;
     private MongoClientURI mongoClientURI;
 
@@ -139,7 +140,7 @@ public class MongoConfig {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new ApplicationException("mongodb load error url" + mongodbUrl);
         }
-        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder().writeConcern(WriteConcern.MAJORITY).readPreference(ReadPreference.primary()));
+        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder());
         this.mongoClientURI = url;
         return url;
     }

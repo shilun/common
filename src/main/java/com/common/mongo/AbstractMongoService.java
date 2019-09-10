@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -27,8 +28,12 @@ import java.util.*;
 public abstract class AbstractMongoService<T extends AbstractBaseEntity> implements MongoService<T> {
     private static Logger logger = LoggerFactory.getLogger(AbstractMongoService.class);
 
-    @Autowired(required = false)
-    protected MongoTemplate template;
+    @Resource(name = "primary")
+    protected MongoTemplate primaryTemplate;
+
+    @Resource(name = "secondary")
+    protected MongoTemplate secondaryTemplate;
+
 
     protected abstract Class getEntityClass();
 
@@ -58,9 +63,8 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity.getUpdateTime() == null) {
             entity.setUpdateTime(createTime);
         }
-        doExcuteProperty(entity);
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        template.insert(entity);
+        primaryTemplate.insert(entity);
         return entity.getId();
     }
 
@@ -70,38 +74,36 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             throw new ApplicationException("Id不能为空");
         }
         Query query = new Query();
-        doExcuteProperty(entity);
         Criteria criteria = Criteria.where("id").is(entity.getId());
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
-        UpdateResult upsert = template.upsert(query, update, entity.getClass());
+        UpdateResult upsert = primaryTemplate.upsert(query, update, entity.getClass());
         if (upsert.getModifiedCount() == 1 && upsert.isModifiedCountAvailable()) {
             return;
         }
         throw new ApplicationException("mongodb updata error");
     }
 
-    private void doExcuteProperty(T entity) {
-//        for (Field field : beanPropertyes.values()) {
-//            Transient annotation = field.getAnnotation(Transient.class);
-//            if (annotation != null) {
-//                try {
-//                    field.set(entity, null);
-//                } catch (IllegalAccessException e) {
-//                    logger.error("set entity property error" + entity.getClass().getSimpleName(), e);
-//                }
-//            }
-//        }
-    }
-
 
     public T findById(Long id) {
+        return findById(id, false);
+    }
+
+    public T findById(Long id, boolean trans) {
+
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
         query.addCriteria(Criteria.where("delStatus").is(YesOrNoEnum.NO.getValue()));
-        List<T> ts = template.find(query, getEntityClass());
+        List<T> ts = null;
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
+        }
+        ts = template.find(query, getEntityClass());
         if (ts != null && ts.size() == 1) {
             return ts.get(0);
         }
@@ -115,37 +117,77 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
-        template.remove(query, getEntityClass());
+        primaryTemplate.remove(query, getEntityClass());
     }
 
     public List<T> query(T entity) {
+        return query(entity, false);
+    }
+
+    public List<T> query(T entity, boolean trans) {
         if (entity == null) {
-            return template.findAll(getEntityClass());
+            return secondaryTemplate.findAll(getEntityClass());
         }
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
+        }
         return template.find(query, getEntityClass());
     }
 
     public Long queryCount(T entity) {
+        return queryCount(entity, false);
+    }
+
+    public Long queryCount(T entity, boolean trans) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
+        }
         return template.count(query, entity.getClass());
     }
 
     public Page<T> queryByPage(T entity, Pageable pageable) {
+        return queryByPage(entity, pageable, false);
+    }
+
+    public Page<T> queryByPage(T entity, Pageable pageable, boolean trans) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Long count = queryCount(entity);
         Query query = buildCondition(entity, pageable);
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
+        }
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
     }
 
     public Page<T> queryByPage(Query query, Pageable pageable) {
-        long count = template.count(query, getEntityClass());
+        return queryByPage(query, pageable, false);
+    }
+
+    public Page<T> queryByPage(Query query, Pageable pageable, boolean trans) {
+        long count = secondaryTemplate.count(query, getEntityClass());
         if (pageable.getSort() == null) {
             return queryByPage(query, pageable, null, null);
+        }
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
         }
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
@@ -153,11 +195,21 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Page<T> queryByPage(Query query, Pageable pageable, String sortColomn, Sort.Direction sortType) {
+        return queryByPage(query, pageable, sortColomn, sortType, false);
+    }
+
+    public Page<T> queryByPage(Query query, Pageable pageable, String sortColomn, Sort.Direction sortType, boolean trans) {
         if (sortType == null) {
             sortType = Sort.Direction.DESC;
         }
         if (StringUtils.isBlank(sortColomn)) {
             sortColomn = "createTime";
+        }
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
         }
         long count = template.count(query, getEntityClass());
         if (pageable.getSort() == null) {
@@ -172,8 +224,19 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public T findByOne(T entity) {
+        return findByOne(entity, false);
+    }
+
+
+    public T findByOne(T entity, boolean trans) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         Query query = buildCondition(entity);
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
+        }
         return template.findOne(query, (Class<T>) getEntityClass());
     }
 
@@ -348,10 +411,6 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             }
         }
         return update;
-    }
-
-    public void setTemplate(MongoTemplate template) {
-        this.template = template;
     }
 }
 
