@@ -41,18 +41,18 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         buildPropertyDescriptor();
     }
 
-    public Long save(T entity) {
+    public void save(T entity) {
         if (entity == null) {
             throw new ApplicationException("保存失败，对象未实例化");
         }
         if (entity.getId() != null) {
             up(entity);
-            return entity.getId();
+            return;
         }
-        return insert(entity);
+        insert(entity);
     }
 
-    public Long insert(T entity) {
+    public void insert(T entity) {
         if (entity == null) {
             throw new ApplicationException("保存失败，对象未实例化");
         }
@@ -65,7 +65,6 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
         primaryTemplate.insert(entity);
-        return entity.getId();
     }
 
 
@@ -74,7 +73,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             throw new ApplicationException("Id不能为空");
         }
         Query query = new Query();
-        Criteria criteria = Criteria.where("id").is(entity.getId());
+        Criteria criteria = Criteria.where("_id").is(entity.getId());
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
@@ -86,14 +85,14 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
 
-    public T findById(Long id) {
+    public T findById(String id) {
         return findById(id, false);
     }
 
-    public T findById(Long id, boolean trans) {
+    public T findById(String id, boolean trans) {
 
         Query query = new Query();
-        Criteria criteria = Criteria.where("id").is(id);
+        Criteria criteria = Criteria.where("_id").is(id);
         query.addCriteria(criteria);
         query.addCriteria(Criteria.where("delStatus").is(YesOrNoEnum.NO.getValue()));
         List<T> ts = null;
@@ -110,12 +109,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         throw new ApplicationException("no data to find");
     }
 
-    public void delById(Long id) {
+    public void delById(String id) {
         if (id == null) {
             throw new ApplicationException("删除数据出错,id不能为空");
         }
         Query query = new Query();
-        Criteria criteria = Criteria.where("id").is(id);
+        Criteria criteria = Criteria.where("_id").is(id);
         query.addCriteria(criteria);
         primaryTemplate.remove(query, getEntityClass());
     }
@@ -270,7 +269,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         for (Field field : beanPropertyes.values()) {
             Object property = null;
             String descriptorName = field.getName();
-            if ((!descriptorName.equals("class")) && (!descriptorName.equals("orderColumn")) && (!descriptorName.equals("orderTpe"))) {
+            if ((!descriptorName.equals("class")) && (!descriptorName.equals("orderColumn")) && (!descriptorName.equals("orderType"))) {
                 try {
                     property = PropertyUtil.getProperty(entity, descriptorName);
                     if (property instanceof Money) {
@@ -375,13 +374,13 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (StringUtils.isBlank(entity.getOrderColumn())) {
             entity.setOrderColumn("createTime");
         }
-        if (entity.getOrderTpe() == null) {
-            entity.setOrderTpe(2);
+        if (entity.getOrderType() == null) {
+            entity.setOrderType(2);
         }
-        if (entity.getOrderTpe().intValue() == 1) {
+        if (entity.getOrderType().intValue() == 1) {
             orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());
         }
-        if (entity.getOrderTpe().intValue() == 2) {
+        if (entity.getOrderType().intValue() == 2) {
             orders = new Sort(Sort.Direction.DESC, entity.getOrderColumn());
         }
         return orders;

@@ -17,26 +17,26 @@ public interface MongoService<T extends AbstractBaseEntity> {
      * @param entity
      * @return
      */
-    public Long save(T entity);
+    public void save(T entity);
     /***
      * 添加
      * @param entity
      * @return
      */
-    public Long insert(T entity);
+    public void insert(T entity);
 
     /***
      * 根据id查询
      * @param id
      * @return
      */
-    public T findById(Long id);
+    public T findById(String id);
     /***
      * 根据id查询
      * @param id
      * @return
      */
-    public T findById(Long id,boolean trans);
+    public T findById(String id,boolean trans);
 
     /***
      * 根据条件查询单条记录
@@ -55,7 +55,7 @@ public interface MongoService<T extends AbstractBaseEntity> {
      * 根据id 删除
      * @param id
      */
-    public void delById(Long id);
+    public void delById(String id);
 
     /**
      * 模糊查询

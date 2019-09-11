@@ -1,6 +1,7 @@
 package com.common.mongo;
 
 import com.common.util.AbstractBaseEntity;
+import com.common.util.AbstractSeqEntity;
 import com.common.util.ISplitProxy;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,13 +20,10 @@ public class SaveMongoEventListener extends AbstractMongoEventListener<AbstractB
     public void onBeforeConvert(BeforeConvertEvent event) {
         if (event != null) {
             AbstractBaseEntity entity = (AbstractBaseEntity) event.getSource();
-            if (entity instanceof ISplitProxy) {
-                ISplitProxy proxyEntity = (ISplitProxy) entity;
-                entity.setId(getNextId(entity.getClass().getSimpleName() + "_" + proxyEntity.getProxyId()));
-            } else {
-                entity.setId(getNextId(entity.getClass().getSimpleName()));
+            if (entity instanceof AbstractSeqEntity) {
+                AbstractSeqEntity proxyEntity = (AbstractSeqEntity) entity;
+                proxyEntity.setSeqId(getNextId(entity.getClass().getSimpleName()));
             }
-
         }
     }
 

@@ -5,6 +5,7 @@ import com.common.annotation.GeneratedValue;
 import com.common.annotation.QueryField;
 import com.common.mongo.QueryType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.data.annotation.Id;
@@ -13,10 +14,11 @@ import org.springframework.data.annotation.Transient;
 import java.io.Serializable;
 import java.util.Date;
 
+@Data
 public class AbstractBaseEntity implements Serializable {
 
     @Id
-    private String uuid;
+    private String id;
     private static final long serialVersionUID = 1L;
     @JsonIgnore
     @Transient
@@ -27,9 +29,6 @@ public class AbstractBaseEntity implements Serializable {
     @Transient
     @JsonIgnore
     private Integer endRow;
-    @QueryField
-    @GeneratedValue
-    private Long id;
     private Date createTime;
     private Integer delStatus;
     private Date updateTime;
@@ -48,105 +47,7 @@ public class AbstractBaseEntity implements Serializable {
     private Date endCreateTime;
     @Transient
     @JsonIgnore
-    private Integer orderTpe;//1 升序ASC，2 降序Desc
-    public Long getMinId() {
-        return this.minId;
-    }
-
-    public void setMinId(Long minId) {
-        this.minId = minId;
-    }
-
-    public Date getStartCreateTime() {
-        return this.startCreateTime;
-    }
-
-    public void setStartCreateTime(Date startCreateTime) {
-        this.startCreateTime = startCreateTime;
-    }
-
-    public Date getEndCreateTime() {
-        return this.endCreateTime;
-    }
-
-    public void setEndCreateTime(Date endCreateTime) {
-        this.endCreateTime = endCreateTime;
-    }
-
-    public AbstractBaseEntity() {
-    }
-
-    public String getOrderColumn() {
-        return this.orderColumn;
-    }
-
-    public void setOrderColumn(String orderColumn) {
-        this.orderColumn = orderColumn;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getStartRow() {
-        return this.startRow;
-    }
-
-    public void setStartRow(Integer startRow) {
-        this.startRow = startRow;
-    }
-
-    public Integer getEndRow() {
-        return this.endRow;
-    }
-
-    public void setEndRow(Integer endRow) {
-        this.endRow = endRow;
-    }
-
-    public Date getCreateTime() {
-        return this.createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Integer getDelStatus() {
-        return this.delStatus;
-    }
-
-    public void setDelStatus(Integer delStatus) {
-        this.delStatus = delStatus;
-    }
-
-    public Date getUpdateTime() {
-        return this.updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Integer getOrderTpe() {
-        return orderTpe;
-    }
-
-    public void setOrderTpe(Integer orderTpe) {
-        this.orderTpe = orderTpe;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
+    private Integer orderType;//1 升序ASC，2 降序Desc
 
     @Override
     public String toString() {
