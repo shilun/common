@@ -6,11 +6,11 @@ import com.common.util.AbstractBaseEntity;
 import com.common.util.Money;
 import com.common.util.PropertyUtil;
 import com.common.util.StringUtils;
+import com.common.util.model.OrderTypeEnum;
 import com.common.util.model.YesOrNoEnum;
 import com.mongodb.client.result.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -160,7 +160,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     public Page<T> queryByPage(T entity, Pageable pageable, boolean trans) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        Long count = queryCount(entity);
+        Long count = queryCount(entity,trans);
         Query query = buildCondition(entity, pageable);
         MongoTemplate template = null;
         if (trans) {
@@ -178,9 +178,8 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Page<T> queryByPage(Query query, Pageable pageable, boolean trans) {
-        long count = secondaryTemplate.count(query, getEntityClass());
         if (pageable.getSort() == null) {
-            return queryByPage(query, pageable, null, null);
+            return queryByPage(query, pageable, "createTime", OrderTypeEnum.DESC, trans);
         }
         MongoTemplate template = null;
         if (trans) {
@@ -188,21 +187,25 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         } else {
             template = secondaryTemplate;
         }
+        long count = template.count(query, getEntityClass());
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
     }
 
-    public Page<T> queryByPage(Query query, Pageable pageable, String sortColomn, Sort.Direction sortType) {
-        return queryByPage(query, pageable, sortColomn, sortType, false);
+    public Page<T> queryByPage(Query query, Pageable pageable, String orderColum, OrderTypeEnum orderType) {
+        return queryByPage(query, pageable, orderColum, orderType, false);
     }
 
-    public Page<T> queryByPage(Query query, Pageable pageable, String sortColomn, Sort.Direction sortType, boolean trans) {
-        if (sortType == null) {
+    public Page<T> queryByPage(Query query, Pageable pageable, String orderColum, OrderTypeEnum orderType, boolean trans) {
+        Sort.Direction sortType = null;
+        if (OrderTypeEnum.ASC == orderType) {
+            sortType = Sort.Direction.ASC;
+        } else {
             sortType = Sort.Direction.DESC;
         }
-        if (StringUtils.isBlank(sortColomn)) {
-            sortColomn = "createTime";
+        if (StringUtils.isBlank(orderColum)) {
+            orderColum = "createTime";
         }
         MongoTemplate template = null;
         if (trans) {
@@ -212,7 +215,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
         long count = template.count(query, getEntityClass());
         if (pageable.getSort() == null) {
-            Sort sort = new Sort(sortType, sortColomn);
+            Sort sort = new Sort(sortType, orderColum);
             PageRequest pageRequest = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort);
             query.with(pageRequest);
         }
@@ -375,12 +378,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             entity.setOrderColumn("createTime");
         }
         if (entity.getOrderType() == null) {
-            entity.setOrderType(2);
+            entity.setOrderType(OrderTypeEnum.ASC);
         }
-        if (entity.getOrderType().intValue() == 1) {
+        if (entity.getOrderType().getValue() == 1) {
             orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());
         }
-        if (entity.getOrderType().intValue() == 2) {
+        if (entity.getOrderType().getValue() == 2) {
             orders = new Sort(Sort.Direction.DESC, entity.getOrderColumn());
         }
         return orders;
