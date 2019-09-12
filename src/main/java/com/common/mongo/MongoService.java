@@ -1,6 +1,7 @@
 package com.common.mongo;
 
 import com.common.util.AbstractBaseEntity;
+import com.common.util.model.OrderTypeEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -118,19 +119,19 @@ public interface MongoService<T extends AbstractBaseEntity> {
      * 分页查询 默认不给排序查询 跟据 createTime 倒序
      * @param query
      * @param pageable
-     * @param sortColomn
-     * @param sortType
+     * @param orderColomn
+     * @param orderType
      * @return
      */
-    public Page<T> queryByPage(Query query, Pageable pageable, String sortColomn, Sort.Direction sortType);
+    public Page<T> queryByPage(Query query, Pageable pageable, String orderColomn, OrderTypeEnum orderType);
     /**
      * 分页查询 默认不给排序查询 跟据 createTime 倒序
      * @param query
      * @param pageable
-     * @param sortColomn
-     * @param sortType
+     * @param orderColomn
+     * @param orderType
      * @return
      */
-    public Page<T> queryByPage(Query query, Pageable pageable, String sortColomn, Sort.Direction sortType,boolean trans);
+    public Page<T> queryByPage(Query query, Pageable pageable, String orderColomn, OrderTypeEnum orderType,boolean trans);
 
 }
