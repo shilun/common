@@ -99,7 +99,6 @@ public class MongoConfig {
     public MongoCustomConversions customConversions() {
         List list = new ArrayList();
         list.add(new MoneyToLongConvert());
-        list.add(new IGlossaryToIntegerConvert());
         list.add(new LongToMoneyConvert());
         return new MongoCustomConversions(list);
     }

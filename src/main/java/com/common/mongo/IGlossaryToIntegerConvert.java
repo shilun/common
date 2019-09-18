@@ -1,11 +1,11 @@
 package com.common.mongo;
 
-import com.common.util.IGlossary;
+import com.common.util.model.YesOrNoEnum;
 import org.springframework.core.convert.converter.Converter;
 
-public class IGlossaryToIntegerConvert implements Converter<Enum, Integer> {
+public class IGlossaryToIntegerConvert implements Converter<YesOrNoEnum, Integer> {
     @Override
-    public Integer convert(Enum source) {
-        return ((IGlossary) source).getValue();
+    public Integer convert(YesOrNoEnum source) {
+        return source.getValue();
     }
 }
