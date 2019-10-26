@@ -1,5 +1,6 @@
 package com.common.util;
 
+import com.common.exception.BizException;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.domain.Page;
 
@@ -83,6 +84,12 @@ public class RPCResult<T> implements Serializable {
         this.setTotalCount((int) page.getTotalElements());
         this.setPageIndex(page.getNumber());
         this.setData((T) page.getContent());
+    }
+
+    public RPCResult(BizException exception) {
+        this.message = exception.getMessage();
+        this.code = exception.getCode();
+        this.setSuccess(false);
     }
 
     public Integer getPageIndex() {

@@ -22,10 +22,6 @@ public class BizException extends ApplicationException {
         this.code = code;
     }
 
-    public BizException(BizException exception) {
-        super(exception.getMessage());
-        this.code = exception.getCode();
-    }
 
     public BizException(Throwable cause) {
         super(cause);
