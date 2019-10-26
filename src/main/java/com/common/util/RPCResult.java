@@ -92,6 +92,12 @@ public class RPCResult<T> implements Serializable {
         this.setSuccess(false);
     }
 
+    public void setException(BizException exception) {
+        this.message = exception.getMessage();
+        this.code = exception.getCode();
+        this.setSuccess(false);
+    }
+
     public Integer getPageIndex() {
         return pageIndex;
     }
