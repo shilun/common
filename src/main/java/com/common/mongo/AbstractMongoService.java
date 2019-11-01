@@ -45,6 +45,9 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity == null) {
             throw new ApplicationException("保存失败，对象未实例化");
         }
+        if(StringUtils.isBlank(entity.getId())){
+            entity.setId(null);
+        }
         if (StringUtils.isNotBlank(entity.getId())) {
             up(entity);
             return;
