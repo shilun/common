@@ -76,7 +76,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             throw new ApplicationException("Id不能为空");
         }
         Query query = new Query();
-        Criteria criteria = Criteria.where("_id").is(entity.getId());
+        Criteria criteria = Criteria.where("id").is(entity.getId());
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
@@ -95,7 +95,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     public T findById(String id, boolean trans) {
 
         Query query = new Query();
-        Criteria criteria = Criteria.where("_id").is(id);
+        Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
         query.addCriteria(Criteria.where("delStatus").is(YesOrNoEnum.NO.getValue()));
         List<T> ts = null;
@@ -117,7 +117,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             throw new ApplicationException("删除数据出错,id不能为空");
         }
         Query query = new Query();
-        Criteria criteria = Criteria.where("_id").is(id);
+        Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
         primaryTemplate.remove(query, getEntityClass());
     }
