@@ -1,8 +1,6 @@
 package com.common.mongo;
 
-import com.common.util.AbstractBaseEntity;
-import com.common.util.AbstractSeqEntity;
-import com.common.util.ISplitProxy;
+import com.common.util.*;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -23,6 +21,11 @@ public class SaveMongoEventListener extends AbstractMongoEventListener<AbstractB
             if (entity instanceof AbstractSeqEntity) {
                 AbstractSeqEntity proxyEntity = (AbstractSeqEntity) entity;
                 proxyEntity.setSeqId(getNextId(entity.getClass().getSimpleName()));
+            } else {
+                if (entity instanceof AbstractSeqIdEntity) {
+                    String id = getNextId(entity.getClass().getSimpleName()).toString();
+                    entity.setId(StringUtils.buildMongoId(id));
+                }
             }
         }
     }
