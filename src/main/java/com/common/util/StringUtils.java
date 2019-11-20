@@ -66,11 +66,32 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
         String temp = url.substring(0, i);
         i = temp.lastIndexOf(".", i);
         url = url.substring(i + 1);
-        i=url.indexOf(":");
-        if(i!=-1){
-            url=url.substring(0,i);
+        i = url.indexOf(":");
+        if (i != -1) {
+            url = url.substring(0, i);
         }
         return url;
+    }
+
+    public static final String PW_PATTERN = "[a-z0-9]{1,24}";
+
+    /**
+     * 生成mongoid 自动补齐后面的字符
+     *
+     * @param id
+     * @return
+     */
+    public static String buildMongoId(String id) {
+        if (StringUtils.isBlank(id)) {
+            throw new ApplicationException("字符内容不能为空");
+        }
+        if (!id.matches(PW_PATTERN)) {
+            throw new ApplicationException("id内容不符合规范");
+        }
+        while (id.length() < 24) {
+            id = id + "0";
+        }
+        return id;
     }
 
     public static boolean isContains(String text, String subText) {
@@ -86,7 +107,8 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
     public static String randomSixCode() {
         return String.valueOf(new Random().nextInt(899999) + 100000);
     }
+
     public static void main(String[] args) {
-      System.out.println(StringUtils.getUUID());
+        buildMongoId("fdsafsda");
     }
 }
