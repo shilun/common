@@ -89,7 +89,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
             throw new ApplicationException("id内容不符合规范");
         }
         while (id.length() < 24) {
-            id = id + "0";
+            id = "0" + id;
         }
         return id;
     }
@@ -109,6 +109,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
     }
 
     public static void main(String[] args) {
-        buildMongoId("fdsafsda");
+        String fdsafsda = buildMongoId("fdsafsda");
+        System.out.println(fdsafsda.length());
     }
 }
