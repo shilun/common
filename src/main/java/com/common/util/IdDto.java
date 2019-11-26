@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class IDDto implements Serializable {
+public class IdDto implements Serializable {
     /**
      * 标识
      */
