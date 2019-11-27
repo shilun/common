@@ -5,6 +5,7 @@
 
 package com.common.httpclient;
 
+import com.common.exception.ApplicationException;
 import com.common.security.MD5;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +50,7 @@ public class HttpClientUtil {
     }
 
     private String getHeader() {
-        return StringUtils.isNotBlank(this.authKey)?MD5.MD5Str(this.authKey):null;
+        return StringUtils.isNotBlank(this.authKey) ? MD5.MD5Str(this.authKey) : null;
     }
 
     public void putHeader(String key, String value) {
@@ -58,8 +59,10 @@ public class HttpClientUtil {
 
     public String sendHttpPost(String httpUrl) {
         HttpPost httpPost = new HttpPost(httpUrl);
-        if(this.authKey != null) {
-            httpPost.setHeader(new BasicHeader("authKey", this.getHeader()));
+        if (header.size() != 0) {
+            for (String str : header.keySet()) {
+                httpPost.setHeader(new BasicHeader(str, header.get(str)));
+            }
         }
 
         return this.sendHttpPost(httpPost);
@@ -67,8 +70,10 @@ public class HttpClientUtil {
 
     public String sendHttpPost(String httpUrl, String params) {
         HttpPost httpPost = new HttpPost(httpUrl);
-        if(this.authKey != null) {
-            httpPost.setHeader(new BasicHeader("authKey", this.getHeader()));
+        if (header.size() != 0) {
+            for (String str : header.keySet()) {
+                httpPost.setHeader(new BasicHeader(str, header.get(str)));
+            }
         }
 
         try {
@@ -77,6 +82,7 @@ public class HttpClientUtil {
             httpPost.setEntity(e);
         } catch (Exception var5) {
             LOGGER.error("sendHttpPost", var5);
+            throw new ApplicationException("system.error");
         }
 
         return this.sendHttpPost(httpPost);
@@ -84,22 +90,24 @@ public class HttpClientUtil {
 
     public String sendHttpPost(String httpUrl, Map<String, String> maps) {
         HttpPost httpPost = new HttpPost(httpUrl);
-        if(this.authKey != null) {
-            httpPost.setHeader(new BasicHeader("authKey", this.getHeader()));
+        if (header.size() != 0) {
+            for (String str : header.keySet()) {
+                httpPost.setHeader(new BasicHeader(str, header.get(str)));
+            }
         }
-
         ArrayList nameValuePairs = new ArrayList();
         Iterator e = maps.keySet().iterator();
 
-        while(e.hasNext()) {
-            String key = (String)e.next();
-            nameValuePairs.add(new BasicNameValuePair(key, (String)maps.get(key)));
+        while (e.hasNext()) {
+            String key = (String) e.next();
+            nameValuePairs.add(new BasicNameValuePair(key, (String) maps.get(key)));
         }
 
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
         } catch (Exception var7) {
             LOGGER.error("sendHttpPost", var7);
+            throw new ApplicationException("system.error");
         }
 
         return this.sendHttpPost(httpPost);
@@ -117,22 +125,24 @@ public class HttpClientUtil {
 
     public String sendHttpPost(String httpUrl, Map<String, String> maps, List<File> fileLists) {
         HttpPost httpPost = new HttpPost(httpUrl);
-        if(this.authKey != null) {
-            httpPost.setHeader(new BasicHeader("authKey", this.getHeader()));
+        if (header.size() != 0) {
+            for (String str : header.keySet()) {
+                httpPost.setHeader(new BasicHeader(str, header.get(str)));
+            }
         }
 
         MultipartEntityBuilder meBuilder = MultipartEntityBuilder.create();
         Iterator reqEntity = maps.keySet().iterator();
 
-        while(reqEntity.hasNext()) {
-            String file = (String)reqEntity.next();
-            meBuilder.addPart(file, new StringBody((String)maps.get(file), ContentType.TEXT_PLAIN));
+        while (reqEntity.hasNext()) {
+            String file = (String) reqEntity.next();
+            meBuilder.addPart(file, new StringBody((String) maps.get(file), ContentType.TEXT_PLAIN));
         }
 
         reqEntity = fileLists.iterator();
 
-        while(reqEntity.hasNext()) {
-            File file1 = (File)reqEntity.next();
+        while (reqEntity.hasNext()) {
+            File file1 = (File) reqEntity.next();
             FileBody fileBody = new FileBody(file1);
             meBuilder.addPart("files", fileBody);
         }
@@ -156,13 +166,14 @@ public class HttpClientUtil {
             responseContent = EntityUtils.toString(entity, "UTF-8");
         } catch (Exception var15) {
             LOGGER.error("sendHttpPost", var15);
+            throw new ApplicationException("system.error");
         } finally {
             try {
-                if(response != null) {
+                if (response != null) {
                     response.close();
                 }
 
-                if(httpClient != null) {
+                if (httpClient != null) {
                     httpClient.close();
                 }
             } catch (IOException var14) {
@@ -176,7 +187,7 @@ public class HttpClientUtil {
 
     public String sendHttpGet(String httpUrl) {
         HttpGet httpGet = new HttpGet(httpUrl);
-        if(this.authKey != null) {
+        if (this.authKey != null) {
             httpGet.setHeader(new BasicHeader("authKey", this.getHeader()));
         }
 
@@ -185,10 +196,6 @@ public class HttpClientUtil {
 
     public String sendHttpsGet(String httpUrl) {
         HttpGet httpGet = new HttpGet(httpUrl);
-        if(this.authKey != null) {
-            httpGet.setHeader(new BasicHeader("authKey", this.getHeader()));
-        }
-
         return this.sendHttpsGet(httpGet);
     }
 
@@ -206,13 +213,14 @@ public class HttpClientUtil {
             responseContent = EntityUtils.toString(entity, "UTF-8");
         } catch (Exception var15) {
             LOGGER.error("sendHttpGet", var15);
+            throw new ApplicationException("system.error");
         } finally {
             try {
-                if(response != null) {
+                if (response != null) {
                     response.close();
                 }
 
-                if(httpClient != null) {
+                if (httpClient != null) {
                     httpClient.close();
                 }
             } catch (IOException var14) {
@@ -240,13 +248,14 @@ public class HttpClientUtil {
             responseContent = EntityUtils.toString(entity, "UTF-8");
         } catch (Exception var16) {
             LOGGER.error("sendHttpsGet", var16);
+            throw new ApplicationException("system.error");
         } finally {
             try {
-                if(response != null) {
+                if (response != null) {
                     response.close();
                 }
 
-                if(httpClient != null) {
+                if (httpClient != null) {
                     httpClient.close();
                 }
             } catch (IOException var15) {
@@ -260,5 +269,6 @@ public class HttpClientUtil {
 
     public void setAuthKey(String authKey) {
         this.authKey = authKey;
+        this.header.put("authKey", authKey);
     }
 }
