@@ -48,7 +48,7 @@ public abstract class AbstractController {
                 boolean seted = false;
                 if (e instanceof RPCResult) {
                     RPCResult result = (RPCResult) e;
-                    map.put("success", result.getSuccess());
+
                     if (result.getSuccess()) {
                         if (result.getTotalPage() != null && result.getTotalPage() > 0) {
                             HashMap dataItem = new HashMap();
@@ -61,45 +61,15 @@ public abstract class AbstractController {
                             return map;
                         }
                         map.put("data", result.getData());
+                        map.put("success", result.getSuccess());
                     } else {
                         map.put("code", result.getCode());
-                        map.put("message", result.getMessage());
+                        map.put("success", result.getSuccess());
+                        map.put("message", Boolean.valueOf(false));
                     }
                     return map;
                 }
-                if (!seted && e instanceof Result) {
-                    Result dataItem1 = (Result) e;
-                    map.put("success", dataItem1.getSuccess());
-                    HashMap page1;
-                    if (!dataItem1.getSuccess().booleanValue()) {
-                        page1 = new HashMap();
-                        page1.put("code", dataItem1.getResultCode());
-                        map.put("message", dataItem1.getMessage());
-                        return map;
-                    }
 
-                    page1 = new HashMap();
-                    Set keySet = dataItem1.keySet();
-                    Iterator var8 = keySet.iterator();
-
-                    while (var8.hasNext()) {
-                        String key = (String) var8.next();
-                        Object value = dataItem1.get(key);
-                        if (value instanceof Page) {
-                            Page pateItem = (Page) value;
-                            HashMap pageValue = new HashMap();
-                            pageValue.put("result", pateItem.getContent());
-                            pageValue.put("total", pateItem.getTotalElements());
-                            page1.put(key, pageValue);
-                        } else {
-                            page1.put(key, value);
-                        }
-                    }
-
-                    map.put("data", page1);
-                    seted = true;
-                    return map;
-                }
 
                 HashMap dataItem;
                 if (e instanceof List) {
