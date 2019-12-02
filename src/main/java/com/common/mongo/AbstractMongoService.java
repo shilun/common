@@ -45,7 +45,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity == null) {
             throw new ApplicationException("保存失败，对象未实例化");
         }
-        if(StringUtils.isBlank(entity.getId())){
+        if (StringUtils.isBlank(entity.getId())) {
             entity.setId(null);
         }
         if (StringUtils.isNotBlank(entity.getId())) {
@@ -163,7 +163,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     public Page<T> queryByPage(T entity, Pageable pageable, boolean trans) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        Long count = queryCount(entity,trans);
+        Long count = queryCount(entity, trans);
         Query query = buildCondition(entity, pageable);
         MongoTemplate template = null;
         if (trans) {
@@ -364,7 +364,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (pageable != null) {
             if (pageable instanceof PageRequest) {
                 Sort orders = buildSort(entity);
-                PageRequest pageRequest = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), orders);
+                PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), orders);
                 query.with(pageRequest);
                 query.limit(pageable.getPageSize());
             }
@@ -383,10 +383,10 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity.getOrderType() == null) {
             entity.setOrderType(OrderTypeEnum.ASC);
         }
-        if (entity.getOrderType().getValue() == 1) {
+        if (entity.getOrderType() == OrderTypeEnum.ASC) {
             orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());
         }
-        if (entity.getOrderType().getValue() == 2) {
+        if (entity.getOrderType() == OrderTypeEnum.DESC) {
             orders = new Sort(Sort.Direction.DESC, entity.getOrderColumn());
         }
         return orders;

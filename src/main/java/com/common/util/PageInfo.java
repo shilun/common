@@ -11,7 +11,7 @@ public class PageInfo implements Serializable {
     private Integer size = 10;
 
     public Pageable getPage() {
-        return new PageRequest(page, size);
+        return PageRequest.of(page, size);
     }
 
     public Integer getSize() {
