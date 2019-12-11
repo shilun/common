@@ -14,11 +14,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.annotation.Resource;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -39,6 +41,15 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     public AbstractMongoService() {
         buildPropertyDescriptor();
+        buildIndex();
+    }
+
+    private void buildIndex() {
+        Class entityClass = getEntityClass();
+        Annotation annotation = entityClass.getDeclaredAnnotation(CompoundIndexes.class);
+        if (annotation != null) {
+
+        }
     }
 
     public void save(T entity) {
@@ -80,8 +91,8 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         query.addCriteria(criteria);
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
-        UpdateResult upsert = primaryTemplate.upsert(query, update, entity.getClass());
-        if (upsert.getModifiedCount() == 1 && upsert.isModifiedCountAvailable()) {
+        UpdateResult result = primaryTemplate.updateFirst(query, update, entity.getClass());
+        if (result.getModifiedCount() == 1) {
             return;
         }
         throw new ApplicationException("mongodb updata error");
@@ -248,8 +259,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     private Map<String, Field> beanPropertyes = new HashMap<>();
 
     private void buildPropertyDescriptor() {
+
         List<Class> types = new ArrayList<>();
         Class currentClass = getEntityClass();
+        if (currentClass == null) {
+            logger.error(this.getClass().getName() + ".getEntityClass.null");
+        }
         while (currentClass != AbstractBaseEntity.class) {
             types.add(currentClass);
             currentClass = currentClass.getSuperclass();
@@ -375,7 +390,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         return query;
     }
 
-    private Sort buildSort(T entity) {
+    protected Sort buildSort(T entity) {
         Sort orders = null;
         if (StringUtils.isBlank(entity.getOrderColumn())) {
             entity.setOrderColumn("createTime");

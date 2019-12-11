@@ -9,6 +9,7 @@ import java.io.Serializable;
  */
 @Data
 public abstract class AbstractDTO implements Serializable {
+
     private String id;
     private PageInfo pageinfo;
 }

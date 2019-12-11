@@ -58,7 +58,14 @@ public abstract class AbstractController {
                             dataItem.put("totalPage", Integer.valueOf(result.getTotalPage()));
                             dataItem.put("pageIndex", Integer.valueOf(result.getPageIndex()));
                             map.put("data", dataItem);
+                            map.put("success", result.getSuccess());
                             return map;
+                        }
+                        if(StringUtils.isNotBlank(result.getCode())){
+                            map.put("code", result.getCode());
+                        }
+                        if(StringUtils.isNotBlank(result.getMessage())){
+                            map.put("message", result.getMessage());
                         }
                         map.put("data", result.getData());
                         map.put("success", result.getSuccess());
@@ -69,8 +76,6 @@ public abstract class AbstractController {
                     }
                     return map;
                 }
-
-
                 HashMap dataItem;
                 if (e instanceof List) {
                     seted = true;
