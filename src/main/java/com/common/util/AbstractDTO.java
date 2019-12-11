@@ -1,5 +1,6 @@
 package com.common.util;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,6 +11,11 @@ import java.io.Serializable;
 @Data
 public abstract class AbstractDTO implements Serializable {
 
+    /**
+     * id
+     */
+    @ApiModelProperty("id")
     private String id;
+    @ApiModelProperty("分页信息")
     private PageInfo pageinfo;
 }
