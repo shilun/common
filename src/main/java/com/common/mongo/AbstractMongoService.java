@@ -52,6 +52,22 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
     }
 
+    @Override
+    public void inc(String id, String property, IncType type) {
+        Query query = new Query();
+        Criteria criteria = Criteria.where("id").is(id);
+        query.addCriteria(criteria);
+        Update update = new Update();
+        int size = 0;
+        if (IncType.sub == type) {
+            size = -1;
+        } else {
+            size = 1;
+        }
+        update.inc(property, size);
+        primaryTemplate.updateFirst(query, update, getEntityClass());
+    }
+
     public void save(T entity) {
         if (entity == null) {
             throw new ApplicationException("保存失败，对象未实例化");
@@ -211,7 +227,8 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         return queryByPage(query, pageable, orderColum, orderType, false);
     }
 
-    public Page<T> queryByPage(Query query, Pageable pageable, String orderColum, OrderTypeEnum orderType, boolean trans) {
+    public Page<T> queryByPage(Query query, Pageable pageable, String orderColum, OrderTypeEnum orderType,
+                               boolean trans) {
         Sort.Direction sortType = null;
         if (OrderTypeEnum.ASC == orderType) {
             sortType = Sort.Direction.ASC;

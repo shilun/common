@@ -13,6 +13,27 @@ import java.util.List;
  * Created by Administrator on 2017/7/19.
  */
 public interface MongoService<T extends AbstractBaseEntity> {
+    /**
+     * 数据
+     */
+    public enum IncType{
+        /**
+         * 加
+         */
+        add,
+        /**
+         * 减
+         */
+        sub
+    }
+
+    /**
+     * 计数
+     * @param id 标识
+     * @param property 属性
+     * @param type 类型
+     */
+    public void inc(String id,String property,IncType type);
     /***
      * 添加或保存
      * @param entity
