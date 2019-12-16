@@ -8,17 +8,27 @@ import com.common.util.PropertyUtil;
 import com.common.util.StringUtils;
 import com.common.util.model.OrderTypeEnum;
 import com.common.util.model.YesOrNoEnum;
+import com.mongodb.Block;
+import com.mongodb.client.ListIndexesIterable;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
+import net.sf.json.JSONObject;
+import org.bson.BsonDocument;
+import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -40,17 +50,71 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     protected abstract Class getEntityClass();
 
     public AbstractMongoService() {
-        buildPropertyDescriptor();
-        buildIndex();
+
     }
 
-    private void buildIndex() {
-        Class entityClass = getEntityClass();
-        Annotation annotation = entityClass.getDeclaredAnnotation(CompoundIndexes.class);
-        if (annotation != null) {
-
+    @PostConstruct
+    public void init() {
+        if (getEntityClass() == null) {
+            throw new ApplicationException(getEntityClass().getSimpleName() + "服务获取entityClassError:null");
+        }
+        buildPropertyDescriptor();
+        try {
+            buildIndex(primaryTemplate.getCollectionName(getEntityClass()));
+        } catch (Exception e) {
+            logger.error(getEntityClass().getSimpleName() + " 构建mongodb索引出错，请检查索引配置", e);
         }
     }
+
+    /**
+     * 创建 索引
+     *
+     * @param collectionName
+     */
+    protected void buildIndex(String collectionName) {
+        Class entityClass = getEntityClass();
+        Annotation[] type = entityClass.getAnnotationsByType(CompoundIndexes.class);
+        if (type != null && type.length == 1) {
+            CompoundIndexes index = (CompoundIndexes) type[0];
+            Map<String, CompoundIndex> indexMap = new HashMap<>();
+
+            for (CompoundIndex item : index.value()) {
+                indexMap.put(item.name(), item);
+            }
+            boolean b = primaryTemplate.collectionExists(collectionName);
+            if (b == false) {
+                primaryTemplate.createCollection(collectionName);
+            }
+            List<IndexInfo> indexInfos = primaryTemplate.indexOps(collectionName).getIndexInfo();
+
+            for (String content : indexMap.keySet()) {
+                boolean exist = false;
+                for (IndexInfo info : indexInfos) {
+                    if (content.equals(info.getName())) {
+                        exist = true;
+                    }
+                }
+                if (!exist) {
+                    CompoundIndex compoundIndex = indexMap.get(content);
+                    Document document = new Document();
+                    document.put("name", compoundIndex.name());
+                    document.put("unique", compoundIndex.unique());
+                    primaryTemplate.indexOps(collectionName).ensureIndex(new IndexDefinition() {
+                        @Override
+                        public Document getIndexKeys() {
+                            return Document.parse(compoundIndex.def());
+                        }
+
+                        @Override
+                        public Document getIndexOptions() {
+                            return document;
+                        }
+                    });
+                }
+            }
+        }
+    }
+
 
     @Override
     public void inc(String id, String property, IncType type) {
@@ -64,6 +128,16 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         } else {
             size = 1;
         }
+        update.inc(property, size);
+        primaryTemplate.updateFirst(query, update, getEntityClass());
+    }
+
+    @Override
+    public void inc(String id, String property, Integer size) {
+        Query query = new Query();
+        Criteria criteria = Criteria.where("id").is(id);
+        query.addCriteria(criteria);
+        Update update = new Update();
         update.inc(property, size);
         primaryTemplate.updateFirst(query, update, getEntityClass());
     }
@@ -275,7 +349,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     private Map<String, Field> beanPropertyes = new HashMap<>();
 
-    private void buildPropertyDescriptor() {
+    protected void buildPropertyDescriptor() {
 
         List<Class> types = new ArrayList<>();
         Class currentClass = getEntityClass();
