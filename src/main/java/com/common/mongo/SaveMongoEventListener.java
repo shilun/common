@@ -24,7 +24,7 @@ public class SaveMongoEventListener extends AbstractMongoEventListener<AbstractB
             } else {
                 if (entity instanceof AbstractSeqIdEntity) {
                     String id = getNextId(entity.getClass().getSimpleName()).toString();
-                    entity.setId(StringUtils.buildMongoId(id));
+                    entity.setId(id);
                 }
             }
         }

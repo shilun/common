@@ -88,10 +88,13 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
         if (!id.matches(PW_PATTERN)) {
             throw new ApplicationException("id内容不符合规范");
         }
-        while (id.length() < 24) {
-            id = "0" + id;
-        }
         return id;
+    }
+
+    public static void checkId(String id) {
+        if (!id.matches(PW_PATTERN)) {
+            throw new ApplicationException("id内容不符合规范");
+        }
     }
 
     public static boolean isContains(String text, String subText) {
