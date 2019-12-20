@@ -14,6 +14,7 @@ import com.common.util.*;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -31,6 +32,9 @@ public abstract class AbstractController {
 
     public AbstractController() {
     }
+
+    @Autowired(required = false)
+    protected HttpServletRequest request;
 
     @InitBinder
     public void initBinder(WebDataBinder binder, WebRequest request) {
@@ -61,10 +65,10 @@ public abstract class AbstractController {
                             map.put("success", result.getSuccess());
                             return map;
                         }
-                        if(StringUtils.isNotBlank(result.getCode())){
+                        if (StringUtils.isNotBlank(result.getCode())) {
                             map.put("code", result.getCode());
                         }
-                        if(StringUtils.isNotBlank(result.getMessage())){
+                        if (StringUtils.isNotBlank(result.getMessage())) {
                             map.put("message", result.getMessage());
                         }
                         map.put("data", result.getData());
@@ -105,7 +109,7 @@ public abstract class AbstractController {
 
             map.put("success", Boolean.valueOf(true));
         } catch (BizException var13) {
-            LOGGER.error("execute json error->code:" + var13.getCode()+" msg:"+var13.getMessage());
+            LOGGER.error("execute json error->code:" + var13.getCode() + " msg:" + var13.getMessage());
             map.put("code", var13.getCode());
             map.put("message", var13.getMessage());
             map.put("success", Boolean.valueOf(false));

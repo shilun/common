@@ -19,6 +19,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -41,7 +42,10 @@ public class CommonConfig implements WebMvcConfigurer {
         return objectMapper;
     }
 
-    @Autowired(required =false)
+    @Resource
+    private ObjectMapper objectMapper;
+
+    @Autowired(required = false)
     private HttpServletRequest request;
 
 
@@ -54,7 +58,6 @@ public class CommonConfig implements WebMvcConfigurer {
         for (int i = 0; i < converters.size(); i++) {
             if (converters.get(i) instanceof MappingJackson2HttpMessageConverter) {
                 MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter() {
-
                     @Override
                     protected void writeInternal(Object e, Type type, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
                         if (e instanceof Map) {
@@ -78,7 +81,6 @@ public class CommonConfig implements WebMvcConfigurer {
                             return;
                         }
                         Map<String, Object> map = new HashMap<>();
-                        boolean seted = false;
                         if (e instanceof RPCResult) {
                             RPCResult result = (RPCResult) e;
                             if (result.getSuccess()) {
@@ -112,7 +114,6 @@ public class CommonConfig implements WebMvcConfigurer {
                         }
                         HashMap dataItem;
                         if (e instanceof List) {
-                            seted = true;
                             dataItem = new HashMap();
                             dataItem.put("list", e);
                             map.put("data", dataItem);
@@ -121,7 +122,6 @@ public class CommonConfig implements WebMvcConfigurer {
                             return;
                         }
                         if (e instanceof Page) {
-                            seted = true;
                             dataItem = new HashMap();
                             Page page = (Page) e;
                             dataItem.put("list", page.getContent());
@@ -129,17 +129,17 @@ public class CommonConfig implements WebMvcConfigurer {
                             dataItem.put("totalCount", Long.valueOf(page.getTotalElements()));
                             dataItem.put("totalPage", Integer.valueOf(page.getTotalPages()));
                             dataItem.put("pageIndex", Integer.valueOf(page.getNumber()));
+                            map.put("success", Boolean.valueOf(true));
                             map.put("data", dataItem);
                             super.writeInternal(map, type, outputMessage);
                             return;
                         }
-                        if (!seted) {
-                            map.put("data", e);
-                        }
+                        map.put("data", e);
                         map.put("success", Boolean.valueOf(true));
                         super.writeInternal(map, type, outputMessage);
                     }
                 };
+                converter.setObjectMapper(objectMapper);
                 converters.set(i, converter);
             }
         }

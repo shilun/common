@@ -39,10 +39,8 @@ public class CustomDateEditor extends PropertyEditorSupport {
                         this.setValue(this.dateFormat.parse(text));
                         return;
                     }
-
                     this.dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 }
-
                 this.dateFormat.setLenient(false);
                 this.setValue(this.dateFormat.parse(text));
             } catch (ParseException var3) {

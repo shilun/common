@@ -1,11 +1,18 @@
 package com.common.config;
 
 import com.common.exception.BizException;
+import com.common.util.Money;
+import com.common.web.CustomDateEditor;
+import com.common.web.CustomMoneyEditor;
+import com.common.web.CustomStringEditor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +40,13 @@ public class GloablControllerAdvice {
         map.put("success", Boolean.valueOf(false));
         log.error("execute json error->code:" + e.getCode() + " msg:" + e.getMessage());
         return map;
+    }
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(true));
+        binder.registerCustomEditor(String.class, new CustomStringEditor());
+        binder.registerCustomEditor(Money.class, new CustomMoneyEditor());
     }
 
     /**
