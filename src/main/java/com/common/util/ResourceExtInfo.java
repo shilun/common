@@ -28,9 +28,14 @@ public class ResourceExtInfo implements Serializable {
      */
     @ApiModelProperty("资源url或内容")
     private String content;
-
+    /**
+     * 资源宽度
+     */
     @ApiModelProperty("宽度")
     private Integer width;
+    /**
+     * 资源高度
+     */
     @ApiModelProperty("高度")
     private Integer height;
 }
