@@ -490,7 +490,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             entity.setOrderColumn("createTime");
         }
         if (entity.getOrderType() == null) {
-            entity.setOrderType(OrderTypeEnum.ASC);
+            entity.setOrderType(OrderTypeEnum.DESC);
         }
         if (entity.getOrderType() == OrderTypeEnum.ASC) {
             orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());
