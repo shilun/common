@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Data
 @Api(tags = "资源")
-public class ResourceInfo implements Serializable {
+public class ResourceExtInfo implements Serializable {
     /**
      * 排序
      */
@@ -28,4 +28,9 @@ public class ResourceInfo implements Serializable {
      */
     @ApiModelProperty("资源url或内容")
     private String content;
+
+    @ApiModelProperty("宽度")
+    private Integer width;
+    @ApiModelProperty("高度")
+    private Integer height;
 }
