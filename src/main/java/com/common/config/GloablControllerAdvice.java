@@ -53,6 +53,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         map.put("message", e.getMessage());
         map.put("success", Boolean.valueOf(false));
         log.error("execute json error->code:" + e.getCode() + " msg:" + e.getMessage());
+        request.setAttribute("exception", true);
         return map;
     }
 
@@ -72,6 +73,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public Map<String, Object> exceptionHandler(Exception ex) {
+        request.setAttribute("exception", true);
         Map<String, Object> map = new HashMap<>();
         map.put("code", "999");
         map.put("message", "执行业务失败");
@@ -87,7 +89,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object e, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest req, ServerHttpResponse response) {
-        if (e instanceof Map) {
+        if (request.getAttribute("exception") != null) {
             return e;
         }
         if (request.getServletPath().startsWith("/swagger")) {
