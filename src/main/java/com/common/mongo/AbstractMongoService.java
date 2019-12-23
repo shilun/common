@@ -113,6 +113,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                 }
             }
         }
+        else{
+            boolean b = primaryTemplate.collectionExists(collectionName);
+            if (b == false) {
+                primaryTemplate.createCollection(collectionName);
+            }
+        }
     }
 
 
