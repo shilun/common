@@ -51,58 +51,50 @@ public class CommonConfig implements WebMvcConfigurer {
                 objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
                 SimpleModule moneyModule = new SimpleModule();
                 moneyModule.addSerializer(Money.class, new MoneySerialize());
-                moneyModule.addSerializer(Date.class, new DateSerialize());
-                moneyModule.addDeserializer(Date.class, new DateDeserializer());
+                moneyModule.addSerializer(Date.class, new JsonSerializer<Date>() {
+                    @Override
+                    public void serialize(Date money, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+                        jsonGenerator.writeString(DateUtil.format(money));
+                    }
+                });
+                moneyModule.addDeserializer(Date.class, new JsonDeserializer<Date>() {
+                    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    private SimpleDateFormat dateFormatFirst = new SimpleDateFormat("yyyy.MM.dd");
+                    private SimpleDateFormat chDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+                    private SimpleDateFormat minuteDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                    private SimpleDateFormat hourDateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
+                    private SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+                    @Override
+                    public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+                        String text = jsonParser.getText();
+                        if (StringUtils.isEmpty(text)) {
+                            return null;
+                        }
+                        try {
+                            if (text.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) {
+                                return dateFormat.parse(text);
+                            }
+                            if (text.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}")) {
+                                return minuteDateFormat.parse(text);
+                            }
+                            if (text.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}")) {
+                                return hourDateFormat.parse(text);
+                            }
+                            if (text.matches("\\d{4}\\.\\d{2}\\.\\d{2}")) {
+                                return dateFormatFirst.parse(text);
+                            }
+                            if (text.matches("\\d{4}年\\d{2}月\\d{2}日")) {
+                                return chDateFormat.parse(text);
+                            }
+                            return dayFormat.parse(text);
+                        } catch (ParseException var3) {
+                            throw new IllegalArgumentException("Could not parse date: " + var3.getMessage(), var3);
+                        }
+                    }
+                });
                 objectMapper.registerModule(moneyModule);
             }
         }
     }
-}
-
-
-class DateSerialize extends JsonSerializer<Date> {
-
-    @Override
-    public void serialize(Date money, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-        jsonGenerator.writeString(DateUtil.format(money));
-    }
-}
-
-
-class DateDeserializer extends JsonDeserializer<Date> {
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private SimpleDateFormat dateFormatFirst = new SimpleDateFormat("yyyy.MM.dd");
-    private SimpleDateFormat chDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
-    private SimpleDateFormat minuteDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-    private SimpleDateFormat hourDateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
-    private SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-    @Override
-    public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-        String text = jsonParser.getText();
-        if (StringUtils.isEmpty(text)) {
-            return null;
-        }
-        try {
-            if (text.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) {
-                return dateFormat.parse(text);
-            }
-            if (text.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}")) {
-                return minuteDateFormat.parse(text);
-            }
-            if (text.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}")) {
-                return hourDateFormat.parse(text);
-            }
-            if (text.matches("\\d{4}\\.\\d{2}\\.\\d{2}")) {
-                return dateFormatFirst.parse(text);
-            }
-            if (text.matches("\\d{4}年\\d{2}月\\d{2}日")) {
-                return chDateFormat.parse(text);
-            }
-            return dayFormat.parse(text);
-        } catch (ParseException var3) {
-            throw new IllegalArgumentException("Could not parse date: " + var3.getMessage(), var3);
-        }
-    }
-
 }

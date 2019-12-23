@@ -1,6 +1,5 @@
 package com.common.config;
 
-import com.common.config.convert.CourseDateConverter;
 import com.common.exception.BizException;
 import com.common.util.Money;
 import com.common.util.RPCResult;
@@ -11,7 +10,6 @@ import com.common.web.CustomStringEditor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
@@ -63,10 +61,6 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         binder.registerCustomEditor(Date.class, new CustomDateEditor(true));
         binder.registerCustomEditor(String.class, new CustomStringEditor());
         binder.registerCustomEditor(Money.class, new CustomMoneyEditor());
-        GenericConversionService genericConversionService = (GenericConversionService) binder.getConversionService();
-        if (genericConversionService != null) {
-            genericConversionService.addConverter(new CourseDateConverter());
-        }
     }
 
     /**
