@@ -49,6 +49,7 @@ public class CommonConfig implements WebMvcConfigurer {
                 MappingJackson2HttpMessageConverter item = (MappingJackson2HttpMessageConverter) converter;
                 ObjectMapper objectMapper = item.getObjectMapper();
                 objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
                 SimpleModule moneyModule = new SimpleModule();
                 moneyModule.addSerializer(Money.class, new MoneySerialize());
                 moneyModule.addSerializer(Date.class, new JsonSerializer<Date>() {

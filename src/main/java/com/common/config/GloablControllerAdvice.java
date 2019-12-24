@@ -89,6 +89,11 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object e, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest req, ServerHttpResponse response) {
+        if(e instanceof Map){
+            if(request.getAttribute("buildMessage")!=null) {
+                return e;
+            }
+        }
         if (request.getAttribute("exception") != null) {
             return e;
         }
@@ -104,6 +109,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         if (request.getServletPath().startsWith("/v2")) {
             return e;
         }
+
         Map<String, Object> map = new HashMap<>();
         if (e instanceof RPCResult) {
             RPCResult result = (RPCResult) e;

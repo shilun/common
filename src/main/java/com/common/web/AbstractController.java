@@ -45,7 +45,7 @@ public abstract class AbstractController {
 
     protected Map<String, Object> buildMessage(IExecute execute) {
         HashMap map = new HashMap();
-
+        request.setAttribute("buildMessage",true);
         try {
             Object e = execute.getData();
             if (e != null) {
