@@ -2,6 +2,8 @@ package com.common.util;
 
 import com.common.exception.ApplicationException;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
@@ -47,6 +49,22 @@ public class BeanCoper extends PropertyUtils {
             resultList.add(copyProperties(descType, e));
         });
         return resultList;
+    }
+
+
+    /**
+     * 分页数据copy
+     * @param descType 目标类型
+     * @param sourcePage 源类型
+     * @param <T>
+     * @return
+     */
+    public static <T> Page<T> copyPage(Class<T> descType, Page sourcePage) {
+        List<T> resultList=new ArrayList<>();
+        sourcePage.getContent().forEach((e) -> {
+            resultList.add(copyProperties(descType, e));
+        });
+        return new PageImpl(resultList,sourcePage.getPageable(),sourcePage.getTotalElements());
     }
 
     /**

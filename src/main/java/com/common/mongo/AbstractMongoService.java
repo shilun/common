@@ -112,8 +112,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
                     });
                 }
             }
-        }
-        else{
+        } else {
             boolean b = primaryTemplate.collectionExists(collectionName);
             if (b == false) {
                 primaryTemplate.createCollection(collectionName);
@@ -173,7 +172,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity.getUpdateTime() == null) {
             entity.setUpdateTime(createTime);
         }
-        if(StringUtils.isNotBlank(entity.getId())){
+        if (StringUtils.isNotBlank(entity.getId())) {
             StringUtils.checkId(entity.getId());
         }
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
@@ -310,8 +309,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         return queryByPage(query, pageable, orderColum, orderType, false);
     }
 
-    public Page<T> queryByPage(Query query, Pageable pageable, String orderColum, OrderTypeEnum orderType,
-                               boolean trans) {
+    public Page<T> queryByPage(Query query, Pageable pageable, String orderColum, OrderTypeEnum orderType, boolean trans) {
         Sort.Direction sortType = null;
         if (OrderTypeEnum.ASC == orderType) {
             sortType = Sort.Direction.ASC;
@@ -328,9 +326,9 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             template = secondaryTemplate;
         }
         long count = template.count(query, getEntityClass());
-        if (pageable.getSort() == null) {
+        if (pageable.getSort() == Sort.unsorted()) {
             Sort sort = new Sort(sortType, orderColum);
-            PageRequest pageRequest = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort);
+            PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
             query.with(pageRequest);
         }
         List<T> list = template.find(query, getEntityClass());
