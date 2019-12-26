@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,6 +54,14 @@ public class CommonConfig implements WebMvcConfigurer {
 
                 SimpleModule moneyModule = new SimpleModule();
                 moneyModule.addSerializer(Money.class, new MoneySerialize());
+                moneyModule.addDeserializer(Money.class, new JsonDeserializer(){
+                    @Override
+                    public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+                        String text = jsonParser.getText();
+                        BigDecimal bigDecimal= NumberUtils.createBigDecimal(text);
+                        return new Money(bigDecimal);
+                    }
+                });
                 moneyModule.addSerializer(Date.class, new JsonSerializer<Date>() {
                     @Override
                     public void serialize(Date money, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
