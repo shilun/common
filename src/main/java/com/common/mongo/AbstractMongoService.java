@@ -2,10 +2,7 @@ package com.common.mongo;
 
 import com.common.annotation.QueryField;
 import com.common.exception.ApplicationException;
-import com.common.util.AbstractBaseEntity;
-import com.common.util.Money;
-import com.common.util.PropertyUtil;
-import com.common.util.StringUtils;
+import com.common.util.*;
 import com.common.util.model.OrderTypeEnum;
 import com.common.util.model.YesOrNoEnum;
 import com.mongodb.Block;
@@ -564,5 +561,37 @@ class QueryItem {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * 对象转换
+     * @param typeClass 目标类型
+     * @param source 源类型
+     * @param <T>
+     * @return
+     */
+    protected <T> T clone(Class<T> typeClass,Object source){
+        return BeanCoper.copyProperties(typeClass, source);
+    }
+
+    /**
+     * list数据转换
+     * @param typeClass 目标类型
+     * @param sourcepage 源类型
+     * @param <T>
+     * @return
+     */
+    protected <T> List<T> clone(Class<T> typeClass,List<?> sourcepage){
+        return BeanCoper.copyList(typeClass, sourcepage);
+    }
+    /**
+     * 分页数据转换
+     * @param typeClass 目标类型
+     * @param sourcepage 源类型
+     * @param <T>
+     * @return
+     */
+    protected <T> Page<T> clone(Class<T> typeClass,Page<?> sourcepage){
+        return BeanCoper.copyPage(typeClass, sourcepage);
     }
 }

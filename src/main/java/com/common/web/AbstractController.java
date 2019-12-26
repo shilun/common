@@ -237,18 +237,6 @@ public abstract class AbstractController {
         }
         throw new ApplicationException("获取JSON id 失败");
     }
-
-    /**
-     * 分页数据转换
-     * @param typeClass 目标类型
-     * @param sourcepage 源类型
-     * @param <T>
-     * @return
-     */
-    protected <T> Page<T> toPage(Class<T> typeClass,Page<?> sourcepage){
-       return BeanCoper.copyPage(typeClass, sourcepage);
-    }
-
     /**
      * 对象转换
      * @param typeClass 目标类型
@@ -256,8 +244,30 @@ public abstract class AbstractController {
      * @param <T>
      * @return
      */
-    protected <T> T toDto(Class<T> typeClass,Object source){
+    protected <T> T clone(Class<T> typeClass,Object source){
         return BeanCoper.copyProperties(typeClass, source);
     }
+
+    /**
+     * list数据转换
+     * @param typeClass 目标类型
+     * @param sourcepage 源类型
+     * @param <T>
+     * @return
+     */
+    protected <T> List<T> clone(Class<T> typeClass,List<?> sourcepage){
+        return BeanCoper.copyList(typeClass, sourcepage);
+    }
+    /**
+     * 分页数据转换
+     * @param typeClass 目标类型
+     * @param sourcepage 源类型
+     * @param <T>
+     * @return
+     */
+    protected <T> Page<T> clone(Class<T> typeClass,Page<?> sourcepage){
+       return BeanCoper.copyPage(typeClass, sourcepage);
+    }
+
 
 }
