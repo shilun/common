@@ -37,6 +37,46 @@ public class BeanCoper extends PropertyUtils {
     }
 
     /**
+     * 对象copy
+     * @param descType 目标类型
+     * @param source 源对象
+     * @param <T>
+     * @return
+     */
+    public static <T> T clone(Class<T> descType, Object source) {
+       return copyProperties(descType,source);
+    }
+
+    /**
+     * copy对象
+     * @param descType 目标类型
+     * @param listSource 源类型
+     * @param <T>
+     * @return
+     */
+    public static <T> List<T> clone(Class<T> descType, List listSource) {
+        List resultList = new ArrayList();
+        listSource.forEach((e) -> {
+            resultList.add(copyProperties(descType, e));
+        });
+        return resultList;
+    }
+    /**
+     * 分页数据copy
+     * @param descType 目标类型
+     * @param sourcePage 源类型
+     * @param <T>
+     * @return
+     */
+    public static <T> Page<T> clone(Class<T> descType, Page sourcePage) {
+        List<T> resultList=new ArrayList<>();
+        sourcePage.getContent().forEach((e) -> {
+            resultList.add(copyProperties(descType, e));
+        });
+        return new PageImpl(resultList,sourcePage.getPageable(),sourcePage.getTotalElements());
+    }
+
+    /**
      * List copy
      * @param descType 目标类型
      * @param listSource 源类型
