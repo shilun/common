@@ -84,6 +84,7 @@ public class RPCResult<T> implements Serializable {
         this.setTotalCount((int) page.getTotalElements());
         this.setPageIndex(page.getNumber());
         this.setData((T) page.getContent());
+        this.setSuccess(true);
     }
 
     public RPCResult(BizException exception) {
