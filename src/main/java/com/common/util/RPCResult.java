@@ -50,6 +50,17 @@ public class RPCResult<T> implements Serializable {
     }
 
     public void setData(T data) {
+        this.setSuccess(true);
+        if (this.data instanceof Page) {
+            Page page = (Page) data;
+            this.setTotalPage(page.getTotalPages());
+            this.setPageSize(page.getSize());
+            this.setTotalCount((int) page.getTotalElements());
+            this.setPageIndex(page.getNumber());
+            this.setData((T) page.getContent());
+            return;
+        }
+
         this.data = data;
     }
 
