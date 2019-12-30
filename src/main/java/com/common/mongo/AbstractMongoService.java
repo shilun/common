@@ -527,6 +527,39 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
         return update;
     }
+
+    /**
+     * 对象转换
+     *
+     * @param typeClass 目标类型
+     * @param source    源类型
+     * @return
+     */
+    protected T clone(Class<T> typeClass, Object source) {
+        return BeanCoper.copyProperties(typeClass, source);
+    }
+
+    /**
+     * list数据转换
+     *
+     * @param typeClass  目标类型
+     * @param sourcepage 源类型
+     * @return
+     */
+    protected List<T> clone(Class<T> typeClass, List<?> sourcepage) {
+        return BeanCoper.copyList(typeClass, sourcepage);
+    }
+
+    /**
+     * 分页数据转换
+     *
+     * @param typeClass  目标类型
+     * @param sourcepage 源类型
+     * @return
+     */
+    protected Page<T> clone(Class<T> typeClass, Page<?> sourcepage) {
+        return BeanCoper.copyPage(typeClass, sourcepage);
+    }
 }
 
 class QueryItem {
@@ -563,35 +596,5 @@ class QueryItem {
         this.name = name;
     }
 
-    /**
-     * 对象转换
-     * @param typeClass 目标类型
-     * @param source 源类型
-     * @param <T>
-     * @return
-     */
-    protected <T> T clone(Class<T> typeClass,Object source){
-        return BeanCoper.copyProperties(typeClass, source);
-    }
 
-    /**
-     * list数据转换
-     * @param typeClass 目标类型
-     * @param sourcepage 源类型
-     * @param <T>
-     * @return
-     */
-    protected <T> List<T> clone(Class<T> typeClass,List<?> sourcepage){
-        return BeanCoper.copyList(typeClass, sourcepage);
-    }
-    /**
-     * 分页数据转换
-     * @param typeClass 目标类型
-     * @param sourcepage 源类型
-     * @param <T>
-     * @return
-     */
-    protected <T> Page<T> clone(Class<T> typeClass,Page<?> sourcepage){
-        return BeanCoper.copyPage(typeClass, sourcepage);
-    }
 }
