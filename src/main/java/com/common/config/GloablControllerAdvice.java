@@ -8,6 +8,7 @@ import com.common.web.CustomDateEditor;
 import com.common.web.CustomMoneyEditor;
 import com.common.web.CustomStringEditor;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Page;
@@ -164,6 +165,9 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
             map.put("data", e);
         }
         map.put("success", Boolean.valueOf(true));
+        if(e instanceof String){
+            return JSONObject.fromObject(map).toString();
+        }
         return map;
     }
 }

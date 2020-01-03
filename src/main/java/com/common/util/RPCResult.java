@@ -12,37 +12,27 @@ public class RPCResult<T> implements Serializable {
      *
      */
     private static final long serialVersionUID = 6028636097083630372L;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer totalCount;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer totalPage;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer pageSize;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer pageIndex;
 
 
     /**
      * 是否成功
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean success = false;
 
     /**
      * 返回码
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String resultCode;
     /**
      * 消息
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String message;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String code;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String[] resultCodeParams;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
     public T getData() {
