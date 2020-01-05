@@ -4,6 +4,8 @@ import com.common.util.model.OrderTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.io.Serializable;
 
@@ -31,4 +33,8 @@ public class PageInfoDto implements Serializable {
      */
     @ApiModelProperty("排序类型")
     private OrderTypeEnum orderType = OrderTypeEnum.DESC;
+
+    public Pageable getPageable(){
+        return PageRequest.of(page,page);
+    }
 }
