@@ -35,6 +35,6 @@ public class PageInfoDto implements Serializable {
     private OrderTypeEnum orderType = OrderTypeEnum.DESC;
 
     public Pageable getPageable(){
-        return PageRequest.of(page,page);
+        return PageRequest.of(page,size);
     }
 }

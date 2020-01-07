@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -90,8 +91,13 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object e, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest req, ServerHttpResponse response) {
-        if(e instanceof Map){
-            if(request.getAttribute("buildMessage")!=null) {
+
+        ResponseBody method = returnType.getMethod().getAnnotation(ResponseBody.class);
+        if (method != null) {
+            return e;
+        }
+        if (e instanceof Map) {
+            if (request.getAttribute("buildMessage") != null) {
                 return e;
             }
         }
@@ -165,7 +171,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
             map.put("data", e);
         }
         map.put("success", Boolean.valueOf(true));
-        if(e instanceof String){
+        if (e instanceof String) {
             return JSONObject.fromObject(map).toString();
         }
         return map;
