@@ -75,6 +75,21 @@ public class RPCResult<T> implements Serializable {
         this.setSuccess(true);
         this.setData(data);
     }
+    /**
+     * 默认构造方法
+     */
+    public RPCResult(Exception e) {
+        if(e instanceof BizException){
+            this.setException((BizException) e);
+        }
+        else{
+            this.setCode("999");
+            this.setMessage("执行业务失败");
+        }
+        this.setSuccess(false);
+
+    }
+
 
     /**
      * 默认构造方法
