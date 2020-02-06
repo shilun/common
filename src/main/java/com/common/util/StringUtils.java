@@ -112,7 +112,6 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
     }
 
     public static void main(String[] args) {
-        String fdsafsda = buildMongoId("fdsafsda");
-        System.out.println(fdsafsda.length());
+        System.out.println(getUUID());
     }
 }

@@ -34,6 +34,7 @@ public class PageInfoDto implements Serializable {
     @ApiModelProperty("排序类型")
     private OrderTypeEnum orderType = OrderTypeEnum.DESC;
 
+    @ApiModelProperty(hidden = true)
     public Pageable getPageable(){
         return PageRequest.of(page,size);
     }

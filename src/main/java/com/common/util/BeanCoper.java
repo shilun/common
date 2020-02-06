@@ -1,6 +1,7 @@
 package com.common.util;
 
 import com.common.exception.ApplicationException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -9,6 +10,7 @@ import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class BeanCoper extends PropertyUtils {
     public BeanCoper() {
     }
@@ -32,7 +34,7 @@ public class BeanCoper extends PropertyUtils {
                 }
             }
         } catch (Exception var5) {
-            throw new ApplicationException("copyProperties.error");
+            throw new ApplicationException("copyProperties.error",var5);
         }
     }
 
@@ -122,7 +124,7 @@ public class BeanCoper extends PropertyUtils {
         try {
             entity = (T) descType.getConstructors()[0].newInstance();
         } catch (Exception e) {
-            throw new ApplicationException(descType.getSimpleName() + "Constructors.error");
+            throw new ApplicationException(descType.getSimpleName() + "Constructors.error",e);
         }
         copyProperties(entity, source);
         return entity;

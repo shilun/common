@@ -14,10 +14,11 @@ public enum YesOrNoEnum implements IGlossary {
     private String name;
     private Integer value;
 
-    private YesOrNoEnum(String name, Integer value) {
+    YesOrNoEnum(String name, Integer value) {
         this.name = name;
         this.value = value;
     }
+
 
     public String getName() {
         return this.name;

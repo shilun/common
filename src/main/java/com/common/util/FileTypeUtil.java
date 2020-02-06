@@ -3,6 +3,7 @@ package com.common.util;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -116,6 +117,36 @@ public class FileTypeUtil {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(file);
+            //获取文件头的前六位
+            byte[] b = new byte[3];
+            fis.read(b, 0, b.length);
+            String fileCode = bytesToHexString(b);
+            Iterator<String> keyIter = FILE_TYPE_MAP.keySet().iterator();
+            while (keyIter.hasNext()) {
+                String key = keyIter.next();
+                //比较前几位是否相同就可以判断文件格式（相同格式文件文件头后面几位会有所变化）
+                if (key.toLowerCase().startsWith(fileCode.toLowerCase()) || fileCode.toLowerCase().startsWith(key.toLowerCase())) {
+                    res = FILE_TYPE_MAP.get(key);
+                    return res;
+                }
+            }
+        } catch (Exception e) {
+            log.error("判断文件类型失败", e);
+        } finally {
+            IOUtils.closeQuietly(fis);
+        }
+        return res;
+    }
+
+    /**
+     * 获取文件类型
+     *
+     * @param fis
+     * @return
+     */
+    public static String getFileType(FileInputStream fis) {
+        String res = null;
+        try {
             //获取文件头的前六位
             byte[] b = new byte[3];
             fis.read(b, 0, b.length);
