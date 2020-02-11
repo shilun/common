@@ -1,6 +1,7 @@
 package com.common.util;
 
 import com.common.util.model.OrderTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,13 +17,13 @@ public class PageInfoDto implements Serializable {
      * 页索引
      */
     @ApiModelProperty("页码")
-    private Integer page = 0;
+    private Integer page;
 
     /**
      * 页大小
      */
     @ApiModelProperty("页面大小")
-    private Integer size = 10;
+    private Integer size;
     /**
      * 排序列
      */
@@ -35,7 +36,14 @@ public class PageInfoDto implements Serializable {
     private OrderTypeEnum orderType = OrderTypeEnum.DESC;
 
     @ApiModelProperty(hidden = true)
-    public Pageable getPageable(){
-        return PageRequest.of(page,size);
+    @JsonIgnore
+    public Pageable getPageable() {
+        if (page == null) {
+            page = 0;
+        }
+        if (size == null || size.intValue() == 0) {
+            size = 10;
+        }
+        return PageRequest.of(page, size);
     }
 }
