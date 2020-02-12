@@ -13,10 +13,8 @@ import java.io.Serializable;
 @Data
 public class PageInfo implements Serializable {
     @ApiModelProperty("页码")
-    @JsonIgnore
     private Integer page;
     @ApiModelProperty("页大小")
-    @JsonIgnore
     private Integer size;
 
     @ApiModelProperty(hidden = true)
