@@ -6,6 +6,7 @@ import com.common.util.model.OrderTypeEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
@@ -27,6 +28,15 @@ public interface MongoService<T extends AbstractBaseEntity> extends AbstractServ
          */
         sub
     }
+
+    /**
+     * 构建条件
+     * @param property
+     * @param type
+     * @param value
+     * @return
+     */
+    public Criteria buildCondition(String property,QueryType type,Object value);
 
     /**
      * 计数
@@ -100,6 +110,31 @@ public interface MongoService<T extends AbstractBaseEntity> extends AbstractServ
      * @return
      */
     public List<T> query(T entity,boolean trans);
+
+    /**
+     * 查询所有
+     * @return
+     */
+    public List<T> queryAll();
+
+    /**
+     * 查询所有
+     * @return
+     */
+    public List<T> queryAll(boolean trans);
+
+    /**
+     *
+     * @param query
+     * @return
+     */
+    public List<T> query(Query query);
+    /**
+     *
+     * @param query
+     * @return
+     */
+    public List<T> query(Query query,boolean trans);
 
     /**
      * 查询总条数

@@ -119,6 +119,43 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
 
     @Override
+    public Criteria buildCondition(String property, QueryType type, Object value) {
+        return type.build(property, value);
+    }
+
+    @Override
+    public List<T> queryAll() {
+        return queryAll(false);
+    }
+
+    @Override
+    public List<T> queryAll(boolean trans) {
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
+        }
+        return template.findAll(getEntityClass());
+    }
+
+    @Override
+    public List<T> query(Query query) {
+        return query(query, false);
+    }
+
+    @Override
+    public List<T> query(Query query, boolean trans) {
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
+        }
+        return template.find(query, getEntityClass());
+    }
+
+    @Override
     public void inc(String id, String property, IncType type) {
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(id);
@@ -527,35 +564,40 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
         return update;
     }
+
     /**
      * 对象转换
+     *
      * @param typeClass 目标类型
-     * @param source 源类型
+     * @param source    源类型
      * @param <T>
      * @return
      */
-    protected <T> T clone(Class<T> typeClass,Object source){
+    protected <T> T clone(Class<T> typeClass, Object source) {
         return BeanCoper.copyProperties(typeClass, source);
     }
 
     /**
      * list数据转换
-     * @param typeClass 目标类型
+     *
+     * @param typeClass  目标类型
      * @param sourcepage 源类型
      * @param <T>
      * @return
      */
-    protected <T> List<T> clone(Class<T> typeClass,List<?> sourcepage){
+    protected <T> List<T> clone(Class<T> typeClass, List<?> sourcepage) {
         return BeanCoper.copyList(typeClass, sourcepage);
     }
+
     /**
      * 分页数据转换
-     * @param typeClass 目标类型
+     *
+     * @param typeClass  目标类型
      * @param sourcepage 源类型
      * @param <T>
      * @return
      */
-    protected <T> Page<T> clone(Class<T> typeClass,Page<?> sourcepage){
+    protected <T> Page<T> clone(Class<T> typeClass, Page<?> sourcepage) {
         return BeanCoper.copyPage(typeClass, sourcepage);
     }
 }
