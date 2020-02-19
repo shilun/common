@@ -33,7 +33,7 @@ public class DateUtil {
     public static final String DATE_TIME_SSS_FORMAT = "yyyy-MM-dd HH:mm:ss SSS";
     public static final String[] parsePatterns = new String[]{"yyyy/MM/dd HH:mm", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd", "yyyy-MM-dd", "dd/MM/yyyy"};
 
-    public enum DateTypeEnum {
+    public enum Options {
         /**
          * 秒操作
          */
@@ -64,7 +64,7 @@ public class DateUtil {
         Year("plusYears");
         private String method;
 
-        DateTypeEnum(String method) {
+        Options(String method) {
             this.method = method;
         }
 
@@ -91,7 +91,9 @@ public class DateUtil {
         Date toDate = new Date();
         String s = formatChYYYYMMDD(toDate);
         System.out.println(s);
-        Date plugin = DateTypeEnum.Day.plugin(toDate, 1);
+        Date plugin = DateUtil.Options.Day.plugin(toDate, 1);
+             plugin = DateUtil.Options.Year.plugin(toDate, 1);
+
         s = formatChYYYYMMDD(plugin);
         System.out.println(s);
     }
