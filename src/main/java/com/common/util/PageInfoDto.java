@@ -17,13 +17,13 @@ public class PageInfoDto implements Serializable {
      * 页索引
      */
     @ApiModelProperty("页码")
-    private Integer page;
+    private Integer page=0;
 
     /**
      * 页大小
      */
-    @ApiModelProperty("页面大小")
-    private Integer size;
+    @ApiModelProperty(value = "页大小",example = "10")
+    private Integer size=10;
     /**
      * 排序列
      */

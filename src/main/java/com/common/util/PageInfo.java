@@ -13,9 +13,9 @@ import java.io.Serializable;
 @Data
 public class PageInfo implements Serializable {
     @ApiModelProperty("页码")
-    private Integer page;
-    @ApiModelProperty("页大小")
-    private Integer size;
+    private Integer page=0;
+    @ApiModelProperty(value = "页大小",example = "10")
+    private Integer size=10;
 
     @ApiModelProperty(hidden = true)
     @JsonIgnore

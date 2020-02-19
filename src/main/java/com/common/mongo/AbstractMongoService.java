@@ -324,7 +324,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Page<T> queryByPage(Query query, Pageable pageable, boolean trans) {
-        if (pageable.getSort() == null) {
+        if (pageable.getSort() == Sort.unsorted()) {
             return queryByPage(query, pageable, "createTime", OrderTypeEnum.DESC, trans);
         }
         MongoTemplate template = null;
