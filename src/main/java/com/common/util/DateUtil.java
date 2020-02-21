@@ -111,6 +111,10 @@ public class DateUtil {
                 DateTime time = new DateTime();
                 int year = time.getYear();
                 dateTime = year + "-" + dateTime;
+                Date date = DateUtils.parseDate(dateTime, parsePatterns);
+                if (date.before(new Date())) {
+                    return Options.Year.plugin(date, 1);
+                }
             }
             if (dateTime.matches("\\d{4}-\\d{2}")) {
                 dateTime = dateTime + "-01";
