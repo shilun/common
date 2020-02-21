@@ -89,7 +89,7 @@ public class DateUtil {
 
 
     public static void main(String[] args) {
-        Date date = parseDate("09-09");
+        Date date = parseDate("02-27");
         System.out.println(format(date));
     }
 
