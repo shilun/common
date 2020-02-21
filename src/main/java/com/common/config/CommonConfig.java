@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
@@ -100,7 +101,7 @@ public class CommonConfig implements WebMvcConfigurer {
                             if (text.matches("\\d{4}年\\d{2}月\\d{2}日")) {
                                 return chDateFormat.parse(text);
                             }
-                            return dayFormat.parse(text);
+                            return DateUtil.parseDate(text);
                         } catch (ParseException var3) {
                             throw new IllegalArgumentException("Could not parse date: " + var3.getMessage(), var3);
                         }
@@ -110,4 +111,10 @@ public class CommonConfig implements WebMvcConfigurer {
             }
         }
     }
+
+    public static void main(String[] args) {
+        int dayOfWeek = new DateTime(DateUtil.parseDate("02-16")).getDayOfWeek();
+        System.out.println(dayOfWeek);
+    }
 }
+

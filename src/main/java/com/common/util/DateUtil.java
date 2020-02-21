@@ -31,7 +31,7 @@ public class DateUtil {
     public static final String HHMM_FORMAT = "HH:mm";
     public static final String HHMMSS_FORMAT = "HH:mm:ss";
     public static final String DATE_TIME_SSS_FORMAT = "yyyy-MM-dd HH:mm:ss SSS";
-    public static final String[] parsePatterns = new String[]{"yyyy/MM/dd HH:mm", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd","MM-dd","yyyy-MM", "yyyy-MM-dd", "dd/MM/yyyy"};
+    public static final String[] parsePatterns = new String[]{"yyyy/MM/dd HH:mm", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd", "MM-dd", "yyyy-MM", "MM-dd", "yyyy-MM-dd", "dd/MM/yyyy"};
 
     public enum Options {
         /**
@@ -81,6 +81,7 @@ public class DateUtil {
                 time = (DateTime) MethodUtils.invokeMethod(time, method, count.intValue());
             } catch (Exception e) {
                 log.error("时间操作失败", e);
+                throw new ApplicationException(this.name() + ".plugin.error", e);
             }
             return time.toDate();
         }
@@ -88,7 +89,7 @@ public class DateUtil {
 
 
     public static void main(String[] args) {
-        Date date = parseDate("2019-09");
+        Date date = parseDate("09-09");
         System.out.println(format(date));
     }
 
@@ -107,12 +108,12 @@ public class DateUtil {
     public static Date parseDate(String dateTime) {
         try {
             if (dateTime.matches("\\d{2}-\\d{2}")) {
-                DateTime time=new DateTime();
+                DateTime time = new DateTime();
                 int year = time.getYear();
-                dateTime=year+"-"+dateTime;
+                dateTime = year + "-" + dateTime;
             }
             if (dateTime.matches("\\d{4}-\\d{2}")) {
-                dateTime=dateTime+"-01";
+                dateTime = dateTime + "-01";
             }
             return DateUtils.parseDate(dateTime, parsePatterns);
         } catch (ParseException var2) {
