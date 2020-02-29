@@ -8,6 +8,7 @@ import com.common.util.model.YesOrNoEnum;
 import com.mongodb.Block;
 import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import net.sf.json.JSONObject;
 import org.bson.BsonDocument;
@@ -168,7 +169,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             size = 1;
         }
         update.inc(property, size);
-        primaryTemplate.updateFirst(query, update, getEntityClass());
+        UpdateResult updateResult = primaryTemplate.updateFirst(query, update, getEntityClass());
+        if(updateResult.getModifiedCount()==1){
+            return;
+        }
+        throw new ApplicationException("mongodb updata error");
     }
 
     @Override
@@ -178,7 +183,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         query.addCriteria(criteria);
         Update update = new Update();
         update.inc(property, size);
-        primaryTemplate.updateFirst(query, update, getEntityClass());
+        UpdateResult updateResult = primaryTemplate.updateFirst(query, update, getEntityClass());
+        if(updateResult.getModifiedCount()==1){
+            return;
+        }
+        throw new ApplicationException("mongodb updata error");
     }
 
     public void save(T entity) {
@@ -224,12 +233,33 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         entity.setUpdateTime(new Date());
         Update update = addUpdate(entity);
         UpdateResult result = primaryTemplate.updateFirst(query, update, entity.getClass());
-        if (result.getModifiedCount() == 1) {
+        if (result.getMatchedCount() == 1) {
             return;
         }
         throw new ApplicationException("mongodb updata error");
     }
 
+    /**
+     * 查询第一条记录
+     * @param entity
+     * @param trans
+     * @return
+     */
+    public T queryFirst(T entity,boolean trans){
+        entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        Query query = buildCondition(entity, PageRequest.of(0,1));
+        MongoTemplate template = null;
+        if (trans) {
+            template = primaryTemplate;
+        } else {
+            template = secondaryTemplate;
+        }
+        List<T> list = template.find(query, getEntityClass());
+        if(list.size()>0){
+            return list.get(0);
+        }
+        return null;
+    }
 
     public T findById(String id) {
         return findById(id, false);
@@ -262,7 +292,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
-        primaryTemplate.remove(query, getEntityClass());
+        DeleteResult remove = primaryTemplate.remove(query, getEntityClass());
+        if(remove.getDeletedCount()==1){
+            return;
+        }
+        throw new ApplicationException("no data to find");
     }
 
     public List<T> query(T entity) {
