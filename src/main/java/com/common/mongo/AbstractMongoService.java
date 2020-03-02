@@ -634,6 +634,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     protected <T> Page<T> clone(Class<T> typeClass, Page<?> sourcepage) {
         return BeanCoper.copyPage(typeClass, sourcepage);
     }
+
 }
 
 class QueryItem {

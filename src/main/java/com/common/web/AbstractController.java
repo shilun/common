@@ -269,5 +269,4 @@ public abstract class AbstractController {
        return BeanCoper.copyPage(typeClass, sourcepage);
     }
 
-
 }
