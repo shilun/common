@@ -2,6 +2,7 @@ package com.common.util;
 
 import com.common.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,7 +18,8 @@ public class BeanCoper extends PropertyUtils {
 
     /**
      * 对象copy
-     * @param desc 目标对象
+     *
+     * @param desc   目标对象
      * @param source 源对象
      */
     public static void copyProperties(Object desc, Object source) {
@@ -34,24 +36,26 @@ public class BeanCoper extends PropertyUtils {
                 }
             }
         } catch (Exception var5) {
-            throw new ApplicationException("copyProperties.error",var5);
+            throw new ApplicationException("copyProperties.error", var5);
         }
     }
 
     /**
      * 对象copy
+     *
      * @param descType 目标类型
-     * @param source 源对象
+     * @param source   源对象
      * @param <T>
      * @return
      */
     public static <T> T clone(Class<T> descType, Object source) {
-       return copyProperties(descType,source);
+        return copyProperties(descType, source);
     }
 
     /**
      * copy对象
-     * @param descType 目标类型
+     *
+     * @param descType   目标类型
      * @param listSource 源类型
      * @param <T>
      * @return
@@ -63,24 +67,44 @@ public class BeanCoper extends PropertyUtils {
         });
         return resultList;
     }
+
     /**
      * 分页数据copy
-     * @param descType 目标类型
+     *
+     * @param descType   目标类型
      * @param sourcePage 源类型
      * @param <T>
      * @return
      */
     public static <T> Page<T> clone(Class<T> descType, Page sourcePage) {
-        List<T> resultList=new ArrayList<>();
+        List<T> resultList = new ArrayList<>();
         sourcePage.getContent().forEach((e) -> {
             resultList.add(copyProperties(descType, e));
         });
-        return new PageImpl(resultList,sourcePage.getPageable(),sourcePage.getTotalElements());
+        return new PageImpl(resultList, sourcePage.getPageable(), sourcePage.getTotalElements());
+    }
+
+    /**
+     * 分页数据copy
+     *
+     * @param descType   目标类型
+     * @param sourcePage 源类型
+     * @param <T>
+     * @return
+     */
+    public static <T> RPCResult<T> clone(Class<T> descType, RPCResult sourcePage) {
+        RPCResult result = new RPCResult();
+        clone(RPCResult.class, sourcePage);
+        if (sourcePage.getTotalPage() != null) {
+            result.setData(clone(descType, sourcePage.getData()));
+        }
+        return result;
     }
 
     /**
      * List copy
-     * @param descType 目标类型
+     *
+     * @param descType   目标类型
      * @param listSource 源类型
      * @param <T>
      * @return
@@ -96,23 +120,25 @@ public class BeanCoper extends PropertyUtils {
 
     /**
      * 分页数据copy
-     * @param descType 目标类型
+     *
+     * @param descType   目标类型
      * @param sourcePage 源类型
      * @param <T>
      * @return
      */
     public static <T> Page<T> copyPage(Class<T> descType, Page sourcePage) {
-        List<T> resultList=new ArrayList<>();
+        List<T> resultList = new ArrayList<>();
         sourcePage.getContent().forEach((e) -> {
             resultList.add(copyProperties(descType, e));
         });
-        return new PageImpl(resultList,sourcePage.getPageable(),sourcePage.getTotalElements());
+        return new PageImpl(resultList, sourcePage.getPageable(), sourcePage.getTotalElements());
     }
 
     /**
      * 对象copy
+     *
      * @param descType 目标类型
-     * @param source 源对象
+     * @param source   源对象
      * @param <T>
      * @return
      */
@@ -124,7 +150,7 @@ public class BeanCoper extends PropertyUtils {
         try {
             entity = (T) descType.getConstructors()[0].newInstance();
         } catch (Exception e) {
-            throw new ApplicationException(descType.getSimpleName() + "Constructors.error",e);
+            throw new ApplicationException(descType.getSimpleName() + "Constructors.error", e);
         }
         copyProperties(entity, source);
         return entity;
