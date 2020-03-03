@@ -87,14 +87,13 @@ public class BeanCoper extends PropertyUtils {
     /**
      * RpcResultcopy
      *
-     * @param descType   目标类型
+     * @param descType     目标类型
      * @param sourceResult 源类型
      * @param <T>
      * @return
      */
     public static <T> RPCResult<List<T>> cloneResultList(Class<T> descType, RPCResult sourceResult) {
-        RPCResult result = new RPCResult();
-        clone(RPCResult.class, sourceResult);
+        RPCResult result = clone(RPCResult.class, sourceResult);
         if (sourceResult.getTotalPage() != null) {
             result.setData(clone(descType, sourceResult.getData()));
         }
@@ -104,14 +103,13 @@ public class BeanCoper extends PropertyUtils {
     /**
      * RpcResultcopy
      *
-     * @param descType   目标类型
+     * @param descType     目标类型
      * @param sourceResult 源类型
      * @param <T>
      * @return
      */
     public static <T> RPCResult cloneResult(Class<T> descType, RPCResult sourceResult) {
-        RPCResult result = new RPCResult();
-        clone(RPCResult.class, sourceResult);
+        RPCResult result = clone(RPCResult.class, sourceResult);
         if (sourceResult.getTotalPage() != null) {
             result.setData(clone(descType, sourceResult.getData()));
         }
