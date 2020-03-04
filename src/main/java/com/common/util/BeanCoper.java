@@ -93,10 +93,17 @@ public class BeanCoper extends PropertyUtils {
      * @return
      */
     public static <T> RPCResult<List<T>> cloneResultList(Class<T> descType, RPCResult sourceResult) {
-        RPCResult result = clone(RPCResult.class, sourceResult);
-        if (sourceResult.getTotalPage() != null) {
+        RPCResult result = new RPCResult();
+        result.setSuccess(sourceResult.getSuccess());
+        if (sourceResult.getData() != null) {
             result.setData(clone(descType, sourceResult.getData()));
         }
+        if (sourceResult.getTotalPage() != null) {
+            result.setPageSize(sourceResult.getPageSize());
+            result.setPageIndex(sourceResult.getPageIndex());
+        }
+        result.setCode(sourceResult.getCode());
+        result.setMessage(sourceResult.getMessage());
         return result;
     }
 
@@ -109,10 +116,13 @@ public class BeanCoper extends PropertyUtils {
      * @return
      */
     public static <T> RPCResult cloneResult(Class<T> descType, RPCResult sourceResult) {
-        RPCResult result = clone(RPCResult.class, sourceResult);
-        if (sourceResult.getTotalPage() != null) {
+        RPCResult result = new RPCResult();
+        result.setSuccess(sourceResult.getSuccess());
+        if (sourceResult.getData() != null) {
             result.setData(clone(descType, sourceResult.getData()));
         }
+        result.setCode(sourceResult.getCode());
+        result.setMessage(sourceResult.getMessage());
         return result;
     }
 
@@ -167,6 +177,9 @@ public class BeanCoper extends PropertyUtils {
             entity = (T) descType.getConstructors()[0].newInstance();
         } catch (Exception e) {
             throw new ApplicationException(descType.getSimpleName() + "Constructors.error", e);
+        }
+        if(source==null){
+            return entity;
         }
         copyProperties(entity, source);
         return entity;
