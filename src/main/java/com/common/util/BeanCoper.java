@@ -99,6 +99,8 @@ public class BeanCoper extends PropertyUtils {
             result.setData(clone(descType, sourceResult.getData()));
         }
         if (sourceResult.getTotalPage() != null) {
+            result.setTotalCount(sourceResult.getTotalCount());
+            result.setTotalPage(sourceResult.getTotalPage());
             result.setPageSize(sourceResult.getPageSize());
             result.setPageIndex(sourceResult.getPageIndex());
         }
