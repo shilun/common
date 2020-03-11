@@ -123,7 +123,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         if (e instanceof RPCResult) {
             RPCResult result = (RPCResult) e;
             if (result.getSuccess()) {
-                if (result.getTotalPage() != null && result.getTotalPage() > 0) {
+                if (result.getTotalPage() != null && result.getTotalPage()!=null) {
                     HashMap dataItem = new HashMap();
                     dataItem.put("list", result.getData());
                     dataItem.put("pageSize", Integer.valueOf(result.getPageSize()));
