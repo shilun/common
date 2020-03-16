@@ -113,6 +113,26 @@ public class HttpClientUtil {
         return this.sendHttpPost(httpPost);
     }
 
+    /**
+     * 发送postjson
+     * @param url
+     * @param body
+     * @return
+     */
+    public String doPostJsonBody(String url,String body){
+        HttpPost httpPost = new HttpPost(url);
+        if (header.size() != 0) {
+            for (String str : header.keySet()) {
+                httpPost.setHeader(new BasicHeader(str, header.get(str)));
+            }
+        }
+        StringEntity setEntity = new StringEntity(body,"utf-8");
+        setEntity.setContentType("application/json");
+        setEntity.setContentEncoding("UTF-8");
+        httpPost.setEntity(setEntity);
+        return sendHttpPost(httpPost);
+    }
+
     public JSONObject doPostJson(String url, Map<String, String> params) {
         String content = this.sendHttpPost(url, params);
         return JSONObject.fromObject(content);
