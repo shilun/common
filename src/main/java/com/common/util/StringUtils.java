@@ -73,7 +73,7 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
         return url;
     }
 
-    public static final String PW_PATTERN = "[a-z0-9]{1,24}";
+    public static final String PW_PATTERN = "[a-z0-9]{1,32}";
 
     /**
      * 生成mongoid 自动补齐后面的字符
