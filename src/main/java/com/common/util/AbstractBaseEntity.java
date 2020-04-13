@@ -5,6 +5,7 @@ import com.common.annotation.GeneratedValue;
 import com.common.annotation.QueryField;
 import com.common.mongo.QueryType;
 import com.common.util.model.OrderTypeEnum;
+import com.common.util.model.YesOrNoEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -31,13 +32,12 @@ public class AbstractBaseEntity implements Serializable {
     @JsonIgnore
     private Integer endRow;
     private Date createTime;
-    private Integer delStatus;
+    private YesOrNoEnum delStatus;
     private Date updateTime;
     @Transient
     @JsonIgnore
     @QueryField(name = "id", type = QueryType.GTE)
     private Long minId;
-
     @Transient
     @QueryField(name = "createTime", type = QueryType.GTE)
     @JsonIgnore

@@ -218,7 +218,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (StringUtils.isNotBlank(entity.getId())) {
             StringUtils.checkId(entity.getId());
         }
-        entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        entity.setDelStatus(YesOrNoEnum.NO);
         primaryTemplate.insert(entity);
     }
 
@@ -246,7 +246,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
      * @return
      */
     public T queryFirst(T entity,boolean trans){
-        entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        entity.setDelStatus(YesOrNoEnum.NO);
         Query query = buildCondition(entity, PageRequest.of(0,1));
         MongoTemplate template = null;
         if (trans) {
@@ -307,7 +307,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity == null) {
             return secondaryTemplate.findAll(getEntityClass());
         }
-        entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        entity.setDelStatus(YesOrNoEnum.NO);
         Query query = buildCondition(entity);
         MongoTemplate template = null;
         if (trans) {
@@ -323,7 +323,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Long queryCount(T entity, boolean trans) {
-        entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        entity.setDelStatus(YesOrNoEnum.NO);
         Query query = buildCondition(entity);
         MongoTemplate template = null;
         if (trans) {
@@ -339,7 +339,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Page<T> queryByPage(T entity, Pageable pageable, boolean trans) {
-        entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        entity.setDelStatus(YesOrNoEnum.NO);
         Long count = queryCount(entity, trans);
         Query query = buildCondition(entity, pageable);
         MongoTemplate template = null;
@@ -411,7 +411,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
 
     public T findByOne(T entity, boolean trans) {
-        entity.setDelStatus(YesOrNoEnum.NO.getValue());
+        entity.setDelStatus(YesOrNoEnum.NO);
         Query query = buildCondition(entity);
         MongoTemplate template = null;
         if (trans) {

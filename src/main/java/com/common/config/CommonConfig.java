@@ -43,6 +43,7 @@ public class CommonConfig implements WebMvcConfigurer {
         TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
         factory.setPort(serverPort);
         factory.setBaseDirectory(new File("/tomcat"));
+
         return factory;
     }
 
@@ -73,6 +74,7 @@ public class CommonConfig implements WebMvcConfigurer {
                 });
                 moneyModule.addDeserializer(Date.class, new JsonDeserializer<Date>() {
                     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    private SimpleDateFormat dateFormatDayTime = new SimpleDateFormat("MM-dd HH:mm");
                     private SimpleDateFormat dateFormatFirst = new SimpleDateFormat("yyyy.MM.dd");
                     private SimpleDateFormat chDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
                     private SimpleDateFormat minuteDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -98,8 +100,8 @@ public class CommonConfig implements WebMvcConfigurer {
                             if (text.matches("\\d{4}\\.\\d{2}\\.\\d{2}")) {
                                 return dateFormatFirst.parse(text);
                             }
-                            if (text.matches("\\d{4}年\\d{2}月\\d{2}日")) {
-                                return chDateFormat.parse(text);
+                            if (text.matches("\\d{4}\\.\\d{2}\\.\\d{2}")) {
+                                return dateFormatFirst.parse(text);
                             }
                             return DateUtil.parseDate(text);
                         } catch (ParseException var3) {
