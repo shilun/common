@@ -10,13 +10,13 @@ import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.index.IndexDefinition;
-import org.springframework.data.mongodb.core.index.IndexInfo;
+import org.springframework.data.mongodb.core.index.*;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -39,6 +39,8 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     @Resource(name = "secondary")
     protected MongoTemplate secondaryTemplate;
 
+    @Resource
+    private MongoMappingContext mongoMappingContext;
 
     protected abstract Class getEntityClass();
 
@@ -58,7 +60,6 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             logger.error(getEntityClass().getSimpleName() + " 构建mongodb索引出错，请检查索引配置", e);
         }
     }
-
     /**
      * 创建 索引
      *
