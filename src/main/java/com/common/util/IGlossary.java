@@ -10,5 +10,4 @@ import java.io.Serializable;
 public interface IGlossary extends Serializable {
     String getName();
 
-    Integer getValue();
 }

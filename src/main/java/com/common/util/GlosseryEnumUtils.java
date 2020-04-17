@@ -87,36 +87,6 @@ public class GlosseryEnumUtils {
             return getItems(classz);
         }
     }
-
-
-    public static IGlossary getEnumName(String shortName, Integer value) {
-        if(StringUtils.isBlank(shortName)){
-            return null;
-        }
-        if(value == null) {
-            return null;
-        } else {
-            List<IGlossary> items = getItems((Class)classes.get(shortName));
-            for(IGlossary t:items){
-                if(t.getValue().intValue()==value){
-                    return t;
-                }
-
-            }
-            return null;
-        }
-    }
-
-    public static <T extends IGlossary> T getItem(Class<T> classz, Integer value) {
-        List<T> items = getItems(classz);
-        for(T t:items){
-            if(t.getValue().intValue()==value){
-                return t;
-            }
-
-        }
-        return null;
-    }
     public static <T extends IGlossary> T getItem(Class<T> classz, String name) {
         List<T> items = getItems(classz);
         for(T t:items){
@@ -126,17 +96,6 @@ public class GlosseryEnumUtils {
                     return t;
                 }
             }
-        }
-        return null;
-    }
-
-    public static  IGlossary getItem(String className, Integer value) {
-        List<IGlossary> items = getItemsByShortName(className);
-        for(IGlossary t:items){
-            if(t.getValue().intValue()==value){
-                return t;
-            }
-
         }
         return null;
     }
