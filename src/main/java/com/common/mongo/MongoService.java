@@ -53,6 +53,13 @@ public interface MongoService<T extends AbstractBaseEntity> extends AbstractServ
      * @param size
      */
     public void inc(String id, String property, Integer size);
+
+    /**
+     * 数据是否存在
+     * @param entity
+     * @return
+     */
+    public boolean exist(T entity);
     /***
      * 添加或保存
      * @param entity

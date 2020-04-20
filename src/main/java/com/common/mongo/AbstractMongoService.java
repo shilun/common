@@ -186,6 +186,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         throw new ApplicationException("mongodb updata error");
     }
 
+    public boolean exist(T entity){
+        entity.setDelStatus(YesOrNoEnum.NO);
+        Query query = buildCondition(entity, PageRequest.of(0,1));
+        return secondaryTemplate.exists(query,getEntityClass());
+    }
+
     public void save(T entity) {
         if (entity == null) {
             throw new ApplicationException("保存失败，对象未实例化");
