@@ -320,6 +320,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         return template.find(query, getEntityClass());
     }
 
+    @Override
+    public Long queryCount(Query query) {
+        return secondaryTemplate.count(query, getEntityClass());
+    }
+
     public Long queryCount(T entity) {
         return queryCount(entity, false);
     }

@@ -145,6 +145,12 @@ public interface MongoService<T extends AbstractBaseEntity> extends AbstractServ
 
     /**
      * 查询总条数
+     * @param query
+     * @return
+     */
+    public Long queryCount(Query query);
+    /**
+     * 查询总条数
      * @param entity
      * @return
      */
