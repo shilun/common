@@ -453,11 +453,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         beanPropertyes.remove("uuid");
     }
 
-    protected Query buildCondition(T entity) {
+    public Query buildCondition(T entity) {
         return buildCondition(entity, null);
     }
 
-    protected Query buildCondition(T entity, Pageable pageable) {
+    public Query buildCondition(T entity, Pageable pageable) {
         Query query = new Query();
         Map<String, QueryItem> queryItemMap = new HashMap<>();
         for (Field field : beanPropertyes.values()) {

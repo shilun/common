@@ -30,6 +30,20 @@ public interface MongoService<T extends AbstractBaseEntity> extends AbstractServ
     }
 
     /**
+     * 构建查询对象
+     * @param entity
+     * @return
+     */
+    public Query buildCondition(T entity);
+
+    /**
+     * 构建查询对象
+     * @param entity
+     * @param pageable
+     * @return
+     */
+    public Query buildCondition(T entity, Pageable pageable);
+    /**
      * 构建条件
      * @param property
      * @param type
