@@ -64,7 +64,7 @@ public class UploadUtil {
         params.put("file", file);
         params.put("key", code);
 
-        JSONObject doPost = clientUtil.doPost("http://" + domainName + "/upload", params);
+        JSONObject doPost = clientUtil.doPost(domainName + "/upload", params);
 
         result.setSuccess(doPost.getBoolean("success"));
         if (!doPost.getBoolean("success")) {
@@ -121,7 +121,7 @@ public class UploadUtil {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("key", code);
         params.put("fileName", fileName);
-        return clientUtil.doPostByte("http://" + domainName + "/download", params);
+        return clientUtil.doPostByte( domainName + "/download", params);
     }
 
 
