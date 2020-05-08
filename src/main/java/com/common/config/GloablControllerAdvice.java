@@ -13,6 +13,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
@@ -77,6 +78,15 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public Map<String, Object> exceptionHandler(Exception ex) {
+        if(ex instanceof DuplicateKeyException){
+            request.setAttribute("exception", true);
+            Map<String, Object> map = new HashMap<>();
+            map.put("code", "duplicat");
+            map.put("message", "数据已经存在");
+            map.put("success", Boolean.valueOf(false));
+            log.error("数据重复", ex);
+            return map;
+        }
         request.setAttribute("exception", true);
         Map<String, Object> map = new HashMap<>();
         map.put("code", "999");
