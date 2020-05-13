@@ -173,7 +173,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     @Override
-    public void inc(String id, String property, Integer size) {
+    public void inc(String id, String property, Number size) {
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
