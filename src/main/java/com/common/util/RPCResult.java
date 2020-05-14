@@ -3,8 +3,12 @@ package com.common.util;
 import com.common.exception.BizException;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 public class RPCResult<T> implements Serializable {
@@ -68,6 +72,19 @@ public class RPCResult<T> implements Serializable {
     public RPCResult() {
     }
 
+    public  Page<T> toPage(){
+        Pageable pageable=null;
+        List<T> list= (List<T>) data;
+        if(this.totalPage>1){
+            if(this.pageIndex==1){
+                pageable= PageRequest.of(this.pageIndex,this.pageSize);
+            }
+        }
+        else{
+            pageable=PageRequest.of(1,this.pageSize);
+        }
+        return new PageImpl(list,pageable,this.getTotalCount());
+    }
     /**
      * 默认构造方法
      */
