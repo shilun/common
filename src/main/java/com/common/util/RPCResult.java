@@ -2,6 +2,7 @@ package com.common.util;
 
 import com.common.exception.BizException;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +12,7 @@ import java.io.Serializable;
 import java.util.List;
 
 
+@Slf4j
 public class RPCResult<T> implements Serializable {
     /**
      *
@@ -79,11 +81,12 @@ public class RPCResult<T> implements Serializable {
             if(this.pageIndex==1){
                 pageable= PageRequest.of(this.pageIndex,this.pageSize);
             }
+            return new PageImpl(list,pageable,this.getTotalCount());
         }
         else{
-            pageable=PageRequest.of(1,this.pageSize);
+            return new PageImpl(list);
         }
-        return new PageImpl(list,pageable,this.getTotalCount());
+
     }
     /**
      * 默认构造方法
@@ -100,6 +103,7 @@ public class RPCResult<T> implements Serializable {
             this.setException((BizException) e);
         }
         else{
+            log.error("unKnow.error",e);
             this.setCode("999");
             this.setMessage("执行业务失败");
         }
