@@ -2,11 +2,13 @@ package com.common.util;
 
 import com.common.exception.BizException;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 
 import java.io.Serializable;
 
 
+@Slf4j
 public class RPCResult<T> implements Serializable {
     /**
      *
@@ -83,6 +85,7 @@ public class RPCResult<T> implements Serializable {
             this.setException((BizException) e);
         }
         else{
+            log.error("unKnow.error",e);
             this.setCode("999");
             this.setMessage("执行业务失败");
         }
