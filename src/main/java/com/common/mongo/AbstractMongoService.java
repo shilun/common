@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -113,6 +114,14 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
     }
 
+    @Override
+    public void upProperty(String id, String property, Object value) {
+        Query query = new Query(Criteria.where("id").is(id));
+        Update update=new Update();
+        update.set(property,value);
+        FindAndModifyOptions modifyOptions = FindAndModifyOptions.options().upsert(false).returnNew(false);
+        primaryTemplate.findAndModify(query,update, modifyOptions,getEntityClass());
+    }
 
     @Override
     public Criteria buildCondition(String property, QueryType type, Object value) {
@@ -184,6 +193,8 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
         throw new ApplicationException("mongodb updata error");
     }
+
+
 
     public void save(T entity) {
         if (entity == null) {

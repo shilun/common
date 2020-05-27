@@ -53,6 +53,14 @@ public interface MongoService<T extends AbstractBaseEntity> extends AbstractServ
      * @param size
      */
     public void inc(String id, String property, Number size);
+
+    /**
+     * 更新属性
+     * @param id
+     * @param property
+     * @param value
+     */
+    public void upProperty(String id,String property,Object value);
     /***
      * 添加或保存
      * @param entity
