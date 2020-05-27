@@ -14,6 +14,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.*;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
@@ -185,6 +186,16 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
         throw new ApplicationException("mongodb updata error");
     }
+
+    @Override
+    public void upProperty(String id, String property, Object value) {
+        Query query = new Query(Criteria.where("id").is(id));
+        Update update=new Update();
+        update.set(property,value);
+        FindAndModifyOptions modifyOptions = FindAndModifyOptions.options().upsert(false).returnNew(false);
+        primaryTemplate.findAndModify(query,update, modifyOptions,getEntityClass());
+    }
+
 
     public boolean exist(T entity){
         entity.setDelStatus(YesOrNoEnum.NO);
