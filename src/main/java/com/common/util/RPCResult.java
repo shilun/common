@@ -74,20 +74,18 @@ public class RPCResult<T> implements Serializable {
     public RPCResult() {
     }
 
-    public  Page<T> toPage(){
-        Pageable pageable=null;
-        List<T> list= (List<T>) data;
-        if(this.totalPage>1){
-            if(this.pageIndex==1){
-                pageable= PageRequest.of(this.pageIndex,this.pageSize);
-            }
-            return new PageImpl(list,pageable,this.getTotalCount());
-        }
-        else{
+    public Page<T> toPage() {
+        Pageable pageable = null;
+        List<T> list = (List<T>) data;
+        if (this.totalPage > 1) {
+            pageable = PageRequest.of(this.pageIndex, this.pageSize);
+            return new PageImpl(list, pageable, this.getTotalCount());
+        } else {
             return new PageImpl(list);
         }
 
     }
+
     /**
      * 默认构造方法
      */
@@ -95,15 +93,15 @@ public class RPCResult<T> implements Serializable {
         this.setSuccess(true);
         this.setData(data);
     }
+
     /**
      * 默认构造方法
      */
     public RPCResult(Exception e) {
-        if(e instanceof BizException){
+        if (e instanceof BizException) {
             this.setException((BizException) e);
-        }
-        else{
-            log.error("unKnow.error",e);
+        } else {
+            log.error("unKnow.error", e);
             this.setCode("999");
             this.setMessage("执行业务失败");
         }
