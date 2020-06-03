@@ -401,7 +401,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
         long count = template.count(query, getEntityClass());
         if (pageable.getSort() == Sort.unsorted()) {
-            Sort sort = new Sort(sortType, orderColum);
+            Sort sort = Sort.by(sortType, orderColum);
             PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
             query.with(pageRequest);
         }
@@ -571,10 +571,10 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             entity.setOrderType(OrderTypeEnum.DESC);
         }
         if (entity.getOrderType() == OrderTypeEnum.ASC) {
-            orders = new Sort(Sort.Direction.ASC, entity.getOrderColumn());
+            orders = Sort.by(Sort.Direction.ASC, entity.getOrderColumn());
         }
         if (entity.getOrderType() == OrderTypeEnum.DESC) {
-            orders = new Sort(Sort.Direction.DESC, entity.getOrderColumn());
+            orders = Sort.by(Sort.Direction.DESC, entity.getOrderColumn());
         }
         return orders;
     }

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +43,24 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
 
     @Autowired(required = false)
     private HttpServletRequest request;
+
+    /**
+     * 全局异常处理，反正异常返回统一格式的map
+     *
+     * @param e
+     * @return
+     */
+    @ResponseBody
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    public Map<String, Object> maxUploadSize(MaxUploadSizeExceededException e) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", "file.upload.oversize.error");
+        map.put("message", "文件上传,大小超限");
+        map.put("success", Boolean.valueOf(false));
+        log.error("execute json error->code:file.upload.oversize.error msg:" + e.getMessage());
+        request.setAttribute("exception", true);
+        return map;
+    }
 
     /**
      * 全局异常处理，反正异常返回统一格式的map
