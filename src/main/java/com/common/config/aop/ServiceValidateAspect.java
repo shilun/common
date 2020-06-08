@@ -1,4 +1,4 @@
-package com.common.aop;
+package com.common.config.aop;
 
 import com.common.annotation.ParamsCheck;
 import com.common.exception.ParamsCheckException;
