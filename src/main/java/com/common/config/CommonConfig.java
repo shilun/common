@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
@@ -20,7 +19,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
@@ -46,10 +44,8 @@ public class CommonConfig implements WebMvcConfigurer {
 
         return factory;
     }
-    @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
-        return new MethodValidationPostProcessor();
-    }
+
+
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -61,11 +57,11 @@ public class CommonConfig implements WebMvcConfigurer {
 
                 SimpleModule moneyModule = new SimpleModule();
                 moneyModule.addSerializer(Money.class, new MoneySerialize());
-                moneyModule.addDeserializer(Money.class, new JsonDeserializer(){
+                moneyModule.addDeserializer(Money.class, new JsonDeserializer() {
                     @Override
                     public Object deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
                         String text = jsonParser.getText();
-                        BigDecimal bigDecimal= NumberUtils.createBigDecimal(text);
+                        BigDecimal bigDecimal = NumberUtils.createBigDecimal(text);
                         return new Money(bigDecimal);
                     }
                 });
@@ -115,11 +111,6 @@ public class CommonConfig implements WebMvcConfigurer {
                 objectMapper.registerModule(moneyModule);
             }
         }
-    }
-
-    public static void main(String[] args) {
-        int dayOfWeek = new DateTime(DateUtil.parseDate("02-16")).getDayOfWeek();
-        System.out.println(dayOfWeek);
     }
 }
 
