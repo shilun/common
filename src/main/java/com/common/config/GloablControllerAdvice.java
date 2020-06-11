@@ -2,14 +2,12 @@ package com.common.config;
 
 import com.common.exception.BizException;
 import com.common.util.Money;
-import com.common.util.PageInfo;
 import com.common.util.RPCResult;
 import com.common.util.StringUtils;
 import com.common.web.CustomDateEditor;
 import com.common.web.CustomMoneyEditor;
 import com.common.web.CustomStringEditor;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -29,7 +27,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.lang.reflect.Method;
+import javax.validation.Path;
 import java.util.*;
 
 /**
@@ -73,7 +71,16 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
     public Map<String, Object> bizExceptionHandler(ConstraintViolationException e) {
         List<String> msgList = new ArrayList<>();
         for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
-            msgList.add(constraintViolation.getMessage());
+            Path propertyPath = constraintViolation.getPropertyPath();
+            String name = null;
+            if (propertyPath != null) {
+                String pathStr = propertyPath.toString();
+                int index = pathStr.indexOf(".");
+                if (index != -1) {
+                    name = pathStr.substring(index +1);
+                }
+            }
+            msgList.add(StringUtils.defaultIfBlank(name, "") + "," + constraintViolation.getMessage());
         }
         String messages = StringUtils.join(msgList.toArray(), ";");
         Map<String, Object> map = new HashMap<>();
@@ -118,7 +125,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public Map<String, Object> exceptionHandler(Exception ex) {
-        if(ex instanceof DuplicateKeyException){
+        if (ex instanceof DuplicateKeyException) {
             request.setAttribute("exception", true);
             Map<String, Object> map = new HashMap<>();
             map.put("code", "duplicat");
@@ -173,7 +180,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         if (e instanceof RPCResult) {
             RPCResult result = (RPCResult) e;
             if (result.getSuccess()) {
-                if (result.getTotalPage() != null && result.getTotalPage()!=null) {
+                if (result.getTotalPage() != null && result.getTotalPage() != null) {
                     HashMap dataItem = new HashMap();
                     dataItem.put("list", result.getData());
                     dataItem.put("pageSize", Integer.valueOf(result.getPageSize()));
