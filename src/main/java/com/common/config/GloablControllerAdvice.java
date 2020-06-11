@@ -80,13 +80,14 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
                     name = pathStr.substring(index + 1);
                 }
             }
-            msgList.add("参数->\"" + StringUtils.defaultIfBlank(name, "") + "\"" + constraintViolation.getMessage());
+            msgList.add("参数->" + StringUtils.defaultIfBlank(name, "")  + constraintViolation.getMessage());
         }
         String messages = StringUtils.join(msgList.toArray(), ";");
         Map<String, Object> map = new HashMap<>();
         map.put("code", "Violation.error");
         map.put("message", messages);
         map.put("success", Boolean.valueOf(false));
+        log.error("验证错误",e);
         request.setAttribute("exception", true);
         return map;
     }
