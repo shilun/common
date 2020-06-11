@@ -2,14 +2,12 @@ package com.common.config;
 
 import com.common.exception.BizException;
 import com.common.util.Money;
-import com.common.util.PageInfo;
 import com.common.util.RPCResult;
 import com.common.util.StringUtils;
 import com.common.web.CustomDateEditor;
 import com.common.web.CustomMoneyEditor;
 import com.common.web.CustomStringEditor;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -26,11 +24,10 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Path;
+import java.util.*;
 
 /**
  * @Auther: cookie
@@ -79,6 +76,39 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         request.setAttribute("exception", true);
         return map;
     }
+
+    /**
+     * 全局异常处理，反正异常返回统一格式的map
+     *
+     * @param e
+     * @return
+     */
+    @ResponseBody
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public Map<String, Object> bizExceptionHandler(ConstraintViolationException e) {
+        List<String> msgList = new ArrayList<>();
+        for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
+            Path propertyPath = constraintViolation.getPropertyPath();
+            String name = null;
+            if (propertyPath != null) {
+                String pathStr = propertyPath.toString();
+                int index = pathStr.indexOf(".");
+                if (index != -1) {
+                    name = pathStr.substring(index + 1);
+                }
+            }
+            msgList.add("参数->" + StringUtils.defaultIfBlank(name, "") + constraintViolation.getMessage());
+        }
+        String messages = StringUtils.join(msgList.toArray(), ";");
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", "Violation.error");
+        map.put("message", messages);
+        map.put("success", Boolean.valueOf(false));
+        log.error("验证错误", e);
+        request.setAttribute("exception", true);
+        return map;
+    }
+
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -142,7 +172,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         if (e instanceof RPCResult) {
             RPCResult result = (RPCResult) e;
             if (result.getSuccess()) {
-                if (result.getTotalPage() != null && result.getTotalPage()!=null) {
+                if (result.getTotalPage() != null && result.getTotalPage() != null) {
                     HashMap dataItem = new HashMap();
                     dataItem.put("list", result.getData());
                     dataItem.put("pageSize", Integer.valueOf(result.getPageSize()));
