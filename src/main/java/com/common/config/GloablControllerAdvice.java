@@ -27,11 +27,10 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Auther: cookie
@@ -59,6 +58,28 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         map.put("message", "文件上传,大小超限");
         map.put("success", Boolean.valueOf(false));
         log.error("execute json error->code:file.upload.oversize.error msg:" + e.getMessage());
+        request.setAttribute("exception", true);
+        return map;
+    }
+
+    /**
+     * 全局异常处理，反正异常返回统一格式的map
+     *
+     * @param e
+     * @return
+     */
+    @ResponseBody
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public Map<String, Object> bizExceptionHandler(ConstraintViolationException e) {
+        List<String> msgList = new ArrayList<>();
+        for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
+            msgList.add(constraintViolation.getMessage());
+        }
+        String messages = StringUtils.join(msgList.toArray(), ";");
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", "Violation.error");
+        map.put("message", messages);
+        map.put("success", Boolean.valueOf(false));
         request.setAttribute("exception", true);
         return map;
     }
