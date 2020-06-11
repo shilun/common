@@ -77,10 +77,10 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
                 String pathStr = propertyPath.toString();
                 int index = pathStr.indexOf(".");
                 if (index != -1) {
-                    name = pathStr.substring(index +1);
+                    name = pathStr.substring(index + 1);
                 }
             }
-            msgList.add(StringUtils.defaultIfBlank(name, "") + "," + constraintViolation.getMessage());
+            msgList.add("参数->\"" + StringUtils.defaultIfBlank(name, "") + "\"" + constraintViolation.getMessage());
         }
         String messages = StringUtils.join(msgList.toArray(), ";");
         Map<String, Object> map = new HashMap<>();
