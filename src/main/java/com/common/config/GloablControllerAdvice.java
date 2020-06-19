@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +31,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Auther: cookie
@@ -59,7 +62,20 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         request.setAttribute("exception", true);
         return map;
     }
+    @ResponseBody
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, Object> validationErrorHandler(MethodArgumentNotValidException ex) {
+        List<String> errorInformation = ex.getBindingResult().getAllErrors()
+                .stream()
+                .map(ObjectError::getDefaultMessage)
+                .collect(Collectors.toList());
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", "parameter.error");
+        map.put("message", errorInformation.get(0));
+        map.put("success", Boolean.valueOf(false));
 
+        return map;
+    }
     /**
      * 全局异常处理，反正异常返回统一格式的map
      *
