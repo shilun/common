@@ -1,11 +1,9 @@
 
 package com.common.util;
 
-import com.common.annotation.GeneratedValue;
 import com.common.annotation.QueryField;
 import com.common.mongo.QueryType;
 import com.common.util.model.OrderTypeEnum;
-import com.common.util.model.YesOrNoEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -32,7 +30,7 @@ public class AbstractBaseEntity implements Serializable {
     @JsonIgnore
     private Integer endRow;
     private Date createTime;
-    private YesOrNoEnum delStatus;
+    private Boolean delStatus;
     private Date updateTime;
     @Transient
     @JsonIgnore

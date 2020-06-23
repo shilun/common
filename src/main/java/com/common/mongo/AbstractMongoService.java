@@ -10,13 +10,14 @@ import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.*;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.IndexDefinition;
+import org.springframework.data.mongodb.core.index.IndexInfo;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -198,7 +199,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
 
     public boolean exist(T entity){
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(Boolean.FALSE);
         Query query = buildCondition(entity, PageRequest.of(0,1));
         return secondaryTemplate.exists(query,getEntityClass());
     }
@@ -231,7 +232,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (StringUtils.isNotBlank(entity.getId())) {
             StringUtils.checkId(entity.getId());
         }
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(Boolean.FALSE);
         primaryTemplate.insert(entity);
     }
 
@@ -259,7 +260,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
      * @return
      */
     public T queryFirst(T entity,boolean trans){
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(Boolean.FALSE);
         Query query = buildCondition(entity, PageRequest.of(0,1));
         MongoTemplate template = null;
         if (trans) {
@@ -320,7 +321,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity == null) {
             return secondaryTemplate.findAll(getEntityClass());
         }
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(Boolean.FALSE);
         Query query = buildCondition(entity);
         MongoTemplate template = null;
         if (trans) {
@@ -341,7 +342,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Long queryCount(T entity, boolean trans) {
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(Boolean.FALSE);
         Query query = buildCondition(entity);
         MongoTemplate template = null;
         if (trans) {
@@ -357,7 +358,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Page<T> queryByPage(T entity, Pageable pageable, boolean trans) {
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(Boolean.FALSE);
         Long count = queryCount(entity, trans);
         Query query = buildCondition(entity, pageable);
         MongoTemplate template = null;
@@ -429,7 +430,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
 
     public T findByOne(T entity, boolean trans) {
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(Boolean.FALSE);
         Query query = buildCondition(entity);
         MongoTemplate template = null;
         if (trans) {

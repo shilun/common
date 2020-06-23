@@ -16,10 +16,10 @@
 
 package com.common.config;
 
-import com.common.exception.ApplicationException;
 import com.common.mongo.*;
 import com.common.util.StringUtils;
-import com.mongodb.*;
+import com.mongodb.ReadPreference;
+import com.mongodb.WriteConcern;
 import org.bson.conversions.Bson;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -27,32 +27,24 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.domain.EntityScanner;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.annotation.Persistent;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.core.convert.*;
-import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.data.mongodb.core.mapping.BasicMongoPersistentEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.util.TypeInformation;
 
-import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -89,6 +81,8 @@ public class MongoConfig implements ApplicationContextAware, ResourceLoaderAware
         }
     }
 
+    @Resource
+    private MongoDatabaseFactory dbFactory;
 
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -101,22 +95,22 @@ public class MongoConfig implements ApplicationContextAware, ResourceLoaderAware
     }
 
     @Bean("primary")
-    public MongoTemplate mongoPrimaryTemplate(MongoDbFactory dbFactory) throws Exception {
+    public MongoTemplate mongoPrimaryTemplate() throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url" + mongodbUrl);
         }
-        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(dbFactory, this.mongoMappingContext));
+        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(this.mongoMappingContext));
         mongoTemplate.setReadPreference(ReadPreference.primary());
         mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         return mongoTemplate;
     }
 
     @Bean("secondary")
-    public MongoTemplate mongoSecondaryTemplate(MongoDbFactory dbFactory) throws Exception {
+    public MongoTemplate mongoSecondaryTemplate() throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url" + mongodbUrl);
         }
-        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(dbFactory, this.mongoMappingContext));
+        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(this.mongoMappingContext));
         mongoTemplate.setReadPreference(ReadPreference.secondary());
         mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         return mongoTemplate;
@@ -127,37 +121,16 @@ public class MongoConfig implements ApplicationContextAware, ResourceLoaderAware
         List<Converter> list = new ArrayList();
         list.add(new MoneyToLongConvert());
         list.add(new LongToMoneyConvert());
-        list.add(new BigDecimalToDecimal128Converter());
-        list.add(new Decimal128ToBigDecimalConverter());
         return new MongoCustomConversions(list);
-    }
-
-    @Bean
-    public MongoDbFactory dbFactory() throws UnknownHostException {
-        return new SimpleMongoDbFactory(mongo(), mongoClientURI().getDatabase());
     }
 
     @Resource
     private MongoMappingContext mongoMappingContext;
 
     @Bean
-    @ConditionalOnMissingBean
-    public MongoMappingContext mongoMappingContext(BeanFactory beanFactory, ApplicationContext applicationContext) throws ClassNotFoundException {
-        MongoMappingContext context = new MongoMappingContext() {
-            @Override
-            public Collection<BasicMongoPersistentEntity<?>> getPersistentEntities() {
-                return super.getPersistentEntities();
-            }
-        };
-
-        return context;
-    }
-
-
-    @Bean
-    public MappingMongoConverter mappingMongoConverter(MongoDbFactory factory, MongoMappingContext mongoMappingContext) {
+    public MappingMongoConverter mappingMongoConverter( MongoMappingContext mongoMappingContext) {
         mongoMappingContext.setAutoIndexCreation(true);
-        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
+        DbRefResolver dbRefResolver = new DefaultDbRefResolver(dbFactory);
         MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, mongoMappingContext){
         };
 
@@ -180,46 +153,12 @@ public class MongoConfig implements ApplicationContextAware, ResourceLoaderAware
         return mappingConverter;
     }
 
-    private MongoClient mongo;
-    private MongoClientURI mongoClientURI;
-
-    @PreDestroy
-    public void close() {
-        if (this.mongo != null) {
-            this.mongo.close();
-        }
-    }
-
-    @Bean
-    public MongoClientURI mongoClientURI() {
-        if (this.mongoClientURI != null) {
-            return this.mongoClientURI;
-        }
-        if (StringUtils.isBlank(mongodbUrl)) {
-            throw new ApplicationException("mongodb load error url" + mongodbUrl);
-        }
-        com.mongodb.MongoClientURI url = new MongoClientURI(mongodbUrl, MongoClientOptions.builder());
-        this.mongoClientURI = url;
-        return url;
-    }
 
     @Bean
     public SaveMongoEventListener mongoEventListener() {
         return new SaveMongoEventListener();
     }
 
-    @Bean
-    public MongoClient mongo() {
-        if (this.mongo != null) {
-            return this.mongo;
-        }
-        if (StringUtils.isBlank(mongodbUrl)) {
-            return null;
-        }
-        MongoClient mongo = new MongoClient(mongoClientURI());
-        this.mongo = mongo;
-        return mongo;
-    }
 
 }
 
