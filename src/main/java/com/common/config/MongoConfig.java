@@ -16,16 +16,16 @@
 
 package com.common.config;
 
-import com.common.mongo.*;
+import com.common.mongo.LongToMoneyConvert;
+import com.common.mongo.MoneyToLongConvert;
+import com.common.mongo.SaveMongoEventListener;
 import com.common.util.StringUtils;
 import com.mongodb.ReadPreference;
 import com.mongodb.WriteConcern;
 import org.bson.conversions.Bson;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -40,13 +40,11 @@ import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.*;
-import org.springframework.data.mongodb.core.mapping.BasicMongoPersistentEntity;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.util.TypeInformation;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -76,7 +74,7 @@ public class MongoConfig implements ApplicationContextAware, ResourceLoaderAware
         }
 
         @Bean
-        public MongoTransactionManager transactionManager(MongoDbFactory dbFactory) {
+        public MongoTransactionManager transactionManager() {
             return new MongoTransactionManager(dbFactory);
         }
     }
@@ -99,7 +97,7 @@ public class MongoConfig implements ApplicationContextAware, ResourceLoaderAware
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url" + mongodbUrl);
         }
-        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(this.mongoMappingContext));
+        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory);
         mongoTemplate.setReadPreference(ReadPreference.primary());
         mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         return mongoTemplate;
@@ -110,49 +108,11 @@ public class MongoConfig implements ApplicationContextAware, ResourceLoaderAware
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url" + mongodbUrl);
         }
-        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(this.mongoMappingContext));
+        MongoTemplate mongoTemplate = new MongoTemplate(dbFactory);
         mongoTemplate.setReadPreference(ReadPreference.secondary());
         mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         return mongoTemplate;
     }
-
-    @Bean
-    public MongoCustomConversions customConversions() {
-        List<Converter> list = new ArrayList();
-        list.add(new MoneyToLongConvert());
-        list.add(new LongToMoneyConvert());
-        return new MongoCustomConversions(list);
-    }
-
-    @Resource
-    private MongoMappingContext mongoMappingContext;
-
-    @Bean
-    public MappingMongoConverter mappingMongoConverter( MongoMappingContext mongoMappingContext) {
-        mongoMappingContext.setAutoIndexCreation(true);
-        DbRefResolver dbRefResolver = new DefaultDbRefResolver(dbFactory);
-        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, mongoMappingContext){
-        };
-
-        DefaultMongoTypeMapper typeMapper = new DefaultMongoTypeMapper(null){
-            @Override
-            public <T> TypeInformation<? extends T> readType(Bson source, TypeInformation<T> basicType) {
-                return super.readType(source, basicType);
-            }
-
-            @Override
-            public TypeInformation<?> readType(Bson source) {
-                return super.readType(source);
-            }
-        };
-
-        mappingConverter.setTypeMapper(typeMapper);//去掉默认mapper添加的_class
-        mappingConverter.setCustomConversions(customConversions());//添加自定义的转换器
-
-
-        return mappingConverter;
-    }
-
 
     @Bean
     public SaveMongoEventListener mongoEventListener() {
