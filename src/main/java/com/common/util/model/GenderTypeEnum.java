@@ -7,14 +7,14 @@ package com.common.util.model;
 
 import com.common.util.IGlossary;
 
-public enum SexTypeEnum implements IGlossary {
+public enum GenderTypeEnum implements IGlossary {
     MALE("男"),
     FEMALE("女");
 
     private String name;
     private Integer value;
 
-    SexTypeEnum(String name){
+    GenderTypeEnum(String name){
         this.name=name;
     }
 
