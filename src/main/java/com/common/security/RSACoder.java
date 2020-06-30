@@ -103,8 +103,8 @@ public abstract class RSACoder extends Coder {
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
         keyPairGen.initialize(1024);
         KeyPair keyPair = keyPairGen.generateKeyPair();
-        RSAPublicKey publicKey = (RSAPublicKey)keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey)keyPair.getPrivate();
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
         HashMap keyMap = new HashMap(2);
         keyMap.put("RSAPublicKey", publicKey);
         keyMap.put("RSAPrivateKey", privateKey);
