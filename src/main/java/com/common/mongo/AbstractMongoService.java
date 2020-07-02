@@ -4,7 +4,6 @@ import com.common.annotation.QueryField;
 import com.common.exception.ApplicationException;
 import com.common.util.*;
 import com.common.util.model.OrderTypeEnum;
-import com.common.util.model.YesOrNoEnum;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
@@ -284,7 +283,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
-        query.addCriteria(Criteria.where("delStatus").is(YesOrNoEnum.NO));
+        query.addCriteria(Criteria.where("delStatus").is(false));
         List<T> ts = null;
         MongoTemplate template = null;
         if (trans) {
