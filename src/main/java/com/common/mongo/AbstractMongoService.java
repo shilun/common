@@ -337,6 +337,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         } else {
             template = secondaryTemplate;
         }
+        query.limit(0);
         return template.count(query, entity.getClass());
     }
 
@@ -354,6 +355,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         } else {
             template = secondaryTemplate;
         }
+        query.limit(pageable.getPageSize());
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
@@ -373,7 +375,9 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         } else {
             template = secondaryTemplate;
         }
+        query.limit(0);
         long count = template.count(query, getEntityClass());
+        query.limit(pageable.getPageSize());
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
@@ -399,12 +403,14 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         } else {
             template = secondaryTemplate;
         }
+        query.limit(0);
         long count = template.count(query, getEntityClass());
         if (pageable.getSort() == Sort.unsorted()) {
             Sort sort = Sort.by(sortType, orderColum);
             PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
             query.with(pageRequest);
         }
+        query.limit(pageable.getPageSize());
         List<T> list = template.find(query, getEntityClass());
 
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
