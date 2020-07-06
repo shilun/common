@@ -10,13 +10,14 @@ import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.*;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.IndexDefinition;
+import org.springframework.data.mongodb.core.index.IndexInfo;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -333,6 +334,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     @Override
     public Long queryCount(Query query) {
+        query.limit(0);
         return secondaryTemplate.count(query, getEntityClass());
     }
 
@@ -349,6 +351,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         } else {
             template = secondaryTemplate;
         }
+        query.limit(0);
         return template.count(query, entity.getClass());
     }
 
@@ -360,6 +363,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         entity.setDelStatus(YesOrNoEnum.NO);
         Long count = queryCount(entity, trans);
         Query query = buildCondition(entity, pageable);
+        query.limit(pageable.getPageSize());
         MongoTemplate template = null;
         if (trans) {
             template = primaryTemplate;
@@ -385,7 +389,9 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         } else {
             template = secondaryTemplate;
         }
+        query.limit(0);
         long count = template.count(query, getEntityClass());
+        query.limit(pageable.getPageSize());
         List<T> list = template.find(query, getEntityClass());
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
         return pagelist;
@@ -411,12 +417,14 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         } else {
             template = secondaryTemplate;
         }
+        query.limit(0);
         long count = template.count(query, getEntityClass());
         if (pageable.getSort() == Sort.unsorted()) {
             Sort sort = Sort.by(sortType, orderColum);
             PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
             query.with(pageRequest);
         }
+        query.limit(pageable.getPageSize());
         List<T> list = template.find(query, getEntityClass());
 
         Page<T> pagelist = new PageImpl<T>(list, pageable, count);
