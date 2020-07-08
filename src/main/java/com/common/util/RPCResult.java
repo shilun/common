@@ -73,16 +73,13 @@ public class RPCResult<T> implements Serializable {
      */
     public RPCResult() {
     }
-    public  Page<T> toPage(){
-        Pageable pageable=null;
-        List<T> list= (List<T>) data;
-        if(this.totalPage>1){
-            if(this.pageIndex==1){
-                pageable= PageRequest.of(this.pageIndex,this.pageSize);
-            }
-            return new PageImpl(list,pageable,this.getTotalCount());
-        }
-        else{
+    public Page<T> toPage() {
+        Pageable pageable = null;
+        List<T> list = (List<T>) data;
+        if (this.totalPage > 1) {
+            pageable = PageRequest.of(this.pageIndex, this.pageSize);
+            return new PageImpl(list, pageable, this.getTotalCount());
+        } else {
             return new PageImpl(list);
         }
 
