@@ -54,6 +54,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
     @ResponseBody
     @ExceptionHandler(value = MaxUploadSizeExceededException.class)
     public Map<String, Object> maxUploadSize(MaxUploadSizeExceededException e) {
+        log.error("MaxUploadSizeExceededException:url->{}",request.getRequestURI());
         Map<String, Object> map = new HashMap<>();
         map.put("code", "file.upload.oversize.error");
         map.put("message", "文件上传,大小超限");
@@ -65,6 +66,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
     @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, Object> validationErrorHandler(MethodArgumentNotValidException ex) {
+        log.error("MethodArgumentNotValidException:url->{}",request.getRequestURI());
         List<String> errorInformation = ex.getBindingResult().getAllErrors()
                 .stream()
                 .map(ObjectError::getDefaultMessage)
@@ -85,6 +87,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
     @ResponseBody
     @ExceptionHandler(value = ConstraintViolationException.class)
     public Map<String, Object> bizExceptionHandler(ConstraintViolationException e) {
+        log.error("ConstraintViolationException:url->{}",request.getRequestURI());
         List<String> msgList = new ArrayList<>();
         for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
             Path propertyPath = constraintViolation.getPropertyPath();
@@ -117,10 +120,12 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
     @ResponseBody
     @ExceptionHandler(value = BizException.class)
     public Map<String, Object> bizExceptionHandler(BizException e) {
+
         Map<String, Object> map = new HashMap<>();
         map.put("code", e.getCode());
         map.put("message", e.getMessage());
         map.put("success", Boolean.valueOf(false));
+        log.error("BizException:url->{}",request.getRequestURI());
         log.error("execute json error->code:" + e.getCode() + " msg:" + e.getMessage());
         request.setAttribute("exception", true);
         return map;
