@@ -1,5 +1,6 @@
 package com.common.config;
 
+import com.common.exception.BizException;
 import com.common.fastxml.MoneySerialize;
 import com.common.util.DateUtil;
 import com.common.util.Money;
@@ -23,6 +24,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -40,6 +43,9 @@ public class CommonConfig implements WebMvcConfigurer {
 
     @Value("${server.port}")
     private Integer serverPort;
+
+    @Resource
+    private HttpServletRequest request;
 
     @Bean
     public ConfigurableServletWebServerFactory configurableServletWebServerFactory() {
@@ -123,7 +129,8 @@ public class CommonConfig implements WebMvcConfigurer {
                             }
                             return DateUtil.parseDate(text);
                         } catch (ParseException var3) {
-                            throw new IllegalArgumentException("Could not parse date: " + var3.getMessage(), var3);
+                            log.error("parameter.date.format.error:content:=>{},url=>{}", text, request.getRequestURI());
+                            throw new BizException("data.error", "日期参数失败");
                         }
                     }
                 });
