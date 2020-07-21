@@ -91,6 +91,8 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
         return id;
     }
 
+
+
     public static void checkId(String id) {
         if (!id.matches(PW_PATTERN)) {
             throw new ApplicationException("id内容不符合规范");
@@ -112,6 +114,8 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
     }
 
     public static void main(String[] args) {
-        System.out.println(getUUID());
+        String tt="a b c d kkkk ssss kkk";
+        String s = StringUtils.replaceEach(tt, new String[]{"kkk", "sss"}, new String[]{"ok","ok"});
+        System.out.println(s);
     }
 }
