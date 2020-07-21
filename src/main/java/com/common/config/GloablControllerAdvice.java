@@ -149,7 +149,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         request.setAttribute("exception", true);
         Map<String, Object> map = new HashMap<>();
         map.put("code", "999");
-        map.put("message", "执行业务失败");
+        map.put("message", "网络好像不是很给力 重新试试吧");
         map.put("success", Boolean.valueOf(false));
         log.error("未知异常", ex);
         return map;
