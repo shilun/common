@@ -325,7 +325,7 @@ public class DateUtil {
     }
 
     public static Date getEndDate(Date date) {
-        String dateStr = formatYYYYMMDD(Calendar.getInstance().getTime());
+        String dateStr = formatYYYYMMDD(date);
         dateStr = dateStr + " 23:59:59";
 
         try {
