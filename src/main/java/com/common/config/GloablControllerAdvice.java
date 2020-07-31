@@ -27,9 +27,6 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -97,37 +94,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
 
         return map;
     }
-    /**
-     * 全局异常处理，反正异常返回统一格式的map
-     *
-     * @param e
-     * @return
-     */
-    @ResponseBody
-    @ExceptionHandler(value = ConstraintViolationException.class)
-    public Map<String, Object> bizExceptionHandler(ConstraintViolationException e) {
-        List<String> msgList = new ArrayList<>();
-        for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
-            Path propertyPath = constraintViolation.getPropertyPath();
-            String name = null;
-            if (propertyPath != null) {
-                String pathStr = propertyPath.toString();
-                int index = pathStr.indexOf(".");
-                if (index != -1) {
-                    name = pathStr.substring(index + 1);
-                }
-            }
-            msgList.add("参数->" + StringUtils.defaultIfBlank(name, "") + constraintViolation.getMessage());
-        }
-        String messages = StringUtils.join(msgList.toArray(), ";");
-        Map<String, Object> map = new HashMap<>();
-        map.put("code", "Violation.error");
-        map.put("message", messages);
-        map.put("success", Boolean.valueOf(false));
-        log.error("验证错误", e);
-        request.setAttribute("exception", true);
-        return map;
-    }
+
 
 
     @InitBinder

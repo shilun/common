@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.hibernate.validator.HibernateValidator;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
@@ -24,9 +23,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -42,16 +38,6 @@ public class CommonConfig implements WebMvcConfigurer {
     @Value("${server.port}")
     private Integer serverPort;
 
-    @Bean
-    public Validator validator() {
-        ValidatorFactory factory = Validation.byProvider(HibernateValidator.class)
-                .configure()
-                // 将fail_fast设置为true即可，如果想验证全部，则设置为false或者取消配置即可
-                .addProperty("hibernate.validator.fail_fast", "true")
-                .buildValidatorFactory();
-        return factory.getValidator();
-    }
-
 
     @Bean
     public ConfigurableServletWebServerFactory configurableServletWebServerFactory() {
@@ -59,12 +45,6 @@ public class CommonConfig implements WebMvcConfigurer {
         factory.setPort(serverPort);
         factory.setBaseDirectory(new File("/tomcat"));
         return factory;
-    }
-
-
-    @Bean
-    public MethodValidationPostProcessor methodValidationPostProcessor() {
-        return new MethodValidationPostProcessor();
     }
 
 
