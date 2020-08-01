@@ -197,6 +197,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         primaryTemplate.findAndModify(query,update, modifyOptions,getEntityClass());
     }
 
+    public void unSet(String id,String property){
+        Query query = new Query(Criteria.where("id").is(id));
+        Update update=new Update();
+        update.unset(property);
+        primaryTemplate.updateFirst(query,update, getEntityClass());
+    }
 
     public boolean exist(T entity){
         entity.setDelStatus(YesOrNoEnum.NO);
