@@ -75,13 +75,9 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Override
     protected String getDatabaseName() {
-        return mongoClient().listDatabaseNames().first();
+        return mongodbUrl.substring(mongodbUrl.lastIndexOf("/")+1);
     }
 
-    public @Bean
-    MongoClient mongoClient() {
-        return MongoClients.create(mongodbUrl);
-    }
 }
 
 
