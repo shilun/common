@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 
 /**
@@ -46,22 +47,26 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     }
 
     @Bean("primary")
-    public MongoTemplate mongoPrimaryTemplate(MongoDatabaseFactory databaseFactory, MappingMongoConverter converter) throws Exception {
+    public MongoTemplate mongoPrimaryTemplate(MongoDatabaseFactory mongoDatabaseFactory, MappingMongoConverter converter) throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url" + mongodbUrl);
         }
-        MongoTemplate mongoTemplate = new MongoTemplate(databaseFactory, converter);
+        MongoTemplate mongoTemplate = new MongoTemplate(mongoDatabaseFactory, converter);
         mongoTemplate.setReadPreference(ReadPreference.primary());
         mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         return mongoTemplate;
     }
+    @Bean
+    public MongoDatabaseFactory mongoDatabaseFactory(){
+        return new SimpleMongoClientDatabaseFactory(mongodbUrl);
+    }
 
     @Bean("secondary")
-    public MongoTemplate mongoSecondaryTemplate(MongoDatabaseFactory databaseFactory, MappingMongoConverter converter) throws Exception {
+    public MongoTemplate mongoSecondaryTemplate(MongoDatabaseFactory mongoDatabaseFactory, MappingMongoConverter converter) throws Exception {
         if (StringUtils.isBlank(mongodbUrl)) {
             throw new Exception("mongodb load error url" + mongodbUrl);
         }
-        MongoTemplate mongoTemplate = new MongoTemplate(databaseFactory, converter);
+        MongoTemplate mongoTemplate = new MongoTemplate(mongoDatabaseFactory, converter);
         mongoTemplate.setReadPreference(ReadPreference.secondary());
         mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
         return mongoTemplate;
