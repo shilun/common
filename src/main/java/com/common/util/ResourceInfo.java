@@ -1,10 +1,12 @@
 package com.common.util;
 
+import com.common.codetable.ValuePare;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -23,6 +25,11 @@ public class ResourceInfo implements Serializable {
      */
     @ApiModelProperty("类型 1 图片 2 语音 3 视频")
     private Integer type;
+
+    /**
+     * 扩展属性
+     */
+    private String extendsParams;
     /**
      * 资源url或内容
      */
