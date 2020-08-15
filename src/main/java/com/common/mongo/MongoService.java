@@ -180,6 +180,14 @@ public interface MongoService<T extends AbstractBaseEntity> extends AbstractServ
      * @return
      */
     public Page<T> queryByPage(Query query,Pageable pageable);
+
+    /**
+     * 联表查询
+     * @param criteria
+     * @param pageable
+     * @return
+     */
+    public Page<T> joinQueryByPage(Criteria criteria,Class<?> joinType,String localField, String foreignField,Pageable pageable);
     /**
      * 分页查询 默认不给排序查询 跟据 createTime 倒序
      * @param query

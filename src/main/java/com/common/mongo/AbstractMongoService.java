@@ -14,6 +14,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.IndexDefinition;
@@ -117,11 +118,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     @Override
     public void upProperty(String id, String property, Object value) {
         Query query = new Query(Criteria.where("id").is(id));
-        Update update=new Update();
-        update.set(property,value);
+        Update update = new Update();
+        update.set(property, value);
         FindAndModifyOptions modifyOptions = FindAndModifyOptions.options().upsert(false).returnNew(false);
-        primaryTemplate.findAndModify(query,update, modifyOptions,getEntityClass());
+        primaryTemplate.findAndModify(query, update, modifyOptions, getEntityClass());
     }
+
 
     @Override
     public Criteria buildCondition(String property, QueryType type, Object value) {
@@ -174,7 +176,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
         update.inc(property, size);
         UpdateResult updateResult = primaryTemplate.updateFirst(query, update, getEntityClass());
-        if(updateResult.getModifiedCount()==1){
+        if (updateResult.getModifiedCount() == 1) {
             return;
         }
         throw new ApplicationException("mongodb updata error");
@@ -188,12 +190,11 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Update update = new Update();
         update.inc(property, size);
         UpdateResult updateResult = primaryTemplate.updateFirst(query, update, getEntityClass());
-        if(updateResult.getModifiedCount()==1){
+        if (updateResult.getModifiedCount() == 1) {
             return;
         }
         throw new ApplicationException("mongodb updata error");
     }
-
 
 
     public void save(T entity) {
@@ -247,13 +248,14 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     /**
      * 查询第一条记录
+     *
      * @param entity
      * @param trans
      * @return
      */
-    public T queryFirst(T entity,boolean trans){
+    public T queryFirst(T entity, boolean trans) {
         entity.setDelStatus(YesOrNoEnum.NO.getValue());
-        Query query = buildCondition(entity, PageRequest.of(0,1));
+        Query query = buildCondition(entity, PageRequest.of(0, 1));
         MongoTemplate template = null;
         if (trans) {
             template = primaryTemplate;
@@ -261,7 +263,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             template = secondaryTemplate;
         }
         List<T> list = template.find(query, getEntityClass());
-        if(list.size()>0){
+        if (list.size() > 0) {
             return list.get(0);
         }
         return null;
@@ -299,7 +301,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
         DeleteResult remove = primaryTemplate.remove(query, getEntityClass());
-        if(remove.getDeletedCount()==1){
+        if (remove.getDeletedCount() == 1) {
             return;
         }
         throw new ApplicationException("no data to find");
@@ -365,6 +367,40 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         return queryByPage(query, pageable, false);
     }
 
+
+    @Override
+    public Page<T> joinQueryByPage(Criteria criteria, Class<?> joinType, String localField, String foreignField, Pageable pageable) {
+        String collectionName = secondaryTemplate.getCollectionName(joinType);
+        LookupOperation lookupOperation = LookupOperation.newLookup().
+                from(collectionName).
+                localField(localField).
+                foreignField(foreignField).
+                as("ref");
+        MatchOperation matchOperation = Aggregation.match(criteria);
+        Aggregation aggregation = Aggregation.newAggregation(matchOperation, lookupOperation);
+        long totalCount = 0;
+
+        AggregationResults aggregate = secondaryTemplate.aggregate(aggregation, getEntityClass(), getEntityClass());
+
+        totalCount=aggregate.getMappedResults().size();
+        if(totalCount<pageable.getPageSize()){
+            return new PageImpl<T>(aggregate.getMappedResults(), pageable, totalCount);
+        }
+        List<AggregationOperation> operations = new ArrayList<>();
+        operations.add(new SkipOperation(pageable.getPageNumber()  * pageable.getPageSize()));
+        SortOperation solveCount=null;
+        if(pageable.getSort()==null){
+            solveCount = Aggregation.sort(Sort.Direction.DESC, "createTime");
+        }
+        else{
+            solveCount = new SortOperation(pageable.getSort());
+        }
+        operations.add(solveCount);
+        aggregation = Aggregation.newAggregation(operations);
+        aggregate = secondaryTemplate.aggregate(aggregation, getEntityClass(), getEntityClass());
+        return new PageImpl<T>(aggregate.getMappedResults(), pageable, totalCount);
+    }
+
     public Page<T> queryByPage(Query query, Pageable pageable, boolean trans) {
         if (pageable.getSort() == Sort.unsorted()) {
             return queryByPage(query, pageable, "createTime", OrderTypeEnum.DESC, trans);
@@ -379,8 +415,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         long count = template.count(query, getEntityClass());
         query.limit(pageable.getPageSize());
         List<T> list = template.find(query, getEntityClass());
-        Page<T> pagelist = new PageImpl<T>(list, pageable, count);
-        return pagelist;
+        return new PageImpl<T>(list, pageable, count);
     }
 
     public Page<T> queryByPage(Query query, Pageable pageable, String orderColum, OrderTypeEnum orderType) {
@@ -685,3 +720,4 @@ class QueryItem {
 
 
 }
+
