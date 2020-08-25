@@ -1,8 +1,9 @@
 package com.common.upload;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.common.exception.ApplicationException;
 import com.common.security.MD5;
-import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -107,8 +108,7 @@ class HttpClientUtil {
 				nvps.add(new BasicNameValuePair(key, params.get(key)));
 			}
 			result = doGet(url, nvps);
-			JSONObject jsonObject = JSONObject.fromObject(new String(result));
-			return jsonObject;
+			return JSON.parseObject(new String(result));
 		} catch (Exception e) {
 			LOGGER.error("执行远程httpGet请求出错");
 			LOGGER.error("url->:" + url);
@@ -194,8 +194,7 @@ class HttpClientUtil {
 
 	public JSONObject doPost(String url, Map<String, Object> params) {
 		String content = new String(doPostByte(url, params));
-		JSONObject object = JSONObject.fromObject(content);
-		return object;
+		return JSONObject.parseObject(content);
 	}
 
 	public void setAuthKey(String authKey) {

@@ -5,13 +5,14 @@
 
 package com.common.web;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.common.cookie.LoginContext;
 import com.common.exception.ApplicationException;
 import com.common.exception.BizException;
 import com.common.security.DesDecrypter;
 import com.common.security.DesEncrypter;
 import com.common.util.*;
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -230,7 +231,7 @@ public abstract class AbstractController {
      */
     protected Long getIdByJson(String content) {
         try {
-            JSONObject json = JSONObject.fromObject(content);
+            JSONObject json = JSON.parseObject(content);
             return json.getLong("id");
         } catch (Exception e) {
             LOGGER.error("get json id error", e);

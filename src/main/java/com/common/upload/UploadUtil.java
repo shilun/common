@@ -1,9 +1,9 @@
 package com.common.upload;
 
+import com.alibaba.fastjson.JSONObject;
 import com.common.exception.BizException;
 import com.common.util.Result;
 import com.common.util.StringUtils;
-import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
