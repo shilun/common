@@ -1,7 +1,6 @@
 package com.common.util;
 
 import com.common.exception.BizException;
-import net.sf.json.JSONNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,9 +91,6 @@ public class MapPropertyUtils {
                     Method getter = property.getReadMethod();
                     Object value = getter.invoke(obj);
                     if (value == null) {
-                        continue;
-                    }
-                    if (value instanceof JSONNull) {
                         continue;
                     }
                     if (value instanceof Map) {

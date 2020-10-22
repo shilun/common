@@ -1,5 +1,6 @@
 package com.common.config;
 
+import com.alibaba.fastjson.JSONObject;
 import com.common.exception.BizException;
 import com.common.util.Money;
 import com.common.util.RPCResult;
@@ -8,7 +9,6 @@ import com.common.web.CustomDateEditor;
 import com.common.web.CustomMoneyEditor;
 import com.common.web.CustomStringEditor;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.dao.DuplicateKeyException;
@@ -253,7 +253,7 @@ public class GloablControllerAdvice implements ResponseBodyAdvice {
         }
         map.put("success", Boolean.valueOf(true));
         if (e instanceof String) {
-            return JSONObject.fromObject(map).toString();
+            return new JSONObject(map).toString();
         }
         return map;
     }

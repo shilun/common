@@ -5,9 +5,9 @@
 
 package com.common.httpclient;
 
+import com.alibaba.fastjson.JSONObject;
 import com.common.exception.ApplicationException;
 import com.common.security.MD5;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -135,12 +135,12 @@ public class HttpClientUtil {
 
     public JSONObject doPostJson(String url, Map<String, String> params) {
         String content = this.sendHttpPost(url, params);
-        return JSONObject.fromObject(content);
+        return JSONObject.parseObject(content);
     }
 
     public JSONObject doSendJson(String url, Map<String, String> params) {
         String content = this.sendHttpPost(url, params);
-        return JSONObject.fromObject(content);
+        return JSONObject.parseObject(content);
     }
 
     public String sendHttpPost(String httpUrl, Map<String, String> maps, List<File> fileLists) {
