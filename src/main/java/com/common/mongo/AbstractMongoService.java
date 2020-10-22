@@ -4,7 +4,6 @@ import com.common.annotation.QueryField;
 import com.common.exception.ApplicationException;
 import com.common.util.*;
 import com.common.util.model.OrderTypeEnum;
-import com.common.util.model.YesOrNoEnum;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
@@ -62,6 +61,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             logger.error(getEntityClass().getSimpleName() + " 构建mongodb索引出错，请检查索引配置", e);
         }
     }
+
     /**
      * 创建 索引
      *
@@ -168,7 +168,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         }
         update.inc(property, size);
         UpdateResult updateResult = primaryTemplate.updateFirst(query, update, getEntityClass());
-        if(updateResult.getModifiedCount()==1){
+        if (updateResult.getModifiedCount() == 1) {
             return;
         }
         throw new ApplicationException("mongodb updata error");
@@ -182,7 +182,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Update update = new Update();
         update.inc(property, size);
         UpdateResult updateResult = primaryTemplate.updateFirst(query, update, getEntityClass());
-        if(updateResult.getModifiedCount()==1){
+        if (updateResult.getModifiedCount() == 1) {
             return;
         }
         throw new ApplicationException("mongodb updata error");
@@ -191,23 +191,23 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     @Override
     public void upProperty(String id, String property, Object value) {
         Query query = new Query(Criteria.where("id").is(id));
-        Update update=new Update();
-        update.set(property,value);
+        Update update = new Update();
+        update.set(property, value);
         FindAndModifyOptions modifyOptions = FindAndModifyOptions.options().upsert(false).returnNew(false);
-        primaryTemplate.findAndModify(query,update, modifyOptions,getEntityClass());
+        primaryTemplate.findAndModify(query, update, modifyOptions, getEntityClass());
     }
 
-    public void unSet(String id,String property){
+    public void unSet(String id, String property) {
         Query query = new Query(Criteria.where("id").is(id));
-        Update update=new Update();
+        Update update = new Update();
         update.unset(property);
-        primaryTemplate.updateFirst(query,update, getEntityClass());
+        primaryTemplate.updateFirst(query, update, getEntityClass());
     }
 
-    public boolean exist(T entity){
-        entity.setDelStatus(YesOrNoEnum.NO);
-        Query query = buildCondition(entity, PageRequest.of(0,1));
-        return secondaryTemplate.exists(query,getEntityClass());
+    public boolean exist(T entity) {
+        entity.setDelStatus(false);
+        Query query = buildCondition(entity, PageRequest.of(0, 1));
+        return secondaryTemplate.exists(query, getEntityClass());
     }
 
     public void save(T entity) {
@@ -238,7 +238,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (StringUtils.isNotBlank(entity.getId())) {
             StringUtils.checkId(entity.getId());
         }
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(false);
         primaryTemplate.insert(entity);
     }
 
@@ -261,13 +261,14 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
     /**
      * 查询第一条记录
+     *
      * @param entity
      * @param trans
      * @return
      */
-    public T queryFirst(T entity,boolean trans){
-        entity.setDelStatus(YesOrNoEnum.NO);
-        Query query = buildCondition(entity, PageRequest.of(0,1));
+    public T queryFirst(T entity, boolean trans) {
+        entity.setDelStatus(false);
+        Query query = buildCondition(entity, PageRequest.of(0, 1));
         MongoTemplate template = null;
         if (trans) {
             template = primaryTemplate;
@@ -275,7 +276,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             template = secondaryTemplate;
         }
         List<T> list = template.find(query, getEntityClass());
-        if(list.size()>0){
+        if (list.size() > 0) {
             return list.get(0);
         }
         return null;
@@ -290,7 +291,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Query query = new Query();
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
-        query.addCriteria(Criteria.where("delStatus").is(YesOrNoEnum.NO));
+        query.addCriteria(Criteria.where("delStatus").is(false));
         List<T> ts = null;
         MongoTemplate template = null;
         if (trans) {
@@ -313,7 +314,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         Criteria criteria = Criteria.where("id").is(id);
         query.addCriteria(criteria);
         DeleteResult remove = primaryTemplate.remove(query, getEntityClass());
-        if(remove.getDeletedCount()==1){
+        if (remove.getDeletedCount() == 1) {
             return;
         }
         throw new ApplicationException("no data to find");
@@ -327,7 +328,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity == null) {
             return secondaryTemplate.findAll(getEntityClass());
         }
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(false);
         Query query = buildCondition(entity);
         MongoTemplate template = null;
         if (trans) {
@@ -349,7 +350,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Long queryCount(T entity, boolean trans) {
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(false);
         Query query = buildCondition(entity);
         MongoTemplate template = null;
         if (trans) {
@@ -366,7 +367,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
     }
 
     public Page<T> queryByPage(T entity, Pageable pageable, boolean trans) {
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(false);
         Long count = queryCount(entity, trans);
         Query query = buildCondition(entity, pageable);
         query.limit(pageable.getPageSize());
@@ -443,7 +444,7 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
 
 
     public T findByOne(T entity, boolean trans) {
-        entity.setDelStatus(YesOrNoEnum.NO);
+        entity.setDelStatus(false);
         Query query = buildCondition(entity);
         MongoTemplate template = null;
         if (trans) {
@@ -575,35 +576,21 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             query.addCriteria(criteria);
         }
         if (pageable != null) {
-            if (pageable instanceof PageRequest) {
-                Sort orders = buildSort(entity);
-                PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), orders);
-                query.with(pageRequest);
-                query.limit(pageable.getPageSize());
+            Sort orders = pageable.getSort();
+            if (orders == Sort.unsorted()) {
+                orders = Sort.by(Sort.Direction.DESC, "createTime");
             }
+            PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), orders);
+            query.with(pageRequest);
+            query.limit(pageable.getPageSize());
         } else {
-            query.with(buildSort(entity));
+            Sort orders = Sort.by(Sort.Direction.DESC, "createTime");
+            query.with(orders);
             query.limit(50);
         }
         return query;
     }
 
-    protected Sort buildSort(T entity) {
-        Sort orders = null;
-        if (StringUtils.isBlank(entity.getOrderColumn())) {
-            entity.setOrderColumn("createTime");
-        }
-        if (entity.getOrderType() == null) {
-            entity.setOrderType(OrderTypeEnum.DESC);
-        }
-        if (entity.getOrderType() == OrderTypeEnum.ASC) {
-            orders = Sort.by(Sort.Direction.ASC, entity.getOrderColumn());
-        }
-        if (entity.getOrderType() == OrderTypeEnum.DESC) {
-            orders = Sort.by(Sort.Direction.DESC, entity.getOrderColumn());
-        }
-        return orders;
-    }
 
     protected Update addUpdate(T entity) {
         Update update = new Update();

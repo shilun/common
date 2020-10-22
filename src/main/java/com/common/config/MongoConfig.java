@@ -78,7 +78,7 @@ public class MongoConfig implements ApplicationContextAware, ResourceLoaderAware
         }
 
         @Bean
-        public MongoTransactionManager transactionManager(MongoDbFactory dbFactory) {
+        public MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
             return new MongoTransactionManager(dbFactory);
         }
     }
