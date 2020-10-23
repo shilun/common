@@ -311,13 +311,18 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
             throw new ApplicationException("删除数据出错,id不能为空");
         }
         Query query = new Query();
-        Criteria criteria = Criteria.where("id").is(id);
+        Criteria criteria = Criteria.where("_id").is(id);
         query.addCriteria(criteria);
-        DeleteResult remove = primaryTemplate.remove(query, getEntityClass());
+        DeleteResult remove = primaryTemplate.remove(query,getEntityClass());
         if (remove.getDeletedCount() == 1) {
             return;
         }
         throw new ApplicationException("no data to find");
+    }
+
+    @Override
+    public void delById(String id, Boolean soft) {
+        upProperty(id,"delStatus",true);
     }
 
     public List<T> query(T entity) {

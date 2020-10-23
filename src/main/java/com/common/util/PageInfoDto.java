@@ -49,10 +49,7 @@ public class PageInfoDto implements Serializable {
         if (StringUtils.isBlank(orderColumn)) {
             orderColumn = "_id";
         }
-        if (orderType == OrderTypeEnum.DESC) {
-            sort = Sort.by(Sort.Direction.DESC, orderColumn);
-        }
-
+        sort = Sort.by(orderType == OrderTypeEnum.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,orderColumn);
         return PageRequest.of(page, size, sort);
     }
 }

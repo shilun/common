@@ -135,6 +135,13 @@ public interface MongoService<T extends AbstractBaseEntity> extends AbstractServ
     public void delById(String id);
 
     /**
+     * 软删除
+     * @param id
+     * @param soft
+     */
+    public void delById(String id,Boolean soft);
+
+    /**
      * 模糊查询
      * @param entity
      * @return
