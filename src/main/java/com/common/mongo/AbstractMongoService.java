@@ -583,13 +583,12 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (pageable != null) {
             Sort orders = pageable.getSort();
             if (orders == Sort.unsorted()) {
-                orders = Sort.by(Sort.Direction.DESC, "createTime");
+                orders = Sort.by(Sort.Direction.DESC, "_id");
             }
             PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), orders);
             query.with(pageRequest);
-            query.limit(pageable.getPageSize());
         } else {
-            Sort orders = Sort.by(Sort.Direction.DESC, "createTime");
+            Sort orders = Sort.by(Sort.Direction.DESC, "_id");
             query.with(orders);
             query.limit(50);
         }
