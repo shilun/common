@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.io.Serializable;
 
@@ -17,18 +18,18 @@ public class PageInfoDto implements Serializable {
      * 页索引
      */
     @ApiModelProperty("页码")
-    private Integer page=0;
+    private Integer page = 0;
 
     /**
      * 页大小
      */
-    @ApiModelProperty(value = "页大小",example = "10")
-    private Integer size=10;
+    @ApiModelProperty(value = "页大小", example = "10")
+    private Integer size = 10;
     /**
      * 排序列
      */
     @ApiModelProperty("排序列")
-    private String orderColumn = "createTime";
+    private String orderColumn;
     /**
      * 排序类型
      */
@@ -44,6 +45,14 @@ public class PageInfoDto implements Serializable {
         if (size == null || size.intValue() == 0) {
             size = 10;
         }
-        return PageRequest.of(page, size);
+        Sort sort = Sort.unsorted();
+        if (StringUtils.isBlank(orderColumn)) {
+            orderColumn = "_id";
+        }
+        if (orderType == OrderTypeEnum.DESC) {
+            sort = Sort.by(Sort.Direction.DESC, orderColumn);
+        }
+
+        return PageRequest.of(page, size, sort);
     }
 }
