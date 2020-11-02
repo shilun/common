@@ -235,9 +235,6 @@ public abstract class AbstractMongoService<T extends AbstractBaseEntity> impleme
         if (entity.getUpdateTime() == null) {
             entity.setUpdateTime(createTime);
         }
-        if (StringUtils.isNotBlank(entity.getId())) {
-            StringUtils.checkId(entity.getId());
-        }
         entity.setDelStatus(false);
         primaryTemplate.insert(entity);
     }
