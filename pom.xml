@@ -267,8 +267,8 @@
     </dependencyManagement>
     <distributionManagement>
         <repository>
-            <id>snapshots</id>
-            <name>snapshots</name>
+            <id>releases</id>
+            <name>releases</name>
             <url>http://maven.inteeer.com/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
