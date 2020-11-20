@@ -43,6 +43,7 @@ import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.core.WriteResultChecking;
 import org.springframework.data.mongodb.core.convert.*;
 import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.data.mongodb.core.mapping.BasicMongoPersistentEntity;
@@ -108,6 +109,7 @@ public class MongoConfig implements ApplicationContextAware, ResourceLoaderAware
         MongoTemplate mongoTemplate = new MongoTemplate(dbFactory, mappingMongoConverter(dbFactory, this.mongoMappingContext));
         mongoTemplate.setReadPreference(ReadPreference.primary());
         mongoTemplate.setWriteConcern(WriteConcern.MAJORITY);
+        mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
         return mongoTemplate;
     }
 
