@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.bsm</groupId>
+    <groupId>com.gospell</groupId>
     <artifactId>common</artifactId>
     <version>2.3.0.RELEASE</version>
     <properties>
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.71</version>
+            <version>1.2.75</version>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -269,7 +269,7 @@
         <repository>
             <id>releases</id>
             <name>releases</name>
-            <url>http://maven.inteeer.com/repository/maven-releases/</url>
+            <url>http://maven.gospell.com/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 </project>
